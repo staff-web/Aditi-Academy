@@ -8,7 +8,10 @@ import {
   Phone,
   Mail,
   MapPin,
+  Globe,
 } from 'lucide-react';
+
+const logoUrl = new URL('../../assets/logo.png', import.meta.url).href;
 
 export function Footer() {
   return (
@@ -18,9 +21,11 @@ export function Footer() {
           {/* About */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-900 rounded-lg flex items-center justify-center">
-                <span className="text-white text-xl font-bold">A</span>
-              </div>
+              <img
+                src={logoUrl}
+                alt="ADITI Academy logo"
+                className="w-12 h-12 rounded-2xl object-contain shadow-lg"
+              />
               <div className="flex flex-col">
                 <span className="text-white font-bold text-lg">
                   ADITI ACADEMY
@@ -42,8 +47,8 @@ export function Footer() {
             <div className="space-y-3">
               <FooterLink to="/" label="Home" />
               <FooterLink to="/programs" label="Programs" />
-              <FooterLink to="/certifications" label="Certifications" />
-              <FooterLink to="/enterprise" label="Enterprise" />
+              <FooterLink to="/certifications" label="Explore More" />
+              <FooterLink to="/esg" label="ESG / SDG in Practice" />
               <FooterLink to="/about" label="About Us" />
             </div>
           </div>
@@ -90,10 +95,11 @@ export function Footer() {
 
             {/* Social Media */}
             <div className="flex gap-3 mt-6">
-              <SocialIcon icon={Facebook} href="https://www.facebook.com/ADITIAcademyKH" />
-              <SocialIcon icon={Linkedin} href="https://www.linkedin.com/company/aditi-academy/" />
-              <SocialIcon icon={Instagram} href="https://www.instagram.com/aditi.academy/" />
+              <SocialIcon icon={Facebook} href="https://www.facebook.com/ADITIAcademyKH" label="Facebook" />
+              <SocialIcon icon={Linkedin} href="https://www.linkedin.com/company/aditi-academy/" label="LinkedIn" />
+              <SocialIcon icon={Instagram} href="https://www.instagram.com/aditi.academy/" label="Instagram" />
               <SocialIcon icon={Send} href="https://t.me/ADITI_Academy" label="Telegram" />
+              <SocialIcon icon={Globe} href="https://www.tiktok.com/@aditi_academy" label="TikTok" />
             </div>
           </div>
         </div>
