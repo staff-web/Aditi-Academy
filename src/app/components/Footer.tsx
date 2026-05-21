@@ -21,17 +21,21 @@ export function Footer() {
           {/* About */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img
+              <a href="/" className="flex items-center gap-2 group">
+                <img
                 src={logoUrl}
                 alt="ADITI Academy logo"
-                className="w-12 h-12 rounded-2xl object-contain shadow-lg"
+                className="w-48 h-48 sm:w-48sm:h-48 object-contain rounded-2xl"
               />
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-lg">
-                  ADITI ACADEMY
-                </span>
-                <span className="text-red-400 text-xs">Tech Excellence</span>
-              </div>
+                <div className="hidden xs:block">
+                  <div className="text-white font-bold text-base sm:text-xl tracking-tight leading-none">
+                    ADITI ACADEMY
+                  </div>
+                  <div className="text-red-500 text-[10px] sm:text-xs tracking-[0.15em] font-medium mt-0.5">
+                    TECHNOLOGY EXCELLENCE
+                  </div>
+                </div>
+              </a>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               ADITI Academy develops curriculums designed to deliver the latest
@@ -47,9 +51,9 @@ export function Footer() {
             <div className="space-y-3">
               <FooterLink to="/" label="Home" />
               <FooterLink to="/programs" label="Programs" />
-              <FooterLink to="/certifications" label="Explore More" />
-              <FooterLink to="/esg" label="ESG / SDG in Practice" />
-              <FooterLink to="/about" label="About Us" />
+              <FooterLink to="/certifications" label="Certificate Program" />
+              <FooterLink to="/student-activities" label="Student Activities" />
+              <FooterLink to="/contact" label="Contact Us" />
             </div>
           </div>
 

@@ -1,21 +1,20 @@
-import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence, useInView } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import {
   GraduationCap, Building2, Globe, Award, CheckCircle, Sparkles, Rocket,
   Shield, Brain, Star, ChevronDown, ArrowRight, Trophy, Clock,
-  X, PlayCircle, Layers, Cpu, Database, Lock, LineChart, Users, Target, 
-  Hand, Briefcase, Landmark, Zap, TrendingUp, BookOpen, Video, 
+  X, PlayCircle, Layers, Cpu, Database, Lock, LineChart, Users, Target,
+  Hand, Briefcase, Landmark, Zap, TrendingUp, BookOpen, Video,
   BarChart3, Calendar, CheckSquare, DollarSign, Headphones, FileText,
-  BriefcaseBusiness, School, Bank, ChartBar, ClipboardList, UserCheck,
-  Clock as ClockIcon, ThumbsUp, MessageCircle, Phone, Mail, MapPin
+  School, UserCheck, ThumbsUp, MessageCircle, Phone, Mail, MapPin,
+  Upload, Search, AlertCircle, CheckSquare as CheckSq, ShieldCheck,
+  FileCheck, Eye, Loader2, BadgeCheck, Hash, Share2,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BRAND SYSTEM
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── BRAND ───────────────────────────────────────────────────────────────────
 const BRAND      = '#dc2626';
 const BRAND_DARK = '#b91c1c';
 const BRAND_LITE = '#ef4444';
@@ -31,15 +30,9 @@ const IMGS = {
   global:         'https://images.unsplash.com/photo-1621977717126-e29965156a27?w=900&q=80',
   internship:     'https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=900&q=80',
   career:         'https://images.unsplash.com/photo-1528901166007-3784c7dd3653?w=900&q=80',
-  careerBoost1:   'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80',
-  careerBoost2:   'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80',
-  careerBoost3:   'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80',
   corporateHero:  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
-  corporateOffice:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80',
-  corporateTeam:  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
   govHero:        'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1600&q=80',
   govMeeting:     'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1200&q=80',
-  govPartners:    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
 };
 
 const CATEGORIES = [
@@ -60,32 +53,26 @@ const COURSES = [
   { id: 6, category: 'pmp',       title: 'Project Management Professional (PMP)',     level: 'Professional', duration: '6 weeks',  students: '2,600+', rating: 4.7, description: 'Earn PMP certification with comprehensive training in Agile, Scrum, risk management, and leadership skills.',                                     outcomes: ['PMP certification exam prep', 'Lead projects effectively', 'Increase salary potential', 'Global PMI recognition'], img: IMGS.corporate,price: '$799',  color: '#f59e0b' },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ANIMATION COMPONENTS
-// ─────────────────────────────────────────────────────────────────────────────
+// Mock certificate database
+const CERT_DB = {
+  'ADT-2024-001': { name: 'Sopheak Meas', course: 'Advanced Cybersecurity', date: 'March 15, 2024', grade: 'Distinction', id: 'ADT-2024-001', hours: '80 CPD Hours' },
+  'ADT-2024-087': { name: 'Dara Khem',    course: 'Full Stack Web Development', date: 'June 22, 2024', grade: 'Merit', id: 'ADT-2024-087', hours: '112 CPD Hours' },
+  'ADT-2023-412': { name: 'Leakhena Pov', course: 'AI & Machine Learning', date: 'November 10, 2023', grade: 'Distinction', id: 'ADT-2023-412', hours: '96 CPD Hours' },
+  'ADT-2024-205': { name: 'Virak Chan',   course: 'Project Management Professional', date: 'August 5, 2024', grade: 'Pass', id: 'ADT-2024-205', hours: '48 CPD Hours' },
+};
+
+// ─── ANIMATION PRIMITIVES ────────────────────────────────────────────────────
 
 function Reveal({ children, delay = 0, direction = 'up', className = '', style = {} }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
-  
-  const directions = {
-    up: { y: 40, x: 0 },
-    down: { y: -40, x: 0 },
-    left: { y: 0, x: 40 },
-    right: { y: 0, x: -40 },
-  };
-  
-  const { y, x } = directions[direction] || directions.up;
-  
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const dirs = { up: { y: 50, x: 0 }, down: { y: -50, x: 0 }, left: { y: 0, x: 50 }, right: { y: 0, x: -50 } };
+  const { y, x } = dirs[direction] || dirs.up;
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y, x }}
+    <motion.div ref={ref} initial={{ opacity: 0, y, x }}
       animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-      style={style}
-    >
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className} style={style}>
       {children}
     </motion.div>
   );
@@ -94,13 +81,8 @@ function Reveal({ children, delay = 0, direction = 'up', className = '', style =
 function ParallaxScroll({ children, className = '' }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
-  
-  return (
-    <motion.div ref={ref} style={{ y }} className={className}>
-      {children}
-    </motion.div>
-  );
+  const y = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  return <motion.div ref={ref} style={{ y }} className={className}>{children}</motion.div>;
 }
 
 function Eyebrow({ children, dark = false }) {
@@ -114,11 +96,7 @@ function Eyebrow({ children, dark = false }) {
 }
 
 function GradientText({ children }) {
-  return (
-    <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
-      {children}
-    </span>
-  );
+  return <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">{children}</span>;
 }
 
 function AnimatedCounter({ value, suffix = '' }) {
@@ -139,21 +117,21 @@ function AnimatedCounter({ value, suffix = '' }) {
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODALS
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── MODALS ───────────────────────────────────────────────────────────────────
+
+const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', background: '#fafafa', boxSizing: 'border-box' };
 
 function CourseModal({ course, onClose, onRegister }) {
   if (!course) return null;
   return (
+
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
         onClick={onClose}>
         <motion.div initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
           onClick={e => e.stopPropagation()}
-          className="w-full max-w-[740px] max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
-        >
+          className="w-full max-w-[740px] max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
           <div className="relative h-72">
             <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
@@ -198,21 +176,15 @@ function CourseModal({ course, onClose, onRegister }) {
   );
 }
 
-const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', background: '#fafafa' };
-
 function RegModal({ show, onClose, course }) {
   if (!show) return null;
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-        onClick={onClose}>
+        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
         <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
-          onClick={e => e.stopPropagation()}
-          className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-            <X size={14} />
-          </button>
+          onClick={e => e.stopPropagation()} className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
           <h3 className="text-2xl font-bold text-gray-900 mb-1">Register for <GradientText>Course</GradientText></h3>
           {course && <p className="text-sm text-gray-500 mb-6">{course.title}</p>}
           <div className="flex flex-col gap-3">
@@ -231,31 +203,140 @@ function RegModal({ show, onClose, course }) {
   );
 }
 
+// ─── ENHANCED QUOTE MODAL WITH SERVICE SELECTION ─────────────────────────────────
+const SERVICES = [
+  { id: 'ondemand', name: 'On-Demand Training', icon: Cpu, description: 'Self-paced programs with 24/7 access for continuous upskilling' },
+  { id: 'live', name: 'Live Training / Short Courses', icon: Users, description: 'Instructor-led sessions with practical focus' },
+  { id: 'group', name: 'Group Training', icon: Target, description: 'Customized programs for entire teams' },
+  { id: 'elearning', name: 'Digital E-Learning', icon: Globe, description: 'Structured digital solution for remote training' },
+  { id: 'other', name: 'Other (Custom Program)', icon: Sparkles, description: 'Tell us what you\'d like to study' },
+];
+
 function QuoteModal({ show, onClose }) {
+  const [step, setStep] = useState<'select' | 'details'>('select');
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [customTopic, setCustomTopic] = useState('');
+  const [formData, setFormData] = useState({ name: '', company: '', phone: '', email: '' });
+
+  const handleSelect = (serviceId: string) => {
+    setSelectedService(serviceId);
+    setStep('details');
+  };
+
+  const handleSubmit = () => {
+    const serviceName = SERVICES.find(s => s.id === selectedService)?.name || selectedService;
+    let message = `Quote request submitted!\n\nService: ${serviceName}`;
+    if (selectedService === 'other' && customTopic) {
+      message += `\nTopic: ${customTopic}`;
+    }
+    alert(message);
+    onClose();
+    // Reset state after closing
+    setTimeout(() => {
+      setStep('select');
+      setSelectedService(null);
+      setCustomTopic('');
+      setFormData({ name: '', company: '', phone: '', email: '' });
+    }, 300);
+  };
+
+  const handleBack = () => {
+    setStep('select');
+    setSelectedService(null);
+    setCustomTopic('');
+  };
+
   if (!show) return null;
+
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-        onClick={onClose}>
+        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
         <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
-          onClick={e => e.stopPropagation()}
-          className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-            <X size={14} />
-          </button>
-          <h3 className="text-2xl font-bold text-gray-900 mb-1">Get a <GradientText>Quote</GradientText></h3>
-          <p className="text-sm text-gray-500 mb-6">Corporate training solutions tailored to your organization</p>
-          <div className="flex flex-col gap-3">
-            {['Your Name *', 'Company / Organization *', 'Phone Number *', 'Email Address *'].map(ph => (
-              <input key={ph} type="text" placeholder={ph} style={inputStyle} />
-            ))}
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              onClick={() => { alert('Quote request submitted!'); onClose(); }}
-              className="py-4 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg mt-2">
-              Submit Request
-            </motion.button>
-          </div>
+          onClick={e => e.stopPropagation()} className="w-full max-w-2xl bg-white rounded-3xl p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
+          
+          {step === 'select' ? (
+            <>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Get a <GradientText>Quote</GradientText></h3>
+              <p className="text-gray-500 mb-6">Select the training service you're interested in</p>
+              
+              <div className="grid gap-4 mb-6">
+                {SERVICES.map(service => {
+                  const Icon = service.icon;
+                  return (
+                    <motion.button
+                      key={service.id}
+                      whileHover={{ scale: 1.01, x: 4 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => handleSelect(service.id)}
+                      className="flex items-start gap-4 p-5 text-left rounded-xl border border-gray-200 hover:border-red-300 hover:bg-red-50/30 transition-all"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <Icon size={24} className="text-red-600" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-gray-900 text-lg">{service.name}</div>
+                        <p className="text-gray-500 text-sm mt-1">{service.description}</p>
+                      </div>
+                      <ArrowRight size={20} className="text-gray-400 mt-3 flex-shrink-0" />
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">Complete <GradientText>Request</GradientText></h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {selectedService === 'other' 
+                  ? "Tell us about your custom training needs" 
+                  : `You selected: ${SERVICES.find(s => s.id === selectedService)?.name}`}
+              </p>
+              
+              <div className="flex flex-col gap-4">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <input type="text" placeholder="Your Name *" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={inputStyle} />
+                  <input type="text" placeholder="Company / Organization *" value={formData.company} onChange={e => setFormData({...formData, company: e.target.value})} style={inputStyle} />
+                  <input type="tel" placeholder="Phone Number *" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} style={inputStyle} />
+                  <input type="email" placeholder="Email Address *" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={inputStyle} />
+                </div>
+                
+                {selectedService === 'other' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">What would you like to study? *</label>
+                    <textarea
+                      placeholder="Please describe the topics, skills, or technologies you're interested in..."
+                      value={customTopic}
+                      onChange={e => setCustomTopic(e.target.value)}
+                      rows={4}
+                      style={{ ...inputStyle, resize: 'vertical' }}
+                    />
+                  </div>
+                )}
+                
+                <div className="flex gap-3 mt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleBack}
+                    className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold cursor-pointer"
+                  >
+                    ← Back
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleSubmit}
+                    disabled={(selectedService === 'other' && !customTopic.trim()) || !formData.name || !formData.company || !formData.phone || !formData.email}
+                    className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Submit Request
+                  </motion.button>
+                </div>
+              </div>
+            </>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -267,14 +348,10 @@ function PartnerModal({ show, onClose }) {
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-        onClick={onClose}>
+        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
         <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
-          onClick={e => e.stopPropagation()}
-          className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-            <X size={14} />
-          </button>
+          onClick={e => e.stopPropagation()} className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
           <h3 className="text-2xl font-bold text-gray-900 mb-1">Request <GradientText>Partnership</GradientText></h3>
           <p className="text-sm text-gray-500 mb-6">Government and university collaboration opportunities</p>
           <div className="flex flex-col gap-3">
@@ -283,9 +360,7 @@ function PartnerModal({ show, onClose }) {
             ))}
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
               onClick={() => { alert('Partnership request submitted!'); onClose(); }}
-              className="py-4 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg mt-2">
-              Submit Partnership Request
-            </motion.button>
+              className="py-4 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg mt-2">Submit Partnership Request</motion.button>
           </div>
         </motion.div>
       </motion.div>
@@ -293,9 +368,553 @@ function PartnerModal({ show, onClose }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HERO SECTION
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── CERTIFICATE CENTER ───────────────────────────────────────────────────────
+
+function CertificateCenter() {
+  const [certId, setCertId] = useState('');
+  const [status, setStatus] = useState('idle'); // idle | loading | found | error
+  const [cert, setCert] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef(null);
+
+  const handleSearch = useCallback(() => {
+    const q = certId.trim().toUpperCase();
+    if (!q) return;
+    setStatus('loading');
+    setCert(null);
+    setTimeout(() => {
+      if (CERT_DB[q]) {
+        setCert(CERT_DB[q]);
+        setStatus('found');
+      } else {
+        setStatus('error');
+      }
+    }, 1800);
+  }, [certId]);
+
+  const handleFile = (file) => {
+    if (!file) return;
+    setStatus('loading');
+    setCert(null);
+    // Simulate OCR / ID scan
+    setTimeout(() => {
+      const keys = Object.keys(CERT_DB);
+      const random = keys[Math.floor(Math.random() * keys.length)];
+      // 70% chance of finding
+      if (Math.random() > 0.3) {
+        setCert(CERT_DB[random]);
+        setStatus('found');
+      } else {
+        setStatus('error');
+      }
+    }, 2500);
+  };
+
+  const demos = Object.keys(CERT_DB);
+
+  return (
+    <section className="py-24 bg-gray-950 relative overflow-hidden">
+      {/* Background geometric decoration */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(220,38,38,0.08) 0%, transparent 70%)',
+      }} />
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+        background: 'linear-gradient(90deg, transparent, rgba(220,38,38,0.4), transparent)',
+      }} />
+
+      <div className="max-w-5xl mx-auto px-6 lg:px-10 relative z-10">
+        <Reveal className="text-center mb-14">
+          <div className="inline-flex items-center gap-2.5 mb-5">
+            <span className="block w-7 h-px bg-red-500" />
+            <span className="text-xs font-bold tracking-[0.2em] uppercase text-red-400">Verify Credentials</span>
+            <span className="block w-7 h-px bg-red-500" />
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+            Certificate{' '}
+            <span className="bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">Center</span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+            Upload your ID or enter your certificate number to verify and retrieve your official credential
+          </p>
+        </Reveal>
+
+        {/* Single Column Layout */}
+        <div className="flex flex-col gap-8">
+          {/* Input Panel */}
+          <Reveal delay={0.1}>
+            <div style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 24, padding: 32,
+            }}>
+              {/* Certificate ID Input */}
+              <div className="mb-6">
+                <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Certificate ID
+                </label>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, position: 'relative', minWidth: '200px' }}>
+                    <Hash size={16} color="rgba(255,255,255,0.3)" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+                    <input
+                      value={certId}
+                      onChange={e => setCertId(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                      placeholder="e.g. ADT-2024-001"
+                      style={{
+                        width: '100%', padding: '13px 16px 13px 40px',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        borderRadius: 12, color: 'white', fontSize: 14,
+                        outline: 'none', boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleSearch}
+                    disabled={status === 'loading'}
+                    style={{
+                      padding: '13px 20px', background: '#dc2626',
+                      borderRadius: 12, border: 'none', color: 'white',
+                      fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      opacity: status === 'loading' ? 0.7 : 1,
+                      whiteSpace: 'nowrap',
+                    }}>
+                    {status === 'loading' ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Search size={16} />}
+                    Search
+                  </motion.button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+                
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+              </div>
+
+              {/* Demo IDs */}
+              <div className="mt-6">
+                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
+                  Try demo certificate IDs:
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {demos.map(id => (
+                    <button key={id} onClick={() => { setCertId(id); setStatus('idle'); setCert(null); }}
+                      style={{
+                        padding: '5px 12px', background: 'rgba(220,38,38,0.1)',
+                        border: '1px solid rgba(220,38,38,0.25)',
+                        borderRadius: 8, color: '#fca5a5', fontSize: 12, cursor: 'pointer', fontWeight: 600,
+                      }}>
+                      {id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Result Panel */}
+          <Reveal delay={0.2}>
+            <AnimatePresence mode="wait">
+              {status === 'idle' && (
+                <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  style={{
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 24, padding: 48, textAlign: 'center',
+                    minHeight: 320, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <div style={{
+                    width: 80, height: 80, borderRadius: '50%',
+                    background: 'rgba(220,38,38,0.08)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 20px',
+                    border: '1px solid rgba(220,38,38,0.15)',
+                  }}>
+                    <ShieldCheck size={36} color="rgba(220,38,38,0.5)" />
+                  </div>
+                  <h3 style={{ color: 'rgba(255,255,255,0.6)', fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                    Certificate Verification
+                  </h3>
+                  <p style={{ color: 'rgba(255,255,255,0.25)', fontSize: 14, lineHeight: 1.6 }}>
+                    Enter your certificate ID or upload your ID document to verify and retrieve your credential
+                  </p>
+                </motion.div>
+              )}
+
+              {status === 'loading' && (
+                <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  style={{
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: 24, padding: 48, textAlign: 'center',
+                    minHeight: 320, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <div style={{ position: 'relative', width: 80, height: 80, margin: '0 auto 20px' }}>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                      style={{
+                        position: 'absolute', inset: 0,
+                        borderRadius: '50%',
+                        border: '3px solid rgba(220,38,38,0.15)',
+                        borderTopColor: '#dc2626',
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute', inset: 8,
+                      borderRadius: '50%',
+                      background: 'rgba(220,38,38,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <ShieldCheck size={24} color="rgba(220,38,38,0.7)" />
+                    </div>
+                  </div>
+                  <h3 style={{ color: 'rgba(255,255,255,0.8)', fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
+                    Verifying credentials...
+                  </h3>
+                  <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
+                    Scanning our secure certificate registry
+                  </p>
+                </motion.div>
+              )}
+
+              {status === 'error' && (
+                <motion.div key="error" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                  style={{
+                    background: 'rgba(239,68,68,0.05)',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: 24, padding: 48, textAlign: 'center',
+                    minHeight: 320, display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <div style={{
+                    width: 80, height: 80, borderRadius: '50%',
+                    background: 'rgba(239,68,68,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 20px',
+                    border: '1px solid rgba(239,68,68,0.3)',
+                  }}>
+                    <AlertCircle size={36} color="#ef4444" />
+                  </div>
+                  <h3 style={{ color: '#fca5a5', fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+                    Certificate Not Found
+                  </h3>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
+                    We couldn't locate a certificate matching your ID. Please check the number and try again, or contact our support team.
+                  </p>
+                  <button onClick={() => { setStatus('idle'); setCertId(''); }}
+                    style={{
+                      padding: '10px 24px', background: 'rgba(239,68,68,0.15)',
+                      border: '1px solid rgba(239,68,68,0.35)',
+                      borderRadius: 10, color: '#fca5a5', fontWeight: 600, cursor: 'pointer', fontSize: 14,
+                    }}>
+                    Try Again
+                  </button>
+                </motion.div>
+              )}
+
+              {status === 'found' && cert && (
+                <motion.div key="found" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <CertificateCard cert={cert} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Reveal>
+        </div>
+      </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </section>
+  );
+}
+
+function CertificateCard({ cert }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 100); return () => clearTimeout(t); }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 20 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="relative"
+    >
+      {/* Certificate Body - Horizontal with Image */}
+      <div style={{
+        background: 'white',
+        borderRadius: 24,
+        overflow: 'hidden',
+        boxShadow: '0 20px 35px -8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+      }}>
+        {/* Header with red accent */}
+        <div style={{
+          background: '#dc2626',
+          padding: '12px 20px',
+          textAlign: 'center',
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'rgba(255,255,255,0.15)',
+            padding: '3px 12px',
+            borderRadius: 50,
+          }}>
+            <ShieldCheck size={12} color="white" />
+            <span style={{ color: 'white', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em' }}>
+              VERIFIED CERTIFICATE
+            </span>
+          </div>
+        </div>
+
+        {/* Horizontal Layout with Image */}
+        <div style={{ padding: '28px' }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 28,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}>
+            {/* Left Column - Large Image */}
+            <div style={{
+              flex: '0 0 auto',
+              width: '320px',  // Much larger image
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <div style={{
+                width: '100%',
+                height: 'auto',
+                background: '#fef2f2',
+                borderRadius: 16,
+                padding: '28px 20px',
+                textAlign: 'center',
+                border: '1px solid #fecaca',
+              }}>
+                {/* Static Image */}
+                <img 
+                  src="/src/assets/certificate.jpg" 
+                  alt="Certificate Seal" 
+                  style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                />
+                
+                <div style={{
+                  fontSize: 10,
+                  color: '#6b7280',
+                  borderTop: '1px solid #fecaca',
+                  paddingTop: 12,
+                  marginTop: 10,
+                  fontWeight: 500,
+                }}>
+                  Official Credential
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Compact Certificate Details */}
+            <div style={{ flex: 1, minWidth: '240px' }}>
+              {/* Certificate Title - Smaller */}
+              <div style={{ marginBottom: 12 }}>
+                <h3 style={{
+                  color: '#dc2626',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  margin: 0,
+                  marginBottom: 2,
+                }}>
+                  Certificate of Completion
+                </h3>
+                <div style={{
+                  width: 40,
+                  height: 2,
+                  background: '#dc2626',
+                  borderRadius: 2,
+                }} />
+              </div>
+
+              {/* Awarded To - Smaller */}
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ color: '#6b7280', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+                  Awarded To
+                </p>
+                <h4 style={{ color: '#111827', fontSize: 18, fontWeight: 700, margin: 0 }}>
+                  {cert.name || 'John Doe'}
+                </h4>
+              </div>
+
+              {/* Course/Program - More compact */}
+              <div style={{
+                background: '#fef2f2',
+                padding: '10px 14px',
+                borderRadius: 10,
+                marginBottom: 16,
+                borderLeft: '3px solid #dc2626',
+              }}>
+                <p style={{ color: '#6b7280', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 3 }}>
+                  Successfully completed
+                </p>
+                <p style={{ color: '#111827', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3 }}>
+                  {cert.course || 'Professional Certification Program'}
+                </p>
+              </div>
+
+              {/* Details Grid - 2 columns, more compact */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 10,
+                marginBottom: 16,
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                    <Hash size={10} color="#dc2626" />
+                    <span style={{ color: '#6b7280', fontSize: 8, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Cert ID
+                    </span>
+                  </div>
+                  <p style={{ color: '#111827', fontSize: 10, fontWeight: 500, margin: 0, fontFamily: 'monospace' }}>
+                    {cert.id || 'ADT-2024-001'}
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                    <Calendar size={10} color="#dc2626" />
+                    <span style={{ color: '#6b7280', fontSize: 8, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Issue Date
+                    </span>
+                  </div>
+                  <p style={{ color: '#111827', fontSize: 10, fontWeight: 500, margin: 0 }}>
+                    {cert.date || 'Jan 15, 2024'}
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                    <Award size={10} color="#dc2626" />
+                    <span style={{ color: '#6b7280', fontSize: 8, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Grade
+                    </span>
+                  </div>
+                  <p style={{ color: '#111827', fontSize: 10, fontWeight: 500, margin: 0 }}>
+                    {cert.grade || 'Distinction'}
+                  </p>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                    <Clock size={10} color="#dc2626" />
+                    <span style={{ color: '#6b7280', fontSize: 8, fontWeight: 600, textTransform: 'uppercase' }}>
+                      CPD Hours
+                    </span>
+                  </div>
+                  <p style={{ color: '#111827', fontSize: 10, fontWeight: 500, margin: 0 }}>
+                    {cert.hours || '80 Hrs'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons - More compact */}
+              <div style={{
+                display: 'flex',
+                gap: 8,
+              }}>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: '#dc2626',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    fontSize: 11,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 5,
+                  }}
+                  onClick={() => alert('Certificate download initiated (PDF)')}
+                >
+                  <FileCheck size={12} />
+                  Download
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    background: 'white',
+                    color: '#dc2626',
+                    border: '1px solid #dc2626',
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    fontSize: 11,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 5,
+                  }}
+                  onClick={() => alert('Share certificate link copied!')}
+                >
+                  <Share2 size={12} />
+                  Share
+                </motion.button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer with verification - More compact */}
+          <div style={{
+            marginTop: 20,
+            paddingTop: 12,
+            borderTop: '1px solid #e5e7eb',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CheckCircle size={11} color="#22c55e" />
+              <span style={{ color: '#6b7280', fontSize: 9 }}>
+                Blockchain Verified
+              </span>
+            </div>
+            <div>
+              <code style={{
+                fontSize: 8,
+                color: '#9ca3af',
+                background: '#f9fafb',
+                padding: '3px 6px',
+                borderRadius: 4,
+              }}>
+                TX: {cert.id?.slice(-8) || 'A1B2C3D4'}...{cert.id?.slice(-4) || '5678'}
+              </code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── HERO ─────────────────────────────────────────────────────────────────────
 
 function HeroSection({ onExplore }) {
   const heroRef = useRef(null);
@@ -310,23 +929,19 @@ function HeroSection({ onExplore }) {
         <img src={IMGS.hero} alt="Technology Training" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
       </motion.div>
-
       <motion.div className="relative z-10 text-center px-6 max-w-4xl mx-auto" style={{ y: heroY, opacity: heroOpacity }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Eyebrow dark={true}>Technology Training Programs</Eyebrow>
         </motion.div>
-
         <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.9 }}
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
           Empower Your Future<br />
           <span className="bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">with Professional IT</span>
         </motion.h1>
-
         <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
           className="text-gray-300 text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
           Industry-aligned courses designed for students, professionals, and organizations worldwide
         </motion.p>
-
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
           className="flex gap-4 justify-center flex-wrap">
           <motion.button onClick={onExplore} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
@@ -338,7 +953,6 @@ function HeroSection({ onExplore }) {
             <PlayCircle size={18} /> Watch Overview
           </motion.button>
         </motion.div>
-
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
           className="flex justify-center gap-8 mt-16 pt-8 border-t border-red-800/30 max-w-lg mx-auto">
           {[
@@ -353,7 +967,6 @@ function HeroSection({ onExplore }) {
           ))}
         </motion.div>
       </motion.div>
-
       <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 text-red-500 z-10">
         <ChevronDown size={28} />
@@ -362,111 +975,348 @@ function HeroSection({ onExplore }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AUDIENCE SECTION — "WHO ARE YOU"
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── AUDIENCE SWITCHER (redesigned as clear tabbed interface) ─────────────────
 
-function AudienceCard({ tab, activeTab, setActiveTab, img, badge, title, desc, cta, icon: Icon, delay }) {
-  const active = activeTab === tab;
-  
-  return (
-    <ParallaxScroll>
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay, duration: 0.5 }}
-        onClick={() => setActiveTab(tab)}
-        className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
-          active ? 'ring-2 ring-red-500 shadow-xl shadow-red-500/20' : 'hover:shadow-lg hover:border-red-200'
-        }`}
-        style={{ background: '#fff', border: `1px solid ${active ? BRAND : '#e5e7eb'}` }}
-      >
-        {/* Top highlight bar for active */}
-        {active && <div className="absolute top-0 left-0 right-0 h-1 bg-red-600" />}
-
-        <div className="relative h-48 overflow-hidden">
-          <img src={img} alt={title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          
-          <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/20 backdrop-blur border border-white/30 text-white text-xs font-bold">
-            {badge}
-          </div>
-          
-          {active && (
-            <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
-              <CheckCircle size={16} color="#fff" />
-            </div>
-          )}
-          
-          <div className="absolute bottom-4 left-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${active ? 'bg-red-600' : 'bg-white/20 backdrop-blur'}`}>
-              <Icon size={22} color="#fff" />
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6">
-          <h3 className={`text-xl font-bold mb-2 ${active ? 'text-red-600' : 'text-gray-900'}`}>
-            {title}
-          </h3>
-          <p className="text-gray-500 text-sm leading-relaxed mb-4">{desc}</p>
-          
-          <div className={`flex items-center gap-2 text-sm font-semibold ${active ? 'text-red-600' : 'text-gray-500'}`}>
-            <span>{cta}</span>
-            <ArrowRight size={14} />
-          </div>
-        </div>
-      </motion.div>
-    </ParallaxScroll>
-  );
-}
+// ─── AUDIENCE SWITCHER (Full Width, Large, Noticeable Cards) ─────────────────
 
 function WhoAreYouSection({ activeTab, setActiveTab }) {
   const audiences = [
-    { tab: 'individual', badge: 'B2C', title: 'Individual Students', desc: 'Enroll in short courses to gain foundational IT skills and a clear career support pathway.', cta: 'Explore Courses', icon: GraduationCap, img: IMGS.individual, delay: 0 },
-    { tab: 'corporate', badge: 'B2B', title: 'Corporate Clients', desc: 'Secure customized training to close specific team skill gaps with high-value contracts.', cta: 'Get Enterprise Quote', icon: Briefcase, img: IMGS.corporate, delay: 0.1 },
-    { tab: 'government', badge: 'B2G', title: 'Government & Universities', desc: 'Seek cooperation and partnership for large-scale training initiatives and accreditation linkage.', cta: 'Request Partnership', icon: Landmark, img: IMGS.government, delay: 0.2 },
+    {
+      tab: 'individual', badge: 'B2C', icon: GraduationCap, img: IMGS.individual,
+      title: 'Individual Students',
+      desc: 'Enroll in short courses to gain foundational IT skills and a clear career support pathway.',
+      cta: 'Explore Courses',
+      color: '#dc2626',
+      features: ['Self-paced learning', 'Industry certifications', 'Career coaching', 'Job placement'],
+    },
+    {
+      tab: 'corporate', badge: 'B2B', icon: Building2, img: IMGS.corporate,
+      title: 'Corporate Clients',
+      desc: 'Customized training programs to close specific team skill gaps and drive business performance.',
+      cta: 'Get Enterprise Quote',
+      color: '#2563eb',
+      features: ['Custom curriculum', 'Team training', 'ROI reporting', 'Dedicated support'],
+    },
+    {
+      tab: 'government', badge: 'B2G', icon: Landmark, img: IMGS.government,
+      title: 'Government & Universities',
+      desc: 'Strategic partnerships for large-scale training initiatives, MoEYS accreditation, and national capability building.',
+      cta: 'Request Partnership',
+      color: '#7c3aed',
+      features: ['MoEYS accredited', 'Large-scale rollout', 'Policy alignment', 'Research collab'],
+    },
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <Reveal className="text-center mb-12">
+        <Reveal className="text-center mb-4">
           <Eyebrow>Choose Your Path</Eyebrow>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
             Who Are <GradientText>You?</GradientText>
           </h2>
           <p className="text-gray-500 mt-4 max-w-md mx-auto">
-            Select your training pathway to discover tailored programs
+            Select your category below to reveal programs tailored to you
           </p>
         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {audiences.map((audience) => (
-            <AudienceCard
-              key={audience.tab}
-              tab={audience.tab}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              img={audience.img}
-              badge={audience.badge}
-              title={audience.title}
-              desc={audience.desc}
-              cta={audience.cta}
-              icon={audience.icon}
-              delay={audience.delay}
-            />
-          ))}
+        {/* Large Noticeable Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mt-12">
+          {audiences.map(({ tab, badge, title, desc, cta, icon: Icon, img, features, color }) => {
+            const active = activeTab === tab;
+            return (
+              <motion.div
+                key={tab}
+                animate={{
+                  scale: active ? 1.02 : 1,
+                  y: active ? -8 : 0,
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+                onClick={() => setActiveTab(tab)}
+                whileHover={{ scale: 1.02, y: -4 }}
+                style={{
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  border: active ? `3px solid ${color}` : '2px solid #e5e7eb',
+                  boxShadow: active 
+                    ? `0 25px 50px -12px ${color}80, 0 4px 16px rgba(0,0,0,0.1)` 
+                    : '0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02)',
+                  background: active ? `linear-gradient(135deg, white, ${color}08)` : 'white',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                }}
+              >
+                {/* Hover indicator - subtle overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.02) 100%)',
+                  pointerEvents: 'none',
+                  opacity: 0,
+                  transition: 'opacity 0.3s ease',
+                }} className="hover-overlay" />
+                
+                {/* Active glow top bar */}
+                <motion.div
+                  animate={{ scaleX: active ? 1 : 0 }}
+                  style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, height: 4,
+                    background: `linear-gradient(90deg, ${color}, ${color}cc)`,
+                    transformOrigin: 'left', zIndex: 10,
+                  }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+
+                {/* Clickable badge - always visible for inactive cards */}
+                {!active && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    zIndex: 10,
+                    background: 'rgba(0,0,0,0.7)',
+                    backdropFilter: 'blur(8px)',
+                    borderRadius: 30,
+                    padding: '6px 14px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'white',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  }}>
+                    <ArrowRight size={12} />
+                    Click to select
+                  </div>
+                )}
+
+                {/* Active badge */}
+                {active && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    zIndex: 10,
+                    background: color,
+                    borderRadius: 30,
+                    padding: '6px 14px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'white',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    boxShadow: `0 2px 12px ${color}80`,
+                  }}>
+                    <CheckCircle size={12} />
+                    Active • {badge}
+                  </div>
+                )}
+
+                {/* Image Section - Larger */}
+                <div className="relative h-56 overflow-hidden">
+                  <motion.img
+                    animate={{ scale: active ? 1.08 : 1 }}
+                    transition={{ duration: 0.5 }}
+                    src={img} 
+                    alt={title} 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  
+                  {/* Large Icon Overlay */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 16,
+                    left: 16,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 16,
+                    background: active ? color : 'rgba(255,255,255,0.95)',
+                    backdropFilter: 'blur(12px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                  }}>
+                    <Icon size={28} color={active ? 'white' : color} />
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {/* Badge and Title */}
+                  <div style={{
+                    display: 'inline-block',
+                    background: active ? `${color}15` : '#f3f4f6',
+                    color: active ? color : '#6b7280',
+                    padding: '4px 12px',
+                    borderRadius: 20,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    marginBottom: 12,
+                    letterSpacing: '0.05em',
+                  }}>
+                    {badge}
+                  </div>
+                  
+                  <h3 style={{ 
+                    fontSize: 22, 
+                    fontWeight: 700, 
+                    color: active ? color : '#111827', 
+                    marginBottom: 10, 
+                    transition: 'color 0.2s' 
+                  }}>
+                    {title}
+                  </h3>
+                  
+                  <p style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
+                    {desc}
+                  </p>
+
+                  {/* Feature chips - Larger and more visible */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                    {features.map(f => (
+                      <span key={f} style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        padding: '5px 14px',
+                        borderRadius: 30,
+                        border: `1.5px solid ${active ? color + '40' : '#e5e7eb'}`,
+                        background: active ? color + '10' : '#f9fafb',
+                        color: active ? color : '#4b5563',
+                        transition: 'all 0.2s',
+                      }}>
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* CTA Button - Always visible, more prominent */}
+                  <motion.div
+                    animate={active ? { x: 0 } : { x: 0 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginTop: 8,
+                      paddingTop: 16,
+                      borderTop: `1.5px solid ${active ? color + '30' : '#e5e7eb'}`,
+                    }}
+                  >
+                    <span style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: active ? color : '#9ca3af',
+                      transition: 'color 0.2s',
+                    }}>
+                      {active ? `✓ Selected: ${cta}` : cta}
+                    </span>
+                    <motion.div
+                      animate={active ? { x: 5 } : { x: 0 }}
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 30,
+                        background: active ? color : '#f3f4f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <ArrowRight size={16} color={active ? 'white' : '#9ca3af'} />
+                    </motion.div>
+                  </motion.div>
+                </div>
+
+                {/* Click instruction on hover */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  style={{
+                    position: 'absolute',
+                    bottom: 20,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(0,0,0,0.8)',
+                    backdropFilter: 'blur(8px)',
+                    padding: '6px 14px',
+                    borderRadius: 30,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    pointerEvents: 'none',
+                    whiteSpace: 'nowrap',
+                    zIndex: 20,
+                  }}
+                >
+                  <span>👆 Click to switch</span>
+                  <ArrowRight size={10} />
+                </motion.div>
+              </motion.div>
+            );
+          })}
         </div>
+
+        {/* Visual indicator showing current selection */}
+        <Reveal delay={0.2}>
+          <div style={{
+            marginTop: 32,
+            textAlign: 'center',
+            padding: '12px 24px',
+            background: '#fef2f2',
+            borderRadius: 50,
+            display: 'inline-block',
+            width: 'auto',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <div style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: audiences.find(a => a.tab === activeTab)?.color || '#dc2626',
+                animation: 'pulse 1.5s ease-in-out infinite',
+              }} />
+              <span style={{ color: '#4b5563', fontSize: 13 }}>
+                Currently viewing: <strong style={{ color: audiences.find(a => a.tab === activeTab)?.color }}>
+                  {activeTab === 'individual' && 'Individual Student Programs'}
+                  {activeTab === 'corporate' && 'Corporate Training Solutions'}
+                  {activeTab === 'government' && 'Government & University Partnerships'}
+                </strong>
+              </span>
+            </div>
+          </div>
+        </Reveal>
       </div>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .hover-overlay:hover {
+          opacity: 1;
+        }
+      `}</style>
     </section>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COURSE BROWSER (Individual Tab)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── COURSE BROWSER ───────────────────────────────────────────────────────────
 
 function CategoryFilter({ selected, onChange }) {
   return (
@@ -475,17 +1325,10 @@ function CategoryFilter({ selected, onChange }) {
         const Icon = cat.icon;
         const active = selected === cat.id;
         return (
-          <button
-            key={cat.id}
-            onClick={() => onChange(cat.id)}
+          <button key={cat.id} onClick={() => onChange(cat.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
-              active 
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            <Icon size={14} />
-            {cat.name}
+              active ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            <Icon size={14} />{cat.name}
           </button>
         );
       })}
@@ -497,42 +1340,29 @@ function CourseCard({ course, index, onClick }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
   const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+    <motion.div ref={ref} initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
-      className={`bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border ${
-        isHovered ? 'border-red-300 shadow-xl shadow-red-500/10' : 'border-gray-100 shadow-md'
-      }`}
-    >
+      className={`bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border ${isHovered ? 'border-red-300 shadow-xl shadow-red-500/10' : 'border-gray-100 shadow-md'}`}>
       <div className="flex flex-col md:flex-row">
         <div className="relative md:w-64 h-48 md:h-auto overflow-hidden">
-          <img src={course.img} alt={course.title} className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`} />
+          <img src={course.img} alt={course.title}
+            className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`} />
           <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
-          <div className="absolute top-3 left-3 px-2 py-1 rounded-lg text-white text-xs font-bold" style={{ background: course.color }}>
-            {course.level}
-          </div>
+          <div className="absolute top-3 left-3 px-2 py-1 rounded-lg text-white text-xs font-bold" style={{ background: course.color }}>{course.level}</div>
         </div>
-        
         <div className="flex-1 p-5">
           <div className="flex items-center gap-3 mb-2">
             <div className="flex items-center gap-1">
               <Star size={14} fill="#f59e0b" stroke="none" />
               <span className="text-sm font-semibold text-gray-900">{course.rating}</span>
             </div>
-            <span className="text-gray-400 text-xs">· {course.students} students</span>
-            <span className="text-gray-400 text-xs">· {course.duration}</span>
+            <span className="text-gray-400 text-xs">· {course.students} students · {course.duration}</span>
           </div>
-          
           <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
           <p className="text-gray-500 text-sm mb-3 line-clamp-2">{course.description}</p>
-          
           <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100">
             <span className="text-xl font-bold text-gray-900">{course.price}</span>
             <div className={`flex items-center gap-1 text-sm font-semibold text-red-600 transition-all ${isHovered ? 'translate-x-1' : ''}`}>
@@ -545,9 +1375,7 @@ function CourseCard({ course, index, onClick }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CAREER BOOST SECTION
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── CAREER BOOST ────────────────────────────────────────────────────────────
 
 function CareerBoostSection({ onRegister }) {
   const benefits = [
@@ -559,20 +1387,14 @@ function CareerBoostSection({ onRegister }) {
     { title: 'Global Opportunities', desc: 'Eligible to participate in overseas partner programs and awards.', icon: Globe },
     { title: 'Official Certification', desc: 'Receive an official certificate upon successful course completion.', icon: Award },
   ];
-
   return (
     <section className="py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-12">
           <Eyebrow>Career Support</Eyebrow>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Your Career <GradientText>Boost</GradientText>
-          </h2>
-          <p className="text-gray-500 mt-3 max-w-md mx-auto">
-            A complete ecosystem of support to accelerate your professional journey.
-          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Your Career <GradientText>Boost</GradientText></h2>
+          <p className="text-gray-500 mt-3 max-w-md mx-auto">A complete ecosystem of support to accelerate your professional journey.</p>
         </Reveal>
-
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {benefits.map((benefit, i) => (
             <Reveal key={benefit.title} delay={i * 0.05}>
@@ -590,7 +1412,6 @@ function CareerBoostSection({ onRegister }) {
             </Reveal>
           ))}
         </div>
-
         <Reveal className="flex gap-4 justify-center mt-10">
           <button onClick={onRegister}
             className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold cursor-pointer shadow-lg shadow-red-500/30 transition-all">
@@ -602,9 +1423,7 @@ function CareerBoostSection({ onRegister }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// INDUSTRY PROGRAMS SECTION
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── INDUSTRY PROGRAMS ───────────────────────────────────────────────────────
 
 function IndustryProgramsSection() {
   const programs = [
@@ -612,17 +1431,13 @@ function IndustryProgramsSection() {
     { title: 'Internship Program', subtitle: 'Practical Experience', features: ['Partnerships with leading companies', 'Hands-on experience in diverse industries', 'Mentorship from experienced professionals'], img: IMGS.internship, icon: Briefcase },
     { title: 'Work Global Virtual Company', subtitle: 'Global Opportunities', features: ['Remote work and project-based learning', 'Cross-cultural collaboration', 'Agile methodologies training'], img: IMGS.global, icon: Globe },
   ];
-
   return (
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-12">
           <Eyebrow>Industry Programs</Eyebrow>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-            Career <GradientText>Pathways</GradientText>
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Career <GradientText>Pathways</GradientText></h2>
         </Reveal>
-
         <div className="grid md:grid-cols-3 gap-6">
           {programs.map((prog, i) => (
             <Reveal key={prog.title} delay={i * 0.1}>
@@ -652,35 +1467,100 @@ function IndustryProgramsSection() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CORPORATE SECTION — RICH VISUALIZATION (REDESIGNED)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── ENHANCED CORPORATE SECTION WITH SERVICE SELECTION ABOVE QUOTE ───────────
 
 function CorporateSection({ onQuote }) {
   const stats = [
     { value: 98, suffix: '%', label: 'Client Satisfaction', icon: ThumbsUp },
     { value: 500, suffix: '+', label: 'Corporate Clients', icon: Building2 },
-    { value: 45, suffix: 'min', label: 'Average Response', icon: ClockIcon },
+    { value: 45, suffix: 'min', label: 'Average Response', icon: Clock },
     { value: 100, suffix: '%', label: 'Customizable', icon: Target },
   ];
-
+  
+  // Services data - now used for both display and quote selection
   const services = [
-    { title: 'On-Demand Training', desc: 'Self-paced programs with structured content. Access learning materials anytime — ideal for continuous organizational upskilling at scale.', icon: Cpu, duration: '24/7 Access', students: '10,000+' },
-    { title: 'Live Training / Short Courses', desc: 'Instructor-led sessions focusing on practical skills, real-world scenarios, and immediate application.', icon: Users, duration: '2-12 weeks', students: '5,000+' },
-    { title: 'Group Training', desc: 'Customized programs designed for entire teams or departments, tailored to specific organizational objectives.', icon: Target, duration: 'Custom', students: '500+ Teams' },
-    { title: 'Digital Training (E-Learning)', desc: 'Structured digital solution combining video lessons, assessments, and materials for large-scale remote training.', icon: Globe, duration: 'Self-paced', students: '25,000+' },
+    { id: 'ondemand', title: 'On-Demand Training', desc: 'Self-paced programs with structured content. Access anytime for continuous upskilling.', icon: Cpu, duration: '24/7 Access', students: '10,000+' },
+    { id: 'live', title: 'Live Training / Short Courses', desc: 'Instructor-led sessions with practical focus and immediate application.', icon: Users, duration: '2-12 weeks', students: '5,000+' },
+    { id: 'group', title: 'Group Training', desc: 'Customized programs for entire teams, tailored to specific organizational objectives.', icon: Target, duration: 'Custom', students: '500+ Teams' },
+    { id: 'elearning', title: 'Digital E-Learning', desc: 'Structured digital solution combining video, assessments, and materials for remote training.', icon: Globe, duration: 'Self-paced', students: '25,000+' },
   ];
-
+  
+  // New service selection state for quote modal pre-selection
+  const [selectedServiceForQuote, setSelectedServiceForQuote] = useState<string | null>(null);
+  
+  // Handle service selection that triggers quote modal with pre-selected service
+  const handleServiceSelect = (serviceId: string) => {
+    setSelectedServiceForQuote(serviceId);
+    onQuote(); // This opens the quote modal - we'll need to modify QuoteModal to accept preselection
+  };
+  
+  // Original onQuote handler for the main CTA button
+  const handleMainQuote = () => {
+    setSelectedServiceForQuote(null);
+    onQuote();
+  };
+  
   const testimonials = [
     { quote: 'ADITI Academy transformed our IT department\'s capabilities. The custom training program was exactly what we needed.', author: 'Michael Chen', role: 'CTO, TechCorp', rating: 5 },
     { quote: 'The ROI from their training program was immediate. Our team\'s productivity increased by 40% within 3 months.', author: 'Sarah Johnson', role: 'HR Director, Global Solutions', rating: 5 },
   ];
-
   const partners = ['Google', 'Microsoft', 'AWS', 'Cisco', 'IBM', 'Deloitte'];
-
+  
   return (
     <div>
-      {/* Hero Section for Corporate */}
+      
+      <section className="py-16 bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="grid md:grid-cols-4 gap-8">
+            {stats.map((stat, i) => (
+              <Reveal key={stat.label} delay={i * 0.1} className="text-center">
+                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
+                <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
+                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* What We Provide Section - Enhanced with clickable cards that open quote modal */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <Reveal className="text-center mb-12">
+            <Eyebrow>Training Solutions</Eyebrow>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">What We <GradientText>Provide</GradientText></h2>
+            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">Click on any service to request a customized quote</p>
+          </Reveal>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service, i) => {
+              const Icon = service.icon;
+              return (
+                <Reveal key={service.title} delay={i * 0.1}>
+                  <motion.div 
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                    onClick={() => handleServiceSelect(service.id)}
+                    className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-red-300 transition-all cursor-pointer group h-full"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                      <Icon size={24} className="text-red-600 group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
+                    <p className="text-gray-500 text-sm mb-4">{service.desc}</p>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <span className="text-xs text-gray-400">⏱ {service.duration}</span>
+                      <span className="text-xs text-red-600 group-hover:text-red-700 font-medium flex items-center gap-1">
+                        Get Quote <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </motion.div>
+                </Reveal>
+              );
+            })}
+          </div>
+          
+        </div>
+      </section>
       <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={IMGS.corporateHero} alt="Corporate Training" className="w-full h-full object-cover" />
@@ -689,131 +1569,46 @@ function CorporateSection({ onQuote }) {
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 text-white">
           <Reveal>
             <Eyebrow dark={true}>B2B Solutions</Eyebrow>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-              Enterprise Training<br />
-              <span className="text-red-500">Solutions</span>
-            </h1>
-            <p className="text-xl text-gray-200 max-w-2xl mb-8">
-              Empower your workforce with customized IT training programs designed to close skill gaps and drive business growth.
-            </p>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Enterprise Training<br /><span className="text-red-500">Solutions</span></h1>
+            <p className="text-xl text-gray-200 max-w-2xl mb-8">Empower your workforce with customized IT training programs designed to close skill gaps and drive business growth.</p>
             <div className="flex gap-4">
-              <button onClick={onQuote} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
-                Request Enterprise Quote
-              </button>
-              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
-                <Phone size={16} className="inline mr-2" /> Schedule Call
-              </button>
+              <button onClick={handleMainQuote} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">Request Enterprise Quote</button>
+              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all"><Phone size={16} className="inline mr-2" /> Schedule Call</button>
             </div>
           </Reveal>
         </div>
       </section>
-
-      {/* Statistics Section */}
-      <section className="py-16 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <Reveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3">
-                  <stat.icon size={24} className="text-red-600" />
-                </div>
-                <div className="text-3xl font-bold text-gray-900">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <Reveal className="text-center mb-12">
-            <Eyebrow>Training Solutions</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              What We <GradientText>Provide</GradientText>
-            </h2>
-            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
-              Flexible training options tailored to your organization's needs and budget
-            </p>
-          </Reveal>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service, i) => (
-              <Reveal key={service.title} delay={i * 0.1}>
-                <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all h-full">
-                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4">
-                    <service.icon size={24} className="text-red-600" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-gray-500 text-sm mb-4">{service.desc}</p>
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">⏱ {service.duration}</span>
-                    <span className="text-xs text-red-600">{service.students} trained</span>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Success Stories / Case Studies */}
+      
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
             <Eyebrow>Success Stories</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              Trusted by <GradientText>Industry Leaders</GradientText>
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Trusted by <GradientText>Industry Leaders</GradientText></h2>
           </Reveal>
-
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {testimonials.map((testimonial, i) => (
-              <Reveal key={testimonial.author} delay={i * 0.15}>
+            {testimonials.map((t, i) => (
+              <Reveal key={t.author} delay={i * 0.15}>
                 <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                  <div className="flex gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, j) => (
-                      <Star key={j} size={16} fill="#f59e0b" stroke="none" className="text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6">"{testimonial.quote}"</p>
-                  <div>
-                    <p className="font-bold text-gray-900">{testimonial.author}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                  </div>
+                  <div className="flex gap-1 mb-4">{[...Array(t.rating)].map((_, j) => <Star key={j} size={16} fill="#f59e0b" stroke="none" />)}</div>
+                  <p className="text-gray-700 text-lg leading-relaxed mb-6">"{t.quote}"</p>
+                  <div><p className="font-bold text-gray-900">{t.author}</p><p className="text-sm text-gray-500">{t.role}</p></div>
                 </div>
               </Reveal>
             ))}
           </div>
-
-          {/* Partners */}
           <div className="text-center">
             <p className="text-sm text-gray-400 uppercase tracking-wide mb-6">Trusted Partners</p>
             <div className="flex flex-wrap justify-center gap-8 opacity-60">
-              {partners.map(partner => (
-                <span key={partner} className="text-gray-500 font-semibold text-lg">{partner}</span>
-              ))}
+              {partners.map(p => <span key={p} className="text-gray-500 font-semibold text-lg">{p}</span>)}
             </div>
           </div>
-
-          <Reveal className="text-center mt-12">
-            <button onClick={onQuote}
-              className="px-10 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold cursor-pointer shadow-lg shadow-red-500/30 transition-all">
-              Get Custom Quote →
-            </button>
-          </Reveal>
         </div>
       </section>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GOVERNMENT SECTION — RICH VISUALIZATION (REDESIGNED)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── GOVERNMENT ───────────────────────────────────────────────────────────────
 
 function GovernmentSection({ onPartner }) {
   const stats = [
@@ -822,24 +1617,20 @@ function GovernmentSection({ onPartner }) {
     { value: 10, suffix: '+', label: 'Universities', icon: School },
     { value: 100, suffix: '%', label: 'MoEYS Aligned', icon: Award },
   ];
-
   const programs = [
     { title: 'Government Digital Transformation', desc: 'Comprehensive training for public sector digital initiatives', duration: '12 weeks', participants: '500+', icon: BarChart3 },
     { title: 'Cybersecurity for Public Sector', desc: 'Secure government infrastructure and data protection', duration: '8 weeks', participants: '300+', icon: Shield },
     { title: 'Data Analytics for Policy Making', desc: 'Data-driven decision making for government officials', duration: '10 weeks', participants: '400+', icon: TrendingUp },
     { title: 'Leadership in Technology', desc: 'Executive program for technology leaders in government', duration: '6 weeks', participants: '200+', icon: UserCheck },
   ];
-
   const universityPrograms = [
     { title: 'Curriculum Integration', desc: 'Integrate our certified courses into your university programs', icon: BookOpen },
     { title: 'Faculty Development', desc: 'Train your faculty members on the latest technologies', icon: Users },
     { title: 'Student Certification', desc: 'Provide industry-recognized certifications to your students', icon: Award },
     { title: 'Research Collaboration', desc: 'Partner on technology research and innovation projects', icon: Target },
   ];
-
   return (
     <div>
-      {/* Hero Section for Government */}
       <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={IMGS.govHero} alt="Government Partnership" className="w-full h-full object-cover" />
@@ -848,65 +1639,40 @@ function GovernmentSection({ onPartner }) {
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 text-white">
           <Reveal>
             <Eyebrow dark={true}>Public Sector & Education</Eyebrow>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-              Government &<br />
-              <span className="text-red-500">University Partnerships</span>
-            </h1>
-            <p className="text-xl text-gray-200 max-w-2xl mb-8">
-              Driving digital transformation through strategic collaboration and accredited training programs.
-            </p>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Government &<br /><span className="text-red-500">University Partnerships</span></h1>
+            <p className="text-xl text-gray-200 max-w-2xl mb-8">Driving digital transformation through strategic collaboration and accredited training programs.</p>
             <div className="flex gap-4">
-              <button onClick={onPartner} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
-                Request Partnership Info
-              </button>
-              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
-                <Mail size={16} className="inline mr-2" /> Contact Government Team
-              </button>
+              <button onClick={onPartner} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">Request Partnership Info</button>
+              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all"><Mail size={16} className="inline mr-2" /> Contact Government Team</button>
             </div>
           </Reveal>
         </div>
       </section>
-
-      {/* Statistics Section */}
       <section className="py-16 bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3">
-                  <stat.icon size={24} className="text-red-600" />
-                </div>
-                <div className="text-3xl font-bold text-gray-900">
-                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                </div>
+                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
+                <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
                 <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
-
-      {/* Government Training Programs */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
             <Eyebrow>Government Programs</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              Public Sector <GradientText>Training</GradientText>
-            </h2>
-            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
-              Specialized programs designed for government agencies and civil servants
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Public Sector <GradientText>Training</GradientText></h2>
           </Reveal>
-
           <div className="grid md:grid-cols-2 gap-6">
             {programs.map((program, i) => (
               <Reveal key={program.title} delay={i * 0.1}>
                 <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-                      <program.icon size={24} className="text-red-600" />
-                    </div>
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={24} className="text-red-600" /></div>
                     <div className="flex-1">
                       <h3 className="text-lg font-bold text-gray-900 mb-2">{program.title}</h3>
                       <p className="text-gray-500 text-sm mb-3">{program.desc}</p>
@@ -922,39 +1688,25 @@ function GovernmentSection({ onPartner }) {
           </div>
         </div>
       </section>
-
-      {/* University Programs */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <Reveal direction="left">
               <div className="relative">
                 <img src={IMGS.govMeeting} alt="University Partnership" className="rounded-2xl shadow-xl w-full" />
-                <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-4 rounded-xl shadow-lg">
-                  <School size={32} />
-                </div>
+                <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-4 rounded-xl shadow-lg"><School size={32} /></div>
               </div>
             </Reveal>
-            
             <Reveal direction="right">
               <div>
                 <Eyebrow>University Solutions</Eyebrow>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  Academic <GradientText>Partnerships</GradientText>
-                </h2>
-                <p className="text-gray-600 mb-8">
-                  Collaborate with ADITI Academy to bring industry-recognized technology education to your students and faculty.
-                </p>
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Academic <GradientText>Partnerships</GradientText></h2>
+                <p className="text-gray-600 mb-8">Collaborate with ADITI Academy to bring industry-recognized technology education to your students and faculty.</p>
                 <div className="grid gap-4">
-                  {universityPrograms.map((program, i) => (
+                  {universityPrograms.map((program) => (
                     <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                        <program.icon size={16} className="text-red-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{program.title}</h4>
-                        <p className="text-sm text-gray-500">{program.desc}</p>
-                      </div>
+                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={16} className="text-red-600" /></div>
+                      <div><h4 className="font-semibold text-gray-900">{program.title}</h4><p className="text-sm text-gray-500">{program.desc}</p></div>
                     </div>
                   ))}
                 </div>
@@ -963,20 +1715,13 @@ function GovernmentSection({ onPartner }) {
           </div>
         </div>
       </section>
-
-      {/* MoEYS Accreditation */}
       <section className="py-16 bg-red-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
           <Reveal>
             <Award size={48} className="text-red-600 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Officially Accredited by MoEYS</h3>
-            <p className="text-gray-600 max-w-2xl mx-auto mb-6">
-              Our programs are fully aligned with the Ministry of Education, Youth and Sport standards
-            </p>
-            <button onClick={onPartner}
-              className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all">
-              Request Accreditation Information
-            </button>
+            <p className="text-gray-600 max-w-2xl mx-auto mb-6">Our programs are fully aligned with the Ministry of Education, Youth and Sport standards</p>
+            <button onClick={onPartner} className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all">Request Accreditation Information</button>
           </Reveal>
         </div>
       </section>
@@ -984,9 +1729,7 @@ function GovernmentSection({ onPartner }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ROOT PAGE
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── ROOT PAGE ────────────────────────────────────────────────────────────────
 
 export function ProgramsPageEnhanced() {
   const [activeTab, setActiveTab] = useState('individual');
@@ -1003,19 +1746,18 @@ export function ProgramsPageEnhanced() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Navigation />
+
       <HeroSection onExplore={scrollToCourses} />
       <WhoAreYouSection activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <AnimatePresence mode="wait">
         {activeTab === 'individual' && (
-          <motion.div key="individual" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+          <motion.div key="individual" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
             <section ref={coursesRef} className="py-20 bg-gray-50">
               <div className="max-w-7xl mx-auto px-6 lg:px-10">
                 <Reveal className="mb-8">
                   <Eyebrow>Course Catalog</Eyebrow>
-                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-                    Explore by <GradientText>Category</GradientText>
-                  </h2>
+                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Explore by <GradientText>Category</GradientText></h2>
                 </Reveal>
                 <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
                 <div className="space-y-4">
@@ -1031,24 +1773,28 @@ export function ProgramsPageEnhanced() {
         )}
 
         {activeTab === 'corporate' && (
-          <motion.div key="corporate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+          <motion.div key="corporate" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
             <CorporateSection onQuote={() => setShowQuote(true)} />
           </motion.div>
         )}
 
         {activeTab === 'government' && (
-          <motion.div key="government" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
+          <motion.div key="government" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
             <GovernmentSection onPartner={() => setShowPartner(true)} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <CTASection />
+      {/* Certificate Center — always visible below all tab content */}
+      <CertificateCenter />
+
+      {/* <CTASection /> */}
       <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} onRegister={() => { setSelectedCourse(null); setShowRegForm(true); }} />
       <RegModal show={showRegForm} onClose={() => setShowRegForm(false)} course={selectedCourse} />
       <QuoteModal show={showQuote} onClose={() => setShowQuote(false)} />
       <PartnerModal show={showPartner} onClose={() => setShowPartner(false)} />
-      <Footer />
+        <CTASection />
+     <Footer />
     </div>
   );
 }

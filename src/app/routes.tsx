@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 
 
-import { ContactPage } from "./pages/ContactPage";
+
 import { ProgramsPageEnhanced as ProgramsPage } from "./pages/ProgramsPage";
 import { CertificationsPage } from "./pages/CertificationsPage";
 
@@ -13,6 +13,8 @@ import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { AboutPage } from "./pages/AboutPage";
 import { LandingPage } from "./pages/LandingPage";
 import ESGPage from "./pages/ESGPage";
+import { ContactPage } from "./pages/ContactPage";
+
 
 
 export const router = createBrowserRouter([
