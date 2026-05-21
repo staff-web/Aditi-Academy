@@ -72,7 +72,7 @@ export function Navigation() {
             to="/contact"
             className="hidden xl:inline-flex px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-900/40 text-sm"
           >
-            Contact Us
+            Tech Consultant
           </Link>
 
           {/* Mobile Menu Button */}
@@ -132,7 +132,7 @@ export function Navigation() {
                 onClick={() => setMobileOpen(false)}
                 className="block w-full px-5 py-2.5 sm:py-3 bg-red-600 text-white font-semibold rounded-lg text-center mt-3 sm:mt-4 text-sm sm:text-base"
               >
-                Contact Us
+                Tech Consultant
               </Link>
             </div>
           </motion.div>

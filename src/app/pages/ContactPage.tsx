@@ -14,6 +14,9 @@ import {
   Instagram,
   Sparkles,
   Globe,
+  Calendar,
+  ChevronDown,
+  Loader2,
 } from 'lucide-react';
 
 // 3D Scene component using Three.js (runs inside React)
@@ -118,6 +121,164 @@ function ThreeBackground() {
   return <div ref={containerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }} />;
 }
 
+// Google Calendar Integration Component
+function GoogleCalendarSelector({ selectedTime, onTimeSelect }: { selectedTime: string; onTimeSelect: (time: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+
+  // Function to fetch available slots from Google Calendar
+  const fetchAvailableSlots = async (date: string) => {
+    setLoading(true);
+    try {
+      // Replace with your actual Google Calendar API endpoint
+      // This is a demo endpoint - you'll need to set up proper Google Calendar API
+      const response = await fetch(`/api/google-calendar/slots?date=${date}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableSlots(data.slots || []);
+      } else {
+        // Demo data for preview
+        setAvailableSlots(generateDemoSlots());
+      }
+    } catch (error) {
+      console.error('Error fetching calendar slots:', error);
+      // Demo data fallback
+      setAvailableSlots(generateDemoSlots());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Generate demo time slots
+  const generateDemoSlots = () => {
+    const slots = [];
+    const times = ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'];
+    for (let i = 0; i < times.length; i++) {
+      slots.push({
+        id: i,
+        time: times[i],
+        available: Math.random() > 0.3,
+        date: selectedDate,
+      });
+    }
+    return slots;
+  };
+
+  // Get available dates for the next 7 days
+  const getAvailableDates = () => {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      dates.push(date.toISOString().split('T')[0]);
+    }
+    return dates;
+  };
+
+  useEffect(() => {
+    fetchAvailableSlots(selectedDate);
+  }, [selectedDate]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="relative"
+    >
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <Calendar className="inline-block w-4 h-4 mr-2 text-red-600" />
+        Select Available Time Slot *
+      </label>
+      
+      {/* Date Selection */}
+      <div className="mb-4">
+        <label className="block text-xs text-gray-500 mb-2">Select Date</label>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
+          {getAvailableDates().map((date, index) => {
+            const dateObj = new Date(date);
+            const isSelected = selectedDate === date;
+            const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+            const dayNum = dateObj.getDate();
+            
+            return (
+              <motion.button
+                key={date}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedDate(date)}
+                className={`p-2 rounded-lg text-center transition-all duration-300 ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-red-600 to-red-800 text-white shadow-lg'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <div className="text-xs font-semibold">{dayName}</div>
+                <div className="text-lg font-bold">{dayNum}</div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Time Slots */}
+      <div className="relative">
+        <label className="block text-xs text-gray-500 mb-2">Select Time</label>
+        {loading ? (
+          <div className="flex items-center justify-center p-8 bg-gray-50 rounded-xl">
+            <Loader2 className="w-6 h-6 text-red-600 animate-spin" />
+            <span className="ml-2 text-gray-600">Loading available slots...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {availableSlots.map((slot) => (
+              <motion.button
+                key={slot.id}
+                whileHover={slot.available ? { scale: 1.05 } : {}}
+                whileTap={slot.available ? { scale: 0.95 } : {}}
+                onClick={() => slot.available && onTimeSelect(`${selectedDate} - ${slot.time}`)}
+                disabled={!slot.available}
+                className={`p-3 rounded-xl text-center transition-all duration-300 ${
+                  selectedTime === `${selectedDate} - ${slot.time}`
+                    ? 'bg-gradient-to-r from-red-600 to-red-800 text-white shadow-lg'
+                    : slot.available
+                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer'
+                    : 'bg-gray-50 text-gray-400 cursor-not-allowed line-through'
+                }`}
+              >
+                <Clock className={`w-4 h-4 mx-auto mb-1 ${
+                  selectedTime === `${selectedDate} - ${slot.time}` ? 'text-white' : 'text-red-600'
+                }`} />
+                <span className="text-sm font-medium">{slot.time}</span>
+              </motion.button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {selectedTime && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-3 p-2 bg-green-50 rounded-lg border border-green-200"
+        >
+          <p className="text-xs text-green-800">
+            ✓ Selected time: {selectedTime}
+          </p>
+        </motion.div>
+      )}
+    </motion.div>
+  );
+}
+
 export function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -125,6 +286,7 @@ export function ContactPage() {
     phone: '',
     subject: '',
     message: '',
+    selectedTime: '',
   });
   
   const targetRef = useRef<HTMLDivElement>(null);
@@ -139,8 +301,14 @@ export function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form submitted:', formData);
-    alert('Message sent! (Demo)');
+    if (!formData.selectedTime) {
+      alert('Please select a time slot before submitting.');
+      return;
+    }
+    console.log('Contact form submitted with appointment:', formData);
+    alert(`Message sent! Your appointment is scheduled for ${formData.selectedTime}`);
+    // Here you would typically send this data to your backend
+    // which would then create the event in Google Calendar
   };
 
   return (
@@ -231,7 +399,7 @@ export function ContactPage() {
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-red-600 to-red-800 rounded-3xl opacity-20 group-hover:opacity-40 blur-2xl transition-all duration-700" />
                 <div className="relative bg-white border border-gray-200 rounded-3xl p-8 hover:border-red-300 hover:shadow-2xl transition-all duration-500 hover:scale-[1.01]">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-6">Schedule a Consultation</h2>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                       <InputField label="Full Name *" value={formData.name} onChange={(v) => setFormData({...formData, name: v})} type="text" />
@@ -241,6 +409,13 @@ export function ContactPage() {
                       <InputField label="Phone Number" value={formData.phone} onChange={(v) => setFormData({...formData, phone: v})} type="tel" />
                       <InputField label="Subject *" value={formData.subject} onChange={(v) => setFormData({...formData, subject: v})} type="text" />
                     </div>
+                    
+                    {/* Google Calendar Integration */}
+                    <GoogleCalendarSelector 
+                      selectedTime={formData.selectedTime}
+                      onTimeSelect={(time) => setFormData({...formData, selectedTime: time})}
+                    />
+                    
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Message *</label>
                       <textarea
@@ -257,7 +432,8 @@ export function ContactPage() {
                       type="submit"
                       className="w-full px-8 py-4 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-xl font-semibold shadow-xl flex items-center justify-center gap-2 group"
                     >
-                      Send Message
+                      <Calendar className="w-5 h-5" />
+                      Schedule Consultation
                       <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </motion.button>
                   </form>

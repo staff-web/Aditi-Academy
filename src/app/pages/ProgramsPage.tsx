@@ -13,6 +13,8 @@ import {
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
+const certificateImageUrl = new URL("../../assets/certificate.jpg", import.meta.url).href;
+
 
 // ─── BRAND ───────────────────────────────────────────────────────────────────
 const BRAND      = '#dc2626';
@@ -635,6 +637,11 @@ function CertificateCenter() {
   );
 }
 
+
+
+
+
+// Then replace the CertificateCard component with this:
 function CertificateCard({ cert }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { const t = setTimeout(() => setVisible(true), 100); return () => clearTimeout(t); }, []);
@@ -686,7 +693,7 @@ function CertificateCard({ cert }) {
             {/* Left Column - Large Image */}
             <div style={{
               flex: '0 0 auto',
-              width: '320px',  // Much larger image
+              width: '320px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -701,9 +708,9 @@ function CertificateCard({ cert }) {
                 textAlign: 'center',
                 border: '1px solid #fecaca',
               }}>
-                {/* Static Image */}
+                {/* USING THE SAME PATTERN AS MASCOT AND LOGO */}
                 <img 
-                  src="/src/assets/certificate.jpg" 
+                  src={certificateImageUrl}
                   alt="Certificate Seal" 
                   style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
                 />
