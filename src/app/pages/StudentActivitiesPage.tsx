@@ -11,6 +11,7 @@ import {
   ChevronDown, CheckCircle, X, Sparkles,
   Loader2, Eye
 } from 'lucide-react';
+import { CTASection } from '../components/CTASection';
 
 // ─── BRAND ───────────────────────────────────────────────────────────────────
 const BRAND = '#dc2626';
@@ -522,15 +523,6 @@ function WorkshopSection({ onOpen }: { onOpen: (item: any) => void }) {
   );
 }
 
-function CTASection() {
-  return (
-    <section style={{ padding: 'clamp(60px,8vw,100px) 5%', background: '#fafafa', textAlign: 'center' }}>
-      <div style={{ maxWidth: 700, margin: '0 auto' }}>
-        <ScrollReveal><div style={{ width: 64, height: 64, borderRadius: 20, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}><Sparkles size={28} color={BRAND} /></div><h2 style={{ fontSize: 'clamp(36px,5vw,62px)', fontWeight: 800, color: '#0a0a0a', marginBottom: 16 }}>Your future<br /><GradientText>starts here.</GradientText></h2><p style={{ fontSize: 17, color: '#888', marginBottom: 40 }}>Take the career path assessment or apply for a scholarship — your next chapter begins with one step.</p><div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}><motion.a href="#career" whileHover={{ scale: 1.02 }} style={{ padding: '15px 34px', background: BRAND, color: '#fff', borderRadius: 50, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8 }}>Explore My Path <ArrowRight size={17} /></motion.a><motion.a href="#scholarship" whileHover={{ scale: 1.02, background: '#fef2f2', borderColor: BRAND, color: BRAND }} style={{ padding: '15px 34px', background: 'transparent', color: '#555', border: '1.5px solid #ddd', borderRadius: 50, fontWeight: 600, textDecoration: 'none' }}>Apply for Scholarship</motion.a></div></ScrollReveal>
-      </div>
-    </section>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════ ROOT ═══════════════════════════════════════════════════════ */
 export function StudentActivitiesPage() {

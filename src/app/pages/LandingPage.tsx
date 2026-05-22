@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useInView } from 'motion/react';
+import { motion, useMotionValue, useTransform, useSpring, useInView, useScroll } from 'framer-motion';
 import { Navigation } from '../components/Navigation';
 import { ParallaxTechBackground } from '../components/ParallaxTechBackground';
 import { TechnologyAnimation } from '../components/TechnologyAnimation';
@@ -28,6 +28,8 @@ import {
   Lock,
   Cloud,
 } from 'lucide-react';
+import { CTASection } from '../components/CTASection';
+
 
 /* ═══════════════════════════════════════════════════════════════
    3D TILT HOOK
@@ -109,18 +111,80 @@ function SectionLabel({ children }) {
   );
 }
 
-function TechGrid({ opacity = 0.025, color = '#B51D39', size = 48 }) {
+
+const Partner3DCard = ({ partner, index, logoUrl }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const rotateX = useTransform(y, [-100, 100], [15, -15]);
+  const rotateY = useTransform(x, [-100, 100], [-15, 15]);
+  
+  const springRotateX = useSpring(rotateX, { damping: 20, stiffness: 300 });
+  const springRotateY = useSpring(rotateY, { damping: 20, stiffness: 300 });
+  
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set(e.clientX - centerX);
+    y.set(e.clientY - centerY);
+  };
+  
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsHovered(false);
+  };
+  
   return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        backgroundImage: `linear-gradient(${color} 1px,transparent 1px),linear-gradient(90deg,${color} 1px,transparent 1px)`,
-        backgroundSize: `${size}px ${size}px`,
-        opacity,
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8, rotateY: 30 }}
+      whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+      viewport={{ once: true }}
+      transition={{ 
+        duration: 0.5, 
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 100
       }}
-    />
+      style={{
+        rotateX: springRotateX,
+        rotateY: springRotateY,
+        transformStyle: "preserve-3d"
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      className="group cursor-pointer"
+    >
+      <div className={`relative rounded-xl bg-white p-4 md:p-6 shadow-md transition-all duration-300 ${
+        isHovered ? 'shadow-2xl shadow-red-500/20' : 'shadow-md'
+      }`}>
+        <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-red-500 via-red-600 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm -z-10 ${
+          isHovered ? 'scale-105' : 'scale-100'
+        }`} />
+        
+        <div className="relative z-10">
+          <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 bg-white rounded-xl flex items-center justify-center p-3 group-hover:scale-110 transition-transform duration-300">
+            <img 
+              src={logoUrl} 
+              alt={partner}
+              className="w-full h-full object-contain"
+              loading="lazy"
+            />
+          </div>
+          <p className="text-sm md:text-base font-semibold text-gray-700 group-hover:text-red-600 transition-colors duration-300 text-center">
+            {partner}
+          </p>
+          <p className="text-xs text-gray-400 mt-2 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Strategic Partner
+          </p>
+        </div>
+      </div>
+    </motion.div>
   );
-}
+};
 
 /* ═══════════════════════════════════════════════════════════════
    ROOT PAGE — UNCHANGED STRUCTURE (Navigation, Footer, Link, etc.)
@@ -158,6 +222,7 @@ export function LandingPage() {
         <CareerBoostSectionInline />
         <EnterpriseSectionInline />
         <QualityAssuranceSectionInline />
+        <CTASection />
         <Footer />
       </div>
     </div>
@@ -333,28 +398,38 @@ function HeroSectionInline() {
         <PremiumTechBackgroundInline />
       </div>
 
-      <div className="w-full max-w-[1600px] mx-auto px-8 py-20">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20">
         <motion.div style={{ y, opacity }} className="relative">
-          <div className="relative w-full h-[600px] lg:h-[700px] rounded-3xl overflow-hidden">
+          <div className="relative w-full h-[500px] sm:h-[550px] md:h-[600px] lg:h-[700px] rounded-2xl sm:rounded-3xl overflow-hidden">
+            
+            {/* Gradient Overlay - Responsive positioning */}
             <div
               className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"
-              style={{ background: 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, transparent 90%)' }}
+              style={{ 
+                background: 'linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 70%, transparent 100%)' 
+              }}
             />
+            
+            {/* Image */}
             <img
               src="https://iili.io/B5aiJd7.jpg"
               alt="Technology training professionals"
               className="w-full h-full object-cover object-center"
               style={{ filter: 'none' }}
             />
+            
+            {/* Red tint overlay - Responsive */}
             <div
-              className="absolute inset-0 bg-gradient-to-r from-red-950/30 via-transparent to-transparent"
-              style={{ background: 'linear-gradient(to right, rgba(127,29,29,0.3) 0%, transparent 40%)' }}
+              className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-transparent"
+              style={{ background: 'linear-gradient(to right, rgba(127,29,29,0.2) 0%, transparent 50%)' }}
             />
 
+            {/* Content Container */}
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full max-w-3xl px-12 lg:px-20">
-                <div className="space-y-6">
-                  {/* Main Headline */}
+              <div className="w-full max-w-3xl px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20">
+                <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                  
+                  {/* Main Headline - Responsive text sizes */}
                   <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -363,15 +438,15 @@ function HeroSectionInline() {
                       delay: 0.3,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] text-white"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.2] sm:leading-[1.15] md:leading-[1.1] text-white"
                   >
                     Technology courses for the{" "}
-                    <span className="text-red-500">
+                    <span className="text-red-500 inline-block">
                       real world
                     </span>
                   </motion.h1>
 
-                  {/* Subtitle */}
+                  {/* Subtitle - Responsive text sizes */}
                   <motion.p
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -380,13 +455,13 @@ function HeroSectionInline() {
                       delay: 0.4,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="text-xl lg:text-2xl text-gray-200 leading-relaxed max-w-2xl"
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 leading-relaxed max-w-2xl"
                   >
                     Get certified with industry leaders in
                     technology and AI security.
                   </motion.p>
 
-                  {/* CTA Buttons */}
+                  {/* CTA Buttons - Responsive sizing and stacking */}
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -395,25 +470,25 @@ function HeroSectionInline() {
                       delay: 0.5,
                       ease: [0.16, 1, 0.3, 1],
                     }}
-                    className="flex flex-wrap gap-4 pt-2"
+                    className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2 sm:pt-3 md:pt-4"
                   >
                     <Link
                       to="/programs"
-                      className="group px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-lg rounded-lg transition-all duration-300 hover:shadow-xl hover:shadow-red-900/40"
+                      className="group px-6 sm:px-8 py-3 sm:py-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-base sm:text-lg rounded-lg transition-all duration-300 hover:shadow-xl hover:shadow-red-900/40 text-center"
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         Explore Programs
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                       </span>
                     </Link>
 
                     <Link
                       to="/contact"
-                      className="group px-8 py-4 bg-white/10 backdrop-blur-xl border-2 border-white/30 text-white font-semibold text-lg rounded-lg hover:bg-white/20 hover:border-white/40 transition-all duration-300"
+                      className="group px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-xl border-2 border-white/30 text-white font-semibold text-base sm:text-lg rounded-lg hover:bg-white/20 hover:border-white/40 transition-all duration-300 text-center"
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         Tech Consultant
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" />
                       </span>
                     </Link>
                   </motion.div>
@@ -421,28 +496,35 @@ function HeroSectionInline() {
               </div>
             </div>
 
+            {/* Bottom Trust Bar - Responsive design */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
-              className="absolute bottom-0 left-0 right-0 px-12 lg:px-20 py-8 bg-gradient-to-t from-black/80 to-transparent"
+              className="absolute bottom-0 left-0 right-0 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 py-4 sm:py-6 md:py-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent"
             >
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="text-white text-lg">
-                  Trusted by <strong className="text-red-500">400,000+</strong> Certified Professionals Worldwide
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                
+                {/* Trust text - Responsive sizing */}
+                <div className="text-white text-sm sm:text-base md:text-lg text-center sm:text-left">
+                  Trusted by <strong className="text-red-500">400,000+</strong>{" "}
+                  <span className="hidden sm:inline">Certified Professionals Worldwide</span>
+                  <span className="inline sm:hidden">Certified Pros Worldwide</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-white text-2xl font-bold">4.7</div>
+                
+                {/* Rating section - Responsive layout */}
+                <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
+                  <div className="text-white text-xl sm:text-2xl font-bold">4.7</div>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-green-500 fill-green-500" />
+                      <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 fill-green-500" />
                     ))}
                   </div>
                   <div className="flex items-center gap-2">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none">
                       <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#00B67A" />
                     </svg>
-                    <span className="text-gray-200 font-medium">Trustpilot</span>
+                    <span className="text-gray-200 font-medium text-sm sm:text-base">Trustpilot</span>
                   </div>
                 </div>
               </div>
@@ -453,6 +535,7 @@ function HeroSectionInline() {
     </div>
   );
 }
+
 /* ═══════════════════════════════════════════════════════════════
    NEW: STATS BANNER — dark strip between hero and milestones
 ═══════════════════════════════════════════════════════════════ */
@@ -467,7 +550,7 @@ function StatsBannerInline() {
   ];
   return (
     <section ref={ref} className="relative py-14 bg-gray-950 overflow-hidden">
-      <TechGrid opacity={0.07} color="#dc2626" size={40} />
+    
       <div className="absolute inset-0 bg-gradient-to-r from-red-950/20 via-transparent to-red-950/20 pointer-events-none" />
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -509,7 +592,7 @@ function TechShowcaseSectionInline() {
 
   return (
     <section className="relative py-24 bg-gray-950 overflow-hidden">
-      <TechGrid opacity={0.06} color="#dc2626" size={40} />
+      
       {/* Ambient glow orbs */}
       <motion.div
         className="absolute top-1/2 right-0 w-96 h-96 pointer-events-none"
@@ -610,7 +693,7 @@ function MilestonesSectionInline() {
 
   return (
     <section ref={ref} className="relative py-28 bg-white overflow-hidden">
-      <TechGrid />
+     
       {/* Ambient glow */}
       <motion.div
         className="absolute -right-20 top-20 w-80 h-80 pointer-events-none"
@@ -652,7 +735,7 @@ function MilestonesSectionInline() {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
               >
                 <Card3D
-                  className="group relative rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-red-100/60 transition-shadow duration-400 bg-white h-full"
+                  className="group relative rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-xl hover:shadow-red-100/60 transition-shadow duration-400"
                   strength={12}
                 >
                   {/* Image strip with parallax */}
@@ -664,7 +747,7 @@ function MilestonesSectionInline() {
                       speed={0.1}
                       style={{ filter: 'brightness(0.72) saturate(0.85)' }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/90" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-transparent" />
                     {/* Icon bubble floating over image/content boundary */}
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-11 h-11 bg-white rounded-full border-2 border-red-100 shadow-lg flex items-center justify-center z-10">
                       <Icon className="w-5 h-5 text-red-600" />
@@ -711,7 +794,7 @@ function TechGallerySectionInline() {
 
   return (
     <section className="relative py-20 bg-gray-950 overflow-hidden">
-      <TechGrid opacity={0.05} color="#dc2626" size={36} />
+     
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
         <motion.div
@@ -806,7 +889,7 @@ function ProgramsSectionInline() {
   return (
     <section ref={containerRef} className="relative py-28 bg-gray-50 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-200 to-transparent" />
-      <TechGrid />
+    
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
         <motion.div
@@ -826,10 +909,10 @@ function ProgramsSectionInline() {
             </p>
           </div>
           <a
-            href="/training/individual"
+            href="/programs"
             className="group flex-shrink-0 inline-flex items-center gap-2 px-7 py-3.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-200 hover:shadow-red-300 transition-all duration-300"
           >
-            Get Training
+            Explore Our Program
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </a>
         </motion.div>
@@ -894,7 +977,7 @@ function ProgramsSectionInline() {
                   </ul>
 
                   <a
-                    href={`/programs/course/${program.slug}`}
+                    href={`/programs`}
                     className="group/link mt-auto inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"
                   >
                     Learn More
@@ -1022,7 +1105,7 @@ function EnterpriseSectionInline() {
   return (
     <section className="relative py-28 bg-gray-50 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-200 to-transparent" />
-      <TechGrid />
+ 
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 space-y-24">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
@@ -1123,30 +1206,209 @@ function EnterpriseSectionInline() {
           </div>
         </div>
 
-        {/* Partner Showcase */}
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
-          <div className="inline-flex items-center gap-2 mb-5">
-            <Globe className="w-4 h-4 text-red-600" />
-            <span className="text-xs font-bold tracking-[0.15em] text-red-600 uppercase">Partner Showcase</span>
-          </div>
-          <p className="text-gray-500 mb-10">Working with education, government, and international technology partners.</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {partners.map((partner) => (
-              <motion.div key={partner} whileHover={{ y: -3, scale: 1.02 }} className="rounded-xl border border-gray-200 bg-white p-4 text-xs font-semibold text-gray-600 shadow-sm hover:border-red-200 hover:text-red-600 hover:shadow-md transition-all duration-300 cursor-pointer">
-                {partner}
+        {/* Partner Showcase - Professional Horizontal Marquee */}
+<motion.div 
+  initial={{ opacity: 0, y: 24 }} 
+  whileInView={{ opacity: 1, y: 0 }} 
+  viewport={{ once: true }} 
+  transition={{ duration: 0.6, delay: 0.2 }} 
+  className="text-center mt-24"
+>
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: 0.3 }}
+  >
+    <div className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-gradient-to-r from-red-50 to-transparent">
+      <Globe className="w-4 h-4 text-red-600 animate-pulse" />
+      <span className="text-xs font-bold tracking-[0.15em] text-red-600 uppercase">Partner Showcase</span>
+    </div>
+  </motion.div>
+  
+  <motion.p 
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: 0.4 }}
+    className="text-gray-500 mb-10 px-4 text-sm md:text-base"
+  >
+    Working with education, government, and international technology partners.
+  </motion.p>
+  
+  {/* Horizontal Marquee Container */}
+  <div className="relative w-full overflow-hidden py-8">
+    {/* Gradient overlays for smooth edges */}
+    <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-r from-white via-white/80 to-transparent" />
+    <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-l from-white via-white/80 to-transparent" />
+    
+    {/* Marquee Track */}
+    <div className="flex overflow-hidden">
+      <motion.div 
+        className="flex gap-6 md:gap-8"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ 
+          duration: 30,
+          repeat: Infinity,
+          ease: "linear",
+          repeatType: "loop"
+        }}
+      >
+        {/* Partner Cards - First Set */}
+        {[
+          { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
+          { name: "AWS", logo: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" },
+          { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
+          { name: "Cisco", logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg" },
+          { name: "IBM", logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" },
+          { name: "Oracle", logo: "https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" },
+          { name: "Salesforce", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" },
+          { name: "Adobe", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Adobe_Logo.svg" },
+        ].map((partner, idx) => (
+          <motion.div
+            key={`${partner.name}-${idx}`}
+            whileHover={{ y: -5 }}
+            className="group relative w-40 md:w-48"
+          >
+            <div className="relative rounded-2xl bg-white p-5 shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-red-300 overflow-hidden">
+              {/* Tech scan line */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none rounded-2xl"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent"
+                  animate={{ y: ["-100%", "500%"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ filter: "blur(2px)" }}
+                />
+                <motion.div
+                  className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-400 to-transparent"
+                  animate={{ y: ["500%", "-100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  style={{ filter: "blur(1px)" }}
+                />
               </motion.div>
-            ))}
-          </div>
-          <div className="mt-12">
-            <Link
-              to="/contact"
-              className="group inline-flex items-center gap-2 px-9 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-200 hover:shadow-red-300 transition-all duration-300"
-            >
-              Request Partnership
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-        </motion.div>
+              
+              {/* Hover glow */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-50/0 via-red-50/0 to-red-50/0 group-hover:from-red-50/50 group-hover:via-red-50/30 group-hover:to-red-50/50 transition-all duration-500" />
+              
+              {/* Logo container - transparent background */}
+              <div className="relative z-10">
+                <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 flex items-center justify-center p-3 group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={partner.logo}
+                    alt={partner.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-sm md:text-base font-semibold text-gray-800 group-hover:text-red-600 transition-colors duration-300 text-center">
+                  {partner.name}
+                </p>
+                <p className="text-xs text-gray-400 mt-1.5 text-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
+                  Strategic Partner
+                </p>
+              </div>
+              
+              {/* Corner accents */}
+              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+            </div>
+          </motion.div>
+        ))}
+        
+        {/* Duplicate Set for Seamless Loop */}
+        {[
+          { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
+          { name: "AWS", logo: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" },
+          { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
+          { name: "Cisco", logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg" },
+          { name: "IBM", logo: "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" },
+          { name: "Oracle", logo: "https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg" },
+          { name: "Salesforce", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" },
+          { name: "Adobe", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Adobe_Logo.svg" },
+        ].map((partner, idx) => (
+          <motion.div
+            key={`${partner.name}-dup-${idx}`}
+            whileHover={{ y: -5 }}
+            className="group relative w-40 md:w-48"
+          >
+            <div className="relative rounded-2xl bg-white p-5 shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-red-300 overflow-hidden">
+              <motion.div
+                className="absolute inset-0 pointer-events-none rounded-2xl"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div
+                  className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent"
+                  animate={{ y: ["-100%", "500%"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ filter: "blur(2px)" }}
+                />
+                <motion.div
+                  className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-red-400 to-transparent"
+                  animate={{ y: ["500%", "-100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                  style={{ filter: "blur(1px)" }}
+                />
+              </motion.div>
+              
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-50/0 via-red-50/0 to-red-50/0 group-hover:from-red-50/50 group-hover:via-red-50/30 group-hover:to-red-50/50 transition-all duration-500" />
+              
+              <div className="relative z-10">
+                <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 flex items-center justify-center p-3 group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={partner.logo}
+                    alt={partner.name}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="text-sm md:text-base font-semibold text-gray-800 group-hover:text-red-600 transition-colors duration-300 text-center">
+                  {partner.name}
+                </p>
+                <p className="text-xs text-gray-400 mt-1.5 text-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
+                  Strategic Partner
+                </p>
+              </div>
+              
+              <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+              <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
+  </div>
+  
+  <motion.div 
+    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, delay: 0.8, type: "spring", stiffness: 200 }}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="mt-12"
+  >
+    <Link
+      to="/contact"
+      className="group inline-flex items-center gap-2 px-6 sm:px-8 md:px-9 py-3 sm:py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold text-sm sm:text-base rounded-xl shadow-lg shadow-red-200 hover:shadow-red-300 hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+    >
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      <span>Request Partnership</span>
+      <ArrowRight className="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" />
+    </Link>
+  </motion.div>
+</motion.div>
+
       </div>
     </section>
   );
@@ -1176,7 +1438,7 @@ function QualityAssuranceSectionInline() {
   return (
     <section ref={containerRef} className="relative py-28 bg-white overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-200 to-transparent" />
-      <TechGrid />
+   
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-20">

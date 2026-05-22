@@ -1,21 +1,21 @@
-import { motion, useScroll, useTransform, useSpring, useMotionValue, useInView } from 'motion/react';
-import { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, useSpring, useMotionValue, useInView, AnimatePresence } from 'motion/react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import {
-  ChevronDown, Globe, Users, Award, Leaf, Heart, Shield,
-  CheckCircle, Sparkles, TrendingUp, Target, BarChart3,
-  Building2, GraduationCap, Code, Brain, Cloud, Network,
-  Database, Cpu, Server, Wind, Trees, Sun, Droplets, Star,
-
+  Globe, Users, Award, Leaf, Heart, Shield,
+  CheckCircle, Sparkles, Building2, GraduationCap,
+  Code, Brain, Cloud, Network, Cpu, Wind, Trees,
+  ArrowRight, ExternalLink, TrendingUp,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
+import { CTASection } from '../components/CTASection';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BRAND COLORS
-// ─────────────────────────────────────────────────────────────────────────────
-const BRAND = '#dc2626';
+// ─── BRAND TOKEN — never changes ───────────────────────────────────────────
+const RED = '#dc2626';
+const RED_DARK = '#b91c1c';
+const RED_LIGHT = '#fca5a5';
 
-// Images
+// ─── IMAGES ────────────────────────────────────────────────────────────────
 const IMGS = {
   hero: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1800&q=80',
   digitalTransformation: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
@@ -28,713 +28,696 @@ const IMGS = {
   aiTechnology: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&q=80',
   cybersecurity: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80',
   cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
-  dataAnalytics: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
   teamwork: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80',
   innovation: 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=1200&q=80',
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ANIMATION COMPONENTS (from your existing pages)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// SHARED PRIMITIVES
+// ═══════════════════════════════════════════════════════════════════════════
 
-function Reveal({ children, delay = 0, direction = 'up', className = '' }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
-
-  const directions = {
-    up: { y: 60, x: 0 },
-    down: { y: -60, x: 0 },
-    left: { y: 0, x: 60 },
-    right: { y: 0, x: -60 },
-  };
-
-  const { y, x } = directions[direction] || directions.up;
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y, x }}
-      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function ParallaxScroll({ children, speed = 0.02, direction = 'up', className = '' }) {
+function useParallax(offset = 80) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], direction === 'up' ? [60, -60] : [-60, 60]);
-
-  return (
-    <motion.div ref={ref} style={{ y }} className={className}>
-      {children}
-    </motion.div>
-  );
+  const y = useTransform(scrollYProgress, [0, 1], [offset, -offset]);
+  return { ref, y };
 }
 
-function TiltCard({ children, intensity = 8, className = '' }) {
+function Reveal({ children, delay = 0, dir = 'up', className = '' }) {
   const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [intensity, -intensity]), { stiffness: 300, damping: 30 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-intensity, intensity]), { stiffness: 300, damping: 30 });
-
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const init = { up: { y: 56, x: 0 }, down: { y: -56, x: 0 }, left: { y: 0, x: 56 }, right: { y: 0, x: -56 } }[dir] || { y: 56, x: 0 };
   return (
-    <motion.div
-      ref={ref}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 1200 }}
-      className={className}
-      onMouseMove={(e) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if (rect) {
-          x.set((e.clientX - rect.left) / rect.width - 0.5);
-          y.set((e.clientY - rect.top) / rect.height - 0.5);
-        }
-      }}
-      onMouseLeave={() => { x.set(0); y.set(0); }}
-    >
+    <motion.div ref={ref} className={className}
+      initial={{ opacity: 0, ...init }}
+      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}>
       {children}
     </motion.div>
   );
 }
 
-function HoverCard({ children, className = '' }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      className={className}
-      style={{
-        borderRadius: 24,
-        border: `1px solid ${isHovered ? BRAND + '30' : '#e5e7eb'}`,
-        background: '#fff',
-        boxShadow: isHovered
-          ? `0 20px 40px -12px rgba(0,0,0,0.15), 0 0 0 1px ${BRAND}10`
-          : '0 1px 3px rgba(0,0,0,0.05)',
-        transition: 'all 0.3s ease',
-        transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function AnimatedCounter({ value, suffix = '', duration = 2 }) {
+function Magnetic3D({ children, strength = 10, className = '' }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
-  const [count, setCount] = useState(0);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rx = useSpring(useTransform(my, [-0.5, 0.5], [strength, -strength]), { stiffness: 300, damping: 30 });
+  const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-strength, strength]), { stiffness: 300, damping: 30 });
+  return (
+    <motion.div ref={ref} className={className}
+      style={{ rotateX: rx, rotateY: ry, transformStyle: 'preserve-3d', perspective: 1200 }}
+      onMouseMove={e => {
+        const r = ref.current?.getBoundingClientRect();
+        if (r) { mx.set((e.clientX - r.left) / r.width - 0.5); my.set((e.clientY - r.top) / r.height - 0.5); }
+      }}
+      onMouseLeave={() => { mx.set(0); my.set(0); }}>
+      {children}
+    </motion.div>
+  );
+}
 
+function AnimatedCounter({ target, suffix = '', decimals = 0 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const [val, setVal] = useState(0);
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const increment = value / (duration * 60);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= value) {
-        setCount(value);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [inView, value, duration]);
-
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+    const dur = 2200, fps = 60, steps = (dur / 1000) * fps;
+    let i = 0;
+    const tick = () => {
+      i++;
+      const progress = 1 - Math.pow(1 - i / steps, 4);
+      setVal(progress >= 1 ? target : target * progress);
+      if (i < steps) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, target]);
+  return <span ref={ref}>{decimals ? val.toFixed(decimals) : Math.floor(val).toLocaleString()}{suffix}</span>;
 }
 
-function SectionLabel({ children }) {
+function SectionLabel({ children, invert = false }) {
   return (
-    <div className="inline-flex items-center gap-2.5 mb-5">
-      <span className="block w-8 h-px bg-red-600" />
-      <span className="text-xs font-bold tracking-[0.2em] text-red-600 uppercase">{children}</span>
-      <span className="block w-8 h-px bg-red-600" />
+    <div className="inline-flex items-center gap-3 mb-6">
+      <span className={`h-px w-10 ${invert ? 'bg-red-300' : 'bg-red-600'}`} />
+      <span className={`text-[11px] font-black tracking-[0.25em] uppercase ${invert ? 'text-red-300' : 'text-red-600'}`}>{children}</span>
+      <span className={`h-px w-10 ${invert ? 'bg-red-300' : 'bg-red-600'}`} />
     </div>
   );
 }
 
-function GradientText({ children }) {
-  return (
-    <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
-      {children}
-    </span>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PREMIUM TECH SCANNING BACKGROUND (DARK HERO ONLY)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// TECH SCAN HERO OVERLAYS
+// ═══════════════════════════════════════════════════════════════════════════
 
 function TechScanningBackground() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [go, setGo] = useState(false);
+  useEffect(() => { setTimeout(() => setGo(true), 300); }, []);
 
   return (
     <>
-      {/* Horizontal scan lines */}
-      <motion.div
-        initial={{ x: '-5%', opacity: 0 }}
-        animate={{
-          x: mounted ? '105%' : '-5%',
-          opacity: mounted ? [0, 1, 1, 0.5, 0] : 0,
-        }}
-        transition={{ duration: 4.5, delay: 1.5, repeat: Infinity, repeatDelay: 3, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 w-2 h-full pointer-events-none z-50"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(220, 38, 38, 0.2) 20%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.2) 80%, transparent 100%)',
-          filter: 'blur(3px)',
-          boxShadow: '0 0 60px 25px rgba(220, 38, 38, 0.7), 0 0 100px 50px rgba(220, 38, 38, 0.3)',
-        }}
-      />
+      {/* Horizontal laser sweep */}
+      <motion.div className="absolute top-0 left-0 w-[3px] h-full pointer-events-none z-50"
+        style={{ background: `linear-gradient(to bottom,transparent,${RED}dd 50%,transparent)`, filter: 'blur(3px)', boxShadow: `0 0 60px 20px ${RED}99` }}
+        initial={{ x: '-4%', opacity: 0 }}
+        animate={go ? { x: '104%', opacity: [0, 1, 1, 0] } : {}}
+        transition={{ duration: 4.5, delay: 1.2, repeat: Infinity, repeatDelay: 4, ease: [0.22, 1, 0.36, 1] }} />
 
-      <motion.div
-        initial={{ y: '-5%', opacity: 0 }}
-        animate={{ y: mounted ? '105%' : '-5%', opacity: mounted ? [0, 1, 1, 0.6, 0] : 0 }}
-        transition={{ duration: 3.5, delay: 1, repeat: Infinity, repeatDelay: 5, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute top-0 left-0 w-full h-2 pointer-events-none z-50"
-        style={{
-          background: 'linear-gradient(to right, transparent 0%, rgba(220, 38, 38, 0.3) 25%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.3) 75%, transparent 100%)',
-          filter: 'blur(2px)',
-          boxShadow: '0 0 80px 30px rgba(220, 38, 38, 0.8), 0 0 120px 60px rgba(220, 38, 38, 0.4)',
-        }}
-      />
+      {/* Vertical laser sweep */}
+      <motion.div className="absolute top-0 left-0 w-full h-[3px] pointer-events-none z-50"
+        style={{ background: `linear-gradient(to right,transparent,${RED}dd 50%,transparent)`, filter: 'blur(2px)', boxShadow: `0 0 80px 24px ${RED}aa` }}
+        initial={{ y: '-4%', opacity: 0 }}
+        animate={go ? { y: '104%', opacity: [0, 1, 1, 0] } : {}}
+        transition={{ duration: 3.2, delay: 0.8, repeat: Infinity, repeatDelay: 6, ease: [0.16, 1, 0.3, 1] }} />
 
-      {/* Corner brackets */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 1.5 }}
-        className="absolute top-8 left-8 pointer-events-none z-40"
-      >
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <motion.path
-            d="M 50,0 L 0,0 L 0,50"
-            stroke="rgba(220, 38, 38, 0.8)"
-            strokeWidth="3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, delay: 2 }}
-          />
-          <motion.path
-            d="M 30,5 L 5,5 L 5,30"
-            stroke="rgba(220, 38, 38, 0.5)"
-            strokeWidth="1.5"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.2, delay: 2.5 }}
-          />
-        </svg>
+      {/* Corner HUD brackets */}
+      {[
+        { cls: 'top-8 left-8', d1: 'M40,0 L0,0 L0,40', d2: 'M24,4 L4,4 L4,24' },
+        { cls: 'top-8 right-8', d1: 'M0,0 L40,0 L40,40', d2: 'M16,4 L36,4 L36,24' },
+        { cls: 'bottom-8 left-8', d1: 'M40,40 L0,40 L0,0', d2: 'M24,36 L4,36 L4,16' },
+        { cls: 'bottom-8 right-8', d1: 'M0,40 L40,40 L40,0', d2: 'M16,36 L36,36 L36,16' },
+      ].map((c, i) => (
+        <motion.div key={i} className={`absolute ${c.cls} pointer-events-none z-40`}
+          initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.5 + i * 0.12, duration: 0.6 }}>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <motion.path d={c.d1} stroke={RED} strokeWidth="2.5"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 1.2, delay: 1.8 + i * 0.15 }} />
+            <motion.path d={c.d2} stroke={`${RED}66`} strokeWidth="1.2"
+              initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+              transition={{ duration: 0.9, delay: 2.1 + i * 0.15 }} />
+          </svg>
+        </motion.div>
+      ))}
+
+      {/* Scanning rect — center focus box */}
+      <motion.div className="absolute pointer-events-none z-30"
+        style={{ left: '12%', top: '30%', width: 320, height: 220, border: `1.5px solid ${RED}55`, boxShadow: `inset 0 0 40px ${RED}18, 0 0 40px ${RED}28` }}
+        initial={{ opacity: 0, scale: 0.88 }}
+        animate={{ opacity: [0, 0.7, 0.6], scale: [0.88, 1.02, 1] }}
+        transition={{ duration: 2.4, delay: 2.8 }}>
+        {/* Animated scan line inside box */}
+        <motion.div className="absolute left-0 w-full h-[2px]"
+          style={{ background: `linear-gradient(to right,transparent,${RED},transparent)`, boxShadow: `0 0 24px 4px ${RED}` }}
+          animate={{ y: [0, 218, 0] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', delay: 3.5 }} />
+        {/* Corner dots */}
+        {['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'].map((p, i) => (
+          <motion.span key={i} className={`absolute ${p} w-2 h-2 rounded-full`}
+            style={{ background: RED, boxShadow: `0 0 8px 2px ${RED}` }}
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.18 }} />
+        ))}
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 1.7 }}
-        className="absolute top-8 right-8 pointer-events-none z-40"
-      >
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <motion.path
-            d="M 90,0 L 140,0 L 140,50"
-            stroke="rgba(220, 38, 38, 0.8)"
-            strokeWidth="3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, delay: 2.2 }}
-          />
-          <motion.path
-            d="M 110,5 L 135,5 L 135,30"
-            stroke="rgba(220, 38, 38, 0.5)"
-            strokeWidth="1.5"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.2, delay: 2.7 }}
-          />
-        </svg>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 1.9 }}
-        className="absolute bottom-8 left-8 pointer-events-none z-40"
-      >
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <motion.path
-            d="M 50,140 L 0,140 L 0,90"
-            stroke="rgba(220, 38, 38, 0.8)"
-            strokeWidth="3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, delay: 2.4 }}
-          />
-          <motion.path
-            d="M 30,135 L 5,135 L 5,110"
-            stroke="rgba(220, 38, 38, 0.5)"
-            strokeWidth="1.5"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.2, delay: 2.9 }}
-          />
-        </svg>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 2.1 }}
-        className="absolute bottom-8 right-8 pointer-events-none z-40"
-      >
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <motion.path
-            d="M 90,140 L 140,140 L 140,90"
-            stroke="rgba(220, 38, 38, 0.8)"
-            strokeWidth="3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, delay: 2.6 }}
-          />
-          <motion.path
-            d="M 110,135 L 135,135 L 135,110"
-            stroke="rgba(220, 38, 38, 0.5)"
-            strokeWidth="1.5"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 1.2, delay: 3.1 }}
-          />
-        </svg>
-      </motion.div>
-
-      {/* Scanning rectangle */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: [0, 0.6, 0.6, 0.4], scale: [0.85, 1.05, 1, 1] }}
-        transition={{ duration: 2.5, delay: 3, times: [0, 0.2, 0.5, 1] }}
-        className="absolute left-[15%] top-[35%] w-96 h-64 border-2 border-red-600/60 pointer-events-none z-35"
-        style={{ boxShadow: 'inset 0 0 60px rgba(220, 38, 38, 0.2), 0 0 60px rgba(220, 38, 38, 0.35)' }}
-      >
-        <motion.div
-          className="absolute -top-2 -left-2 w-10 h-10 border-t-[5px] border-l-[5px] border-red-500"
-          animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 4 }}
-        />
-        <motion.div
-          className="absolute -top-2 -right-2 w-10 h-10 border-t-[5px] border-r-[5px] border-red-500"
-          animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 4.2 }}
-        />
-        <motion.div
-          className="absolute -bottom-2 -left-2 w-10 h-10 border-b-[5px] border-l-[5px] border-red-500"
-          animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 4.4 }}
-        />
-        <motion.div
-          className="absolute -bottom-2 -right-2 w-10 h-10 border-b-[5px] border-r-[5px] border-red-500"
-          animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 4.6 }}
-        />
-        <motion.div
-          animate={{ y: ['0%', '100%', '0%'] }}
-          transition={{ duration: 2, repeat: Infinity, ease: [0.16, 1, 0.3, 1], delay: 4 }}
-          className="absolute left-0 w-full h-3"
-          style={{
-            background: 'linear-gradient(to bottom, transparent, rgba(220, 38, 38, 0.95) 50%, transparent)',
-            filter: 'blur(3px)',
-            boxShadow: '0 0 30px 5px rgba(220, 38, 38, 1), 0 0 60px 15px rgba(220, 38, 38, 0.6)',
-          }}
-        />
-      </motion.div>
-
-      {/* Glow orb */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 0.08, scale: 1 }}
-        transition={{ duration: 2.5, delay: 1.5 }}
-        className="absolute top-1/3 left-1/3 w-[500px] h-[500px] pointer-events-none z-5"
-        style={{ background: 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)', filter: 'blur(80px)' }}
-      />
+      {/* Ambient glow */}
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] pointer-events-none"
+        style={{ background: `radial-gradient(circle,${RED}14 0%,transparent 70%)`, filter: 'blur(60px)' }} />
     </>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HERO SECTION (DARK MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// HERO
+// ═══════════════════════════════════════════════════════════════════════════
 
 function HeroSection() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 160]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden bg-black">
-      {/* Background image with parallax */}
-      <motion.div className="absolute inset-0 z-0" style={{ scale: imageScale }}>
-        <img src={IMGS.hero} alt="Technology Background" className="w-full h-full object-cover opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+      <motion.div className="absolute inset-0 z-0" style={{ scale: imgScale }}>
+        <img src={IMGS.hero} alt="" className="w-full h-full object-cover opacity-25" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg,#000000 0%,#000000cc 40%,transparent 100%)' }} />
       </motion.div>
 
-      {/* Tech scanning overlay */}
-      <div className="absolute inset-0 z-0">
-        <TechScanningBackground />
+      {/* Noise texture */}
+      <div className="absolute inset-0 z-0 opacity-[0.03]"
+        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundRepeat: 'repeat', backgroundSize: '128px' }} />
+
+      <div className="absolute inset-0 z-0"><TechScanningBackground /></div>
+
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute top-24 left-8 w-80 h-80 rounded-full animate-pulse" style={{ background: `${RED}18`, filter: 'blur(90px)' }} />
+        <div className="absolute bottom-24 right-8 w-[28rem] h-[28rem] rounded-full" style={{ background: `${RED}0f`, filter: 'blur(110px)', animation: 'pulse 3s ease-in-out infinite 1s' }} />
       </div>
 
-      {/* Animated tech particles */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-red-600 rounded-full filter blur-[100px] animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-500 rounded-full filter blur-[120px] animate-pulse delay-1000" />
-      </div>
-
-      {/* Content */}
-      <motion.div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32" style={{ y: heroY, opacity: heroOpacity }}>
+      <motion.div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-10 py-32"
+        style={{ y: heroY, opacity: heroOpacity }}>
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <Reveal delay={0.2}>
-              <SectionLabel>ESG & SDG in Practice</SectionLabel>
+            <Reveal delay={0.15}>
+              <SectionLabel invert>ESG & SDG in Practice</SectionLabel>
             </Reveal>
-            <Reveal delay={0.3} direction="right">
-              <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                Driving Sustainable Impact Through <GradientText>Technology</GradientText>
+            <Reveal delay={0.25} dir="right">
+              <h1 className="text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.05] mb-6 tracking-tight">
+                Driving<br />
+                Sustainable<br />
+                <span style={{ color: RED }}>Impact</span> Through<br />
+                Technology
               </h1>
             </Reveal>
-            <Reveal delay={0.4}>
-              <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                Our integrated ecosystem empowers communities, businesses, and governments to achieve measurable progress on the UN Sustainable Development Goals through human-centered technology innovation.
+            <Reveal delay={0.38}>
+              <p className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg">
+                Our integrated ecosystem empowers communities, businesses, and governments to achieve measurable progress on the UN Sustainable Development Goals.
               </p>
             </Reveal>
-            <Reveal delay={0.5}>
+            <Reveal delay={0.48}>
               <div className="flex flex-wrap gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-red-900/40"
-                >
+                <motion.button whileHover={{ scale: 1.04, boxShadow: `0 0 40px ${RED}66` }} whileTap={{ scale: 0.97 }}
+                  className="px-8 py-4 text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300"
+                  style={{ background: RED }}>
                   Explore Our Ecosystem
                 </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 border-2 border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 text-white font-semibold rounded-xl transition-all duration-300"
-                >
+                <motion.button whileHover={{ scale: 1.04, background: 'rgba(255,255,255,0.15)' }} whileTap={{ scale: 0.97 }}
+                  className="px-8 py-4 border border-white/25 bg-white/8 backdrop-blur text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300">
                   Partner With Us
                 </motion.button>
               </div>
             </Reveal>
           </div>
 
-          <Reveal delay={0.4} direction="left">
-            <div className="relative h-[500px]">
-              <TiltCard intensity={6} className="absolute top-0 left-0 w-[70%] h-[60%]">
-                <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                  <img src={IMGS.techEducation} alt="Technology Education" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <Reveal delay={0.35} dir="left">
+            <div className="relative h-[480px] hidden lg:block">
+              <Magnetic3D strength={5} className="absolute top-0 right-0 w-[72%] h-[60%]">
+                <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl" style={{ boxShadow: `0 32px 80px -16px rgba(0,0,0,0.6), 0 0 0 1px white/5` }}>
+                  <img src={IMGS.techEducation} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,#00000088,transparent)' }} />
+                  {/* Floating label */}
+                  <div className="absolute bottom-5 left-5 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-2.5">
+                    <p className="text-white text-xs font-bold">ADITI Academy</p>
+                    <p className="text-gray-400 text-[10px]">1,500+ Students Trained</p>
+                  </div>
                 </div>
-              </TiltCard>
-              <TiltCard intensity={6} className="absolute bottom-0 right-0 w-[65%] h-[55%]">
-                <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                  <img src={IMGS.sustainability} alt="Sustainability" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              </Magnetic3D>
+              <Magnetic3D strength={5} className="absolute bottom-0 left-0 w-[65%] h-[58%]">
+                <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl" style={{ boxShadow: `0 32px 80px -16px rgba(0,0,0,0.6)` }}>
+                  <img src={IMGS.sustainability} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,#00000088,transparent)' }} />
+                  <div className="absolute bottom-5 left-5 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl px-4 py-2.5">
+                    <p className="text-white text-xs font-bold">Sustainability</p>
+                    <p className="text-gray-400 text-[10px]">30% Carbon Reduction</p>
+                  </div>
                 </div>
-              </TiltCard>
+              </Magnetic3D>
+              {/* Floating stat pill */}
+              <motion.div className="absolute top-[55%] right-[-12px] bg-black border rounded-2xl px-5 py-4 z-20"
+                style={{ borderColor: `${RED}44`, boxShadow: `0 0 30px ${RED}22` }}
+                animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>
+                <p className="text-white font-black text-2xl" style={{ color: RED }}>27K+</p>
+                <p className="text-gray-500 text-[10px] uppercase tracking-widest">Lives Touched</p>
+              </motion.div>
             </div>
           </Reveal>
         </div>
 
-        {/* Stats row */}
-        <Reveal delay={0.7}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-8 border-t border-red-800/30">
-            {[
-              { value: '10+', label: 'Countries' },
-              { value: '27.1K+', label: 'Lives Touched' },
-              { value: '100%', label: 'MoEYS Aligned' },
-              { value: '30%', label: 'Carbon Reduction' },
-            ].map((stat, i) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl font-bold text-white">{stat.value}</div>
-                <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
+        {/* Stats bar */}
+        <Reveal delay={0.6}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 pt-8 border-t" style={{ borderColor: `${RED}25` }}>
+            {[{ v: '10+', l: 'Countries' }, { v: '27.1K+', l: 'Lives Touched' }, { v: '100%', l: 'MoEYS Aligned' }, { v: '30%', l: 'Carbon Reduction' }].map(s => (
+              <div key={s.l} className="text-center">
+                <p className="text-3xl font-black text-white">{s.v}</p>
+                <p className="text-xs text-gray-500 mt-1 tracking-wide uppercase">{s.l}</p>
               </div>
             ))}
           </div>
         </Reveal>
       </motion.div>
+
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background: 'linear-gradient(to bottom,transparent,#fff)' }} />
     </section>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ESG & SDG SECTION (LIGHT MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// ESG & SDG SECTION — premium split layout
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Floating 3D card shell
+function Card3D({ children, className = '', depth = 8 }) {
+  const ref = useRef(null);
+  const [hov, setHov] = useState(false);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rx = useSpring(useTransform(my, [-0.5, 0.5], [depth, -depth]), { stiffness: 250, damping: 28 });
+  const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-depth, depth]), { stiffness: 250, damping: 28 });
+  const shadow = useSpring(hov ? 1 : 0, { stiffness: 200, damping: 22 });
+
+  return (
+    <motion.div ref={ref} className={className}
+      style={{ rotateX: rx, rotateY: ry, transformStyle: 'preserve-3d', perspective: 1000,
+        boxShadow: useTransform(shadow, [0, 1], ['0 4px 16px rgba(0,0,0,0.06)', '0 28px 72px -12px rgba(0,0,0,0.2), 0 0 0 1px rgba(220,38,38,0.08)']) }}
+      onMouseMove={e => {
+        const r = ref.current?.getBoundingClientRect();
+        if (r) { mx.set((e.clientX - r.left) / r.width - 0.5); my.set((e.clientY - r.top) / r.height - 0.5); }
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { mx.set(0); my.set(0); setHov(false); }}>
+      {children}
+    </motion.div>
+  );
+}
+
+// ESG Pillar: dark-themed glass card with accent strip
+function ESGCard({ pillar, index }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [open, setOpen] = useState(false);
+  const [hov, setHov] = useState(false);
+
+  const PILLAR_META = {
+    Environmental: { Icon: Leaf, color: '#10b981', label: 'E', gradient: 'from-emerald-900/40 to-emerald-950/60' },
+    Social: { Icon: Heart, color: RED, label: 'S', gradient: 'from-red-900/40 to-red-950/60' },
+    Governance: { Icon: Shield, color: '#3b82f6', label: 'G', gradient: 'from-blue-900/40 to-blue-950/60' },
+  };
+  const meta = PILLAR_META[pillar.title];
+  const Icon = meta.Icon;
+
+  return (
+    <motion.div ref={ref}
+      initial={{ opacity: 0, y: 48, rotateX: 12 }}
+      animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+      transition={{ duration: 0.85, delay: index * 0.14, ease: [0.16, 1, 0.3, 1] }}>
+      <Card3D depth={6}
+        className="relative rounded-2xl overflow-hidden cursor-default"
+        style2={{ background: '#0a0a0a' }}>
+        <motion.div
+          className="relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg,#111111,#0d0d0d)' }}
+          onMouseEnter={() => setHov(true)}
+          onMouseLeave={() => setHov(false)}>
+
+          {/* Image header */}
+          <div className="relative h-40 overflow-hidden">
+            <motion.img src={pillar.image} alt={pillar.title}
+              className="w-full h-full object-cover"
+              animate={{ scale: hov ? 1.08 : 1 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.7) 70%, #0d0d0d 100%)` }} />
+            {/* Colored overlay tint */}
+            <div className="absolute inset-0 opacity-30" style={{ background: `linear-gradient(135deg, ${meta.color}55, transparent)` }} />
+
+            {/* Letter badge */}
+            <motion.div className="absolute top-4 left-4 w-11 h-11 rounded-xl flex items-center justify-center font-black text-lg shadow-xl"
+              style={{ background: meta.color, color: '#fff', boxShadow: `0 8px 24px ${meta.color}66` }}
+              animate={{ scale: hov ? 1.08 : 1, boxShadow: hov ? `0 12px 32px ${meta.color}88` : `0 8px 24px ${meta.color}66` }}
+              transition={{ duration: 0.3 }}>
+              {meta.label}
+            </motion.div>
+
+            {/* Icon top-right */}
+            <div className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
+              <Icon size={16} color={meta.color} />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="px-6 pb-6 pt-4">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-white font-black text-lg tracking-tight">{pillar.title}</h4>
+              <motion.button
+                onClick={() => setOpen(!open)}
+                className="text-xs font-bold px-3 py-1.5 rounded-full border transition-colors duration-200"
+                style={{ borderColor: `${meta.color}44`, color: meta.color, background: `${meta.color}12` }}
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+                {open ? 'Less' : 'More'}
+              </motion.button>
+            </div>
+
+            {/* Items list */}
+            <ul className="space-y-2.5">
+              {(open ? pillar.items : pillar.items.slice(0, 2)).map((item, i) => (
+                <motion.li key={i}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.06 }}
+                  className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-[7px]" style={{ background: meta.color }} />
+                  <span className="text-gray-400 text-sm leading-relaxed">{item}</span>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Bottom glow line */}
+          <motion.div className="absolute bottom-0 left-0 right-0 h-[2px]"
+            style={{ background: `linear-gradient(to right, transparent, ${meta.color}, transparent)` }}
+            animate={{ opacity: hov ? 1 : 0.3 }}
+            transition={{ duration: 0.3 }} />
+        </motion.div>
+      </Card3D>
+    </motion.div>
+  );
+}
+
+// SDG Goal card: light theme, horizontal
+const SDG_COLORS = { 4: '#C5192D', 5: '#FF3A21', 8: '#A21942', 9: '#FD6925', 17: '#19486A' };
+
+function SDGCard({ goal, index }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [hov, setHov] = useState(false);
+
+  const col = SDG_COLORS[goal.number] || RED;
+
+  return (
+    <motion.div ref={ref}
+      initial={{ opacity: 0, x: 60 }}
+      animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}>
+      <Card3D depth={4} className="rounded-2xl overflow-hidden">
+        <motion.div className="flex items-stretch bg-white rounded-2xl overflow-hidden border"
+          style={{ borderColor: hov ? `${col}40` : '#e5e7eb' }}
+          animate={{ y: hov ? -3 : 0 }}
+          transition={{ duration: 0.3 }}>
+
+          {/* SDG Number slab */}
+          <div className="relative w-20 flex-shrink-0 flex items-center justify-center overflow-hidden"
+            style={{ background: col, minHeight: 88 }}>
+            <span className="text-white font-black text-3xl leading-none z-10">{goal.number}</span>
+            {/* Shine */}
+            <motion.div className="absolute inset-0 opacity-0"
+              style={{ background: 'linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 60%)' }}
+              animate={{ opacity: hov ? 1 : 0 }}
+              transition={{ duration: 0.3 }} />
+          </div>
+
+          {/* Thumbnail */}
+          <div className="w-20 flex-shrink-0 overflow-hidden">
+            <motion.img src={goal.image} alt="" className="w-full h-full object-cover"
+              animate={{ scale: hov ? 1.12 : 1 }} transition={{ duration: 0.5 }} />
+          </div>
+
+          {/* Text */}
+          <div className="flex-1 px-5 py-4">
+            <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: col }}>SDG {goal.number}</p>
+            <h4 className="font-black text-gray-900 text-sm leading-tight mb-1">{goal.name}</h4>
+            <p className="text-xs text-gray-500 leading-relaxed">{goal.description}</p>
+          </div>
+
+          {/* Arrow */}
+          <motion.div className="flex items-center pr-4"
+            animate={{ opacity: hov ? 1 : 0, x: hov ? 0 : 6 }}
+            transition={{ duration: 0.2 }}>
+            <ArrowRight size={15} color={col} />
+          </motion.div>
+
+          {/* Bottom accent */}
+          <motion.div className="absolute bottom-0 left-20 right-0 h-[2px] rounded-full"
+            style={{ background: col }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: hov ? 1 : 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            style2={{ transformOrigin: 'left' }} />
+        </motion.div>
+      </Card3D>
+    </motion.div>
+  );
+}
 
 function ESGSDGSection() {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+
   const esgPillars = [
-    {
-      title: 'Environmental',
-      icon: Leaf,
-      image: IMGS.sustainability,
-      items: [
-        'Digital transformation & cyber resiliency in 10+ countries',
-        'Technology driving lower carbon emissions through AI health',
-        'Paperless workflows, cloud efficiency, greener operations',
-        'Track energy per user, optimize models, prefer low-carbon infrastructure',
-      ]
-    },
-    {
-      title: 'Social',
-      icon: Heart,
-      image: IMGS.womenInTech,
-      items: [
-        '6,000+ girls trained in technology & leadership',
-        '10,000+ children introduced to coding & AI',
-        'Thousands of SMEs & government officers upskilled',
-        'Inclusive technology education for all',
-      ]
-    },
-    {
-      title: 'Governance',
-      icon: Shield,
-      image: IMGS.cybersecurity,
-      items: [
-        'Advocacy on AI ethics & responsible tech adoption across ASEAN',
-        'AI Governance-by-Design: Bias testing, human oversight',
-        'Privacy-by-Design: Consent, minimization, strong security',
-        'Transparent Reporting: Impact, safety, reliability metrics',
-      ]
-    },
+    { title: 'Environmental', image: IMGS.sustainability, items: ['Digital transformation & cyber resiliency in 10+ countries', 'Technology driving lower carbon emissions through AI', 'Paperless workflows, cloud efficiency, greener operations', 'Energy-per-user tracking, low-carbon infrastructure preference'] },
+    { title: 'Social', image: IMGS.womenInTech, items: ['6,000+ girls trained in technology & leadership', '10,000+ children introduced to coding & AI', 'Thousands of SMEs & government officers upskilled', 'Inclusive technology education for all communities'] },
+    { title: 'Governance', image: IMGS.cybersecurity, items: ['AI ethics advocacy & responsible tech adoption across ASEAN', 'AI Governance-by-Design: Bias testing, human oversight', 'Privacy-by-Design: Consent, minimization, strong security', 'Transparent Reporting: Impact, safety, reliability metrics'] },
   ];
 
   const sdgGoals = [
-    { number: 4, name: 'Quality Education', description: 'Accessible, high-quality tech education', image: IMGS.techEducation },
-    { number: 5, name: 'Gender Equality', description: 'Empowering women and girls in tech', image: IMGS.womenInTech },
-    { number: 8, name: 'Decent Work', description: 'Sustainable employment through skills', image: IMGS.teamwork },
-    { number: 9, name: 'Industry Innovation', description: 'Driving technological advancement', image: IMGS.innovation },
-    { number: 17, name: 'Partnerships', description: 'Building collaborative ecosystems', image: IMGS.globalPartners },
+    { number: 4, name: 'Quality Education', description: 'Accessible, high-quality tech education for all learners', image: IMGS.techEducation },
+    { number: 5, name: 'Gender Equality', description: 'Empowering 6,000+ women and girls in technology', image: IMGS.womenInTech },
+    { number: 8, name: 'Decent Work & Growth', description: 'Sustainable employment through digital skill-building', image: IMGS.teamwork },
+    { number: 9, name: 'Industry & Innovation', description: 'Driving technological advancement across ASEAN', image: IMGS.innovation },
+    { number: 17, name: 'Global Partnerships', description: 'Building collaborative ecosystems for lasting impact', image: IMGS.globalPartners },
   ];
 
   return (
-    <section className="py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <Reveal className="text-center mb-16">
+    <section ref={sectionRef} className="relative py-28 overflow-hidden" style={{ background: '#f8f8f8' }}>
+      {/* Background mesh */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
+        {/* Dot grid */}
+        <div className="absolute inset-0 opacity-40"
+          style={{ backgroundImage: `radial-gradient(circle,${RED}22 1px,transparent 1px)`, backgroundSize: '36px 36px' }} />
+        {/* Split line */}
+        <div className="hidden lg:block absolute top-0 bottom-0 left-1/2 w-px opacity-10"
+          style={{ background: `linear-gradient(to bottom,transparent,${RED},transparent)` }} />
+      </motion.div>
+
+      {/* Ambient orbs */}
+      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none opacity-30"
+        style={{ background: `radial-gradient(circle,${RED}12,transparent 70%)`, filter: 'blur(80px)' }} />
+      <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full pointer-events-none opacity-20"
+        style={{ background: 'radial-gradient(circle,#3b82f612,transparent 70%)', filter: 'blur(80px)' }} />
+
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+
+        {/* ── HEADER ── */}
+        <Reveal className="text-center mb-20">
           <SectionLabel>Our Foundation</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            ESG Commitment & <GradientText>SDG Alignment</GradientText>
+          <h2 className="text-4xl md:text-5xl lg:text-[3.5rem] font-black text-gray-900 leading-tight tracking-tight">
+            ESG Commitment &{' '}
+            <span className="relative inline-block">
+              <span style={{ color: RED }}>SDG Alignment</span>
+              {/* Underline stroke */}
+              <motion.span className="absolute -bottom-2 left-0 right-0 h-[3px] rounded-full"
+                style={{ background: `linear-gradient(to right,${RED},${RED_DARK})` }}
+                initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }}
+                viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }} />
+            </span>
           </h2>
-          <p className="text-gray-500 mt-4 max-w-3xl mx-auto text-lg">
-            At ADITI Academy, ESG is not just a framework—it's the foundation of everything we do, aligned with the UN Sustainable Development Goals.
+          <p className="text-gray-500 mt-6 max-w-2xl mx-auto text-lg leading-relaxed">
+            At ADITI Academy, ESG is not just a framework — it's the foundation of everything we do, aligned with the UN Sustainable Development Goals.
           </p>
         </Reveal>
 
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          {/* ESG Column */}
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-              <span className="w-2 h-10 bg-red-600 rounded-full" />
-              ESG Pillars
-            </h3>
+        {/* ── MAIN TWO-COLUMN ── */}
+        <div className="grid lg:grid-cols-2 gap-10 xl:gap-16">
 
-            <div className="space-y-6">
-              {esgPillars.map((pillar, idx) => (
-                <ParallaxScroll key={pillar.title} direction={idx % 2 === 0 ? 'up' : 'down'}>
-                  <Reveal delay={idx * 0.1}>
-                    <TiltCard>
-                      <HoverCard>
-                        <div className="relative h-48 overflow-hidden rounded-t-2xl">
-                          <img src={pillar.image} alt={pillar.title} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-                          <div className="absolute top-6 left-6">
-                            <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-lg">
-                              <pillar.icon size={24} className="text-white" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-6">
-                          <h4 className="text-xl font-bold text-gray-900 mb-4">{pillar.title}</h4>
-                          <ul className="space-y-2">
-                            {pillar.items.map((item, i) => (
-                              <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                                <CheckCircle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </HoverCard>
-                    </TiltCard>
-                  </Reveal>
-                </ParallaxScroll>
+          {/* ════ LEFT: ESG ════ */}
+          <div>
+            <Reveal delay={0.1}>
+              {/* Column label strip */}
+              <div className="flex items-center gap-4 mb-8 pb-5 border-b border-gray-200">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white text-sm shadow-lg"
+                    style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 24px ${RED}44` }}>
+                    ESG
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-gray-900">ESG Pillars</h3>
+                  <p className="text-xs text-gray-400 mt-0.5 uppercase tracking-widest">Environmental · Social · Governance</p>
+                </div>
+                {/* Live badge */}
+                <div className="ml-auto flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Active</span>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* ESG cards stacked */}
+            <div className="space-y-5">
+              {esgPillars.map((pillar, i) => (
+                <ESGCard key={pillar.title} pillar={pillar} index={i} />
               ))}
             </div>
+
+            {/* ESG bottom cta */}
+            <Reveal delay={0.5}>
+              <motion.div className="mt-8 rounded-2xl p-6 text-white overflow-hidden relative"
+                style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})` }}>
+                <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10"
+                  style={{ background: 'radial-gradient(circle,white,transparent)', transform: 'translate(30%,-30%)' }} />
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles size={16} className="text-red-200" />
+                    <span className="text-xs font-bold text-red-100 uppercase tracking-widest">Competitive Advantage</span>
+                  </div>
+                  <h4 className="text-lg font-black mb-2">ESG Turns Responsibility Into Market Power</h4>
+                  <p className="text-red-100 text-sm leading-relaxed">
+                    Drives innovation, attracts top talent, builds partner trust, and creates long-term value.
+                  </p>
+                </div>
+              </motion.div>
+            </Reveal>
           </div>
 
-          {/* SDG Column */}
+          {/* ════ RIGHT: SDG ════ */}
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-              <span className="w-2 h-10 bg-blue-600 rounded-full" />
-              SDG Alignment
-            </h3>
+            <Reveal delay={0.2}>
+              <div className="flex items-center gap-4 mb-8 pb-5 border-b border-gray-200">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-white text-xs shadow-lg"
+                  style={{ background: 'linear-gradient(135deg,#1a56db,#1e40af)', boxShadow: '0 8px 24px #1a56db44' }}>
+                  SDG
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-gray-900">SDG Alignment</h3>
+                  <p className="text-xs text-gray-400 mt-0.5 uppercase tracking-widest">UN 2030 Agenda for Sustainable Development</p>
+                </div>
+              </div>
+            </Reveal>
 
-            <div className="space-y-4">
-              {sdgGoals.map((goal, idx) => (
-                <ParallaxScroll key={goal.number} direction={idx % 2 === 0 ? 'up' : 'down'}>
-                  <Reveal delay={idx * 0.1}>
-                    <TiltCard>
-                      <HoverCard>
-                        <div className="flex gap-4 p-5">
-                          <div className="relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden">
-                            <img src={goal.image} alt={goal.name} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-red-600/80 flex items-center justify-center">
-                              <span className="text-3xl font-bold text-white">{goal.number}</span>
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-lg font-bold text-gray-900 mb-1">{goal.name}</h4>
-                            <p className="text-gray-600 text-sm">{goal.description}</p>
-                          </div>
-                        </div>
-                      </HoverCard>
-                    </TiltCard>
-                  </Reveal>
-                </ParallaxScroll>
+            {/* UN commitment banner */}
+            <Reveal delay={0.25}>
+              <div className="mb-6 rounded-2xl overflow-hidden relative" style={{ background: 'linear-gradient(135deg,#003a63,#00274d)' }}>
+                <div className="absolute inset-0 opacity-20"
+                  style={{ backgroundImage: `radial-gradient(circle,rgba(255,255,255,0.15) 1px,transparent 1px)`, backgroundSize: '20px 20px' }} />
+                <div className="relative flex items-center gap-5 p-5">
+                  <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                    <Globe size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white font-black text-sm mb-1">Committed to 5 of 17 Global Goals</p>
+                    <p className="text-blue-200 text-xs leading-relaxed">Every programme we deliver contributes to the UN 2030 Sustainable Development Agenda.</p>
+                  </div>
+                  <div className="ml-auto text-right flex-shrink-0">
+                    <p className="text-white font-black text-3xl leading-none">5</p>
+                    <p className="text-blue-300 text-[10px] uppercase tracking-wider mt-1">SDGs</p>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* SDG cards */}
+            <div className="space-y-3.5">
+              {sdgGoals.map((goal, i) => (
+                <SDGCard key={goal.number} goal={goal} index={i} />
               ))}
             </div>
+
+            {/* SDG mini stats */}
+            <Reveal delay={0.55}>
+              <div className="mt-8 grid grid-cols-3 gap-3">
+                {[{ n: '5', l: 'SDGs Addressed' }, { n: '17', l: 'Total UN Goals' }, { n: '2030', l: 'Target Year' }].map(s => (
+                  <div key={s.l} className="rounded-xl bg-white border border-gray-100 p-4 text-center"
+                    style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                    <p className="text-2xl font-black text-gray-900">{s.n}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider leading-tight">{s.l}</p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
           </div>
         </div>
-
-        {/* Bottom CTA */}
-        <Reveal delay={0.3}>
-          <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-2xl p-8 text-center text-white">
-            <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-4">
-              <Sparkles size={16} />
-              <span className="text-sm font-semibold">Competitive Advantage</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">ESG Turns Responsibility Into Market Power</h3>
-            <p className="text-red-100 max-w-2xl mx-auto">
-              Our commitment drives innovation, attracts top talent, builds trust with partners, and creates long-term sustainable value.
-            </p>
-          </div>
-        </Reveal>
       </div>
     </section>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ECOSYSTEM PILLARS (LIGHT MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// ECOSYSTEM SECTION
+// ═══════════════════════════════════════════════════════════════════════════
 
 function EcosystemSection() {
   const pillars = [
-    {
-      name: 'ADITI',
-      icon: Cpu,
-      description: 'Sustainable digital transformation, software solutions, global software engineer outsourcing',
-      countries: 'Cambodia, Singapore, Japan, EU',
-      impact: 'Carbon-aware coding, ethical hiring, 40% women in engineering',
-      image: IMGS.digitalTransformation,
-    },
-    {
-      name: 'ADITI Academy',
-      icon: GraduationCap,
-      description: 'Upskilling IT students, professors, SMEs, government staff, women leaders',
-      stats: '1,500+ students | 600+ professionals | 500+ government officers',
-      impact: 'Industry-aligned curriculum, career support, certification programs',
-      image: IMGS.techEducation,
-    },
-    {
-      name: 'Tech For Kids Academy',
-      icon: Code,
-      description: '10,000+ children learning coding, AI, and entrepreneurship',
-      stats: 'Ages 8-16 | 65% from underserved communities',
-      impact: 'Building future innovators, digital literacy for next generation',
-      image: IMGS.kidsCoding,
-    },
-    {
-      name: 'Technovation Girls Cambodia',
-      icon: Users,
-      description: '6,000 girls trained in tech, leadership, and entrepreneurship',
-      stats: '6,000+ girls | 200+ mentors | Inspiring millions globally',
-      impact: 'Gender equality in tech, SDG-focused problem solving',
-      image: IMGS.womenInTech,
-    },
-    {
-      name: 'Nironcare',
-      icon: Heart,
-      description: 'Groundbreaking AI-powered digital health',
-      impact: 'Reduces emissions, ensures inclusivity, expands healthcare access, safeguards data privacy',
-      image: IMGS.healthcare,
-    },
+    { name: 'ADITI', icon: Cpu, description: 'Sustainable digital transformation, software solutions, global software engineer outsourcing', countries: 'Cambodia, Singapore, Japan, EU', impact: 'Carbon-aware coding, ethical hiring, 40% women in engineering', image: IMGS.digitalTransformation },
+    { name: 'ADITI Academy', icon: GraduationCap, description: 'Upskilling IT students, professors, SMEs, government staff, women leaders', stats: '1,500+ students · 600+ professionals · 500+ government officers', impact: 'Industry-aligned curriculum, career support, certification programs', image: IMGS.techEducation },
+    { name: 'Tech For Kids Academy', icon: Code, description: '10,000+ children learning coding, AI, and entrepreneurship', stats: 'Ages 8–16 · 65% from underserved communities', impact: 'Building future innovators, digital literacy for next generation', image: IMGS.kidsCoding },
+    { name: 'Technovation Girls Cambodia', icon: Users, description: '6,000 girls trained in tech, leadership, and entrepreneurship', stats: '6,000+ girls · 200+ mentors · Inspiring millions globally', impact: 'Gender equality in tech, SDG-focused problem solving', image: IMGS.womenInTech },
+    { name: 'Nironcare', icon: Heart, description: 'Groundbreaking AI-powered digital health platform', impact: 'Reduces emissions, ensures inclusivity, expands healthcare access, safeguards data privacy', image: IMGS.healthcare },
   ];
 
   return (
-    <section className="py-28 bg-gray-50">
+    <section className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-16">
           <SectionLabel>Our Ecosystem</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            5 Pillars of <GradientText>Sustainable Impact</GradientText>
+          <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
+            5 Pillars of <span style={{ color: RED }}>Sustainable Impact</span>
           </h2>
-          <p className="text-gray-500 mt-4 max-w-3xl mx-auto text-lg">
-            ADITI Academy operates through five interconnected pillars driving sustainable impact across education, technology, and social development.
+          <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
+            Five interconnected pillars driving sustainable impact across education, technology, and social development.
           </p>
         </Reveal>
 
-        <div className="space-y-8">
-          {pillars.map((pillar, index) => (
-            <ParallaxScroll key={pillar.name}>
-              <Reveal delay={index * 0.1}>
-                <TiltCard>
-                  <HoverCard>
-                    <div className="grid md:grid-cols-2">
-                      <div className="p-8">
-                        <div className="w-14 h-14 rounded-xl bg-red-600 flex items-center justify-center mb-6 shadow-lg">
-                          <pillar.icon size={28} className="text-white" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">{pillar.name}</h3>
-                        <p className="text-gray-600 text-lg mb-4">{pillar.description}</p>
-                        {pillar.countries && (
-                          <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                            <Globe size={14} />
-                            <span>{pillar.countries}</span>
-                          </div>
-                        )}
-                        {pillar.stats && (
-                          <p className="text-sm font-semibold text-red-600 mb-3">{pillar.stats}</p>
-                        )}
-                        <div className="flex items-start gap-2 text-gray-600">
-                          <CheckCircle size={16} className="text-green-500 flex-shrink-0 mt-0.5" />
-                          <span>{pillar.impact}</span>
-                        </div>
-                      </div>
-                      <div className="relative h-64 md:h-auto overflow-hidden rounded-r-2xl">
-                        <img
-                          src={pillar.image}
-                          alt={pillar.name}
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/10" />
-                      </div>
+        <div className="space-y-6">
+          {pillars.map((p, i) => (
+            <Reveal key={p.name} delay={i * 0.08}>
+              <Card3D depth={4} className="rounded-2xl overflow-hidden bg-white border border-gray-100">
+                <motion.div className="grid md:grid-cols-2 bg-white rounded-2xl overflow-hidden"
+                  whileHover={{ boxShadow: `0 24px 64px -12px rgba(0,0,0,0.14), 0 0 0 1px ${RED}15` }}
+                  transition={{ duration: 0.3 }}>
+                  <div className="p-8 lg:p-10">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+                      style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
+                      <p.icon size={26} className="text-white" />
                     </div>
-                  </HoverCard>
-                </TiltCard>
-              </Reveal>
-            </ParallaxScroll>
+                    <h3 className="text-2xl font-black text-gray-900 mb-3">{p.name}</h3>
+                    <p className="text-gray-500 leading-relaxed mb-5">{p.description}</p>
+                    {p.countries && (
+                      <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
+                        <Globe size={13} />
+                        <span>{p.countries}</span>
+                      </div>
+                    )}
+                    {p.stats && <p className="text-sm font-bold mb-4" style={{ color: RED }}>{p.stats}</p>}
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-600 text-sm leading-relaxed">{p.impact}</span>
+                    </div>
+                  </div>
+                  <div className="relative h-56 md:h-auto overflow-hidden">
+                    <motion.img src={p.image} alt={p.name} className="w-full h-full object-cover"
+                      whileHover={{ scale: 1.06 }} transition={{ duration: 0.6 }} />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to left,transparent,rgba(255,255,255,0.04))' }} />
+                    {/* Red stripe */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: `linear-gradient(to bottom,transparent,${RED},transparent)` }} />
+                  </div>
+                </motion.div>
+              </Card3D>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -742,78 +725,81 @@ function EcosystemSection() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TECHNOLOGY SHOWCASE (LIGHT MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// TECHNOLOGY SHOWCASE
+// ═══════════════════════════════════════════════════════════════════════════
 
 function TechnologyShowcase() {
-  const technologies = [
-    { name: 'Artificial Intelligence', icon: Brain, description: 'AI-powered healthcare, smart logistics, sustainable agriculture', image: IMGS.aiTechnology },
-    { name: 'Cloud Computing', icon: Cloud, description: 'Cloud efficiency, reduced carbon footprint, scalable solutions', image: IMGS.cloudComputing },
-    { name: 'Cybersecurity', icon: Shield, description: 'Digital transformation, cyber resiliency, data protection', image: IMGS.cybersecurity },
-    { name: 'IoT & Smart Systems', icon: Network, description: 'Smart logistics, environmental monitoring, efficiency optimization', image: IMGS.innovation },
+  const techs = [
+    { name: 'Artificial Intelligence', icon: Brain, desc: 'AI-powered healthcare, smart logistics, sustainable agriculture', image: IMGS.aiTechnology },
+    { name: 'Cloud Computing', icon: Cloud, desc: 'Cloud efficiency, reduced carbon footprint, scalable solutions', image: IMGS.cloudComputing },
+    { name: 'Cybersecurity', icon: Shield, desc: 'Digital transformation, cyber resiliency, data protection', image: IMGS.cybersecurity },
+    { name: 'IoT & Smart Systems', icon: Network, desc: 'Smart logistics, environmental monitoring, efficiency optimization', image: IMGS.innovation },
   ];
 
   return (
-    <section className="py-28 bg-white">
+    <section className="py-28" style={{ background: '#f8f8f8' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-16">
           <SectionLabel>Technology Innovation</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            Driving <GradientText>Green Technology</GradientText>
+          <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
+            Driving <span style={{ color: RED }}>Green Technology</span>
           </h2>
-          <p className="text-gray-500 mt-4 max-w-3xl mx-auto text-lg">
-            Our technology solutions are designed with sustainability at their core, reducing environmental impact while maximizing social benefit.
+          <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
+            Sustainability is at the core of every solution we build.
           </p>
         </Reveal>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {technologies.map((tech, index) => (
-            <ParallaxScroll key={tech.name} direction={index % 2 === 0 ? 'up' : 'down'}>
-              <Reveal delay={index * 0.1}>
-                <TiltCard intensity={5}>
-                  <HoverCard className="overflow-hidden">
-                    <div className="relative h-48 overflow-hidden rounded-t-2xl">
-                      <img src={tech.image} alt={tech.name} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-5">
-                        <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center mb-3 shadow-lg">
-                          <tech.icon size={20} className="text-white" />
-                        </div>
-                        <h3 className="text-lg font-bold text-white">{tech.name}</h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+          {techs.map((t, i) => (
+            <Reveal key={t.name} delay={i * 0.09}>
+              <Card3D depth={6} className="rounded-2xl overflow-hidden bg-white border border-gray-100">
+                <motion.div className="rounded-2xl overflow-hidden bg-white"
+                  whileHover={{ boxShadow: `0 24px 60px -12px rgba(0,0,0,0.16), 0 0 0 1px ${RED}15`, y: -6 }}
+                  transition={{ duration: 0.3 }}>
+                  <div className="relative h-44 overflow-hidden">
+                    <motion.img src={t.image} alt={t.name} className="w-full h-full object-cover"
+                      whileHover={{ scale: 1.1 }} transition={{ duration: 0.6 }} />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,#00000088,transparent)' }} />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-2"
+                        style={{ background: RED, boxShadow: `0 6px 20px ${RED}66` }}>
+                        <t.icon size={18} className="text-white" />
                       </div>
+                      <h3 className="text-sm font-black text-white leading-tight">{t.name}</h3>
                     </div>
-                    <div className="p-5">
-                      <p className="text-gray-600 text-sm">{tech.description}</p>
-                    </div>
-                  </HoverCard>
-                </TiltCard>
-              </Reveal>
-            </ParallaxScroll>
+                  </div>
+                  <div className="p-5">
+                    <p className="text-gray-500 text-sm leading-relaxed">{t.desc}</p>
+                  </div>
+                </motion.div>
+              </Card3D>
+            </Reveal>
           ))}
         </div>
 
-        {/* Environmental Impact Stats */}
         <Reveal delay={0.3}>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-5">
             {[
-              { icon: Wind, value: '30%', label: 'Reduction in Carbon Emissions', image: IMGS.sustainability },
+              { icon: Wind, value: '30%', label: 'Carbon Emission Reduction', image: IMGS.sustainability },
               { icon: Cloud, value: '25%', label: 'Cloud Efficiency Gains', image: IMGS.cloudComputing },
-              { icon: Trees, value: '10+', label: 'Countries with Digital Transformation', image: IMGS.globalPartners },
-            ].map((stat, i) => (
-              <TiltCard key={stat.label}>
-                <HoverCard>
-                  <div className="relative h-32 overflow-hidden rounded-t-2xl">
-                    <img src={stat.image} alt={stat.label} className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent" />
+              { icon: Trees, value: '10+', label: 'Countries Transformed', image: IMGS.globalPartners },
+            ].map((s, i) => (
+              <Card3D key={s.label} depth={5} className="rounded-2xl overflow-hidden bg-white border border-gray-100">
+                <motion.div className="rounded-2xl overflow-hidden bg-white"
+                  whileHover={{ boxShadow: '0 20px 50px -12px rgba(0,0,0,0.14)', y: -4 }}
+                  transition={{ duration: 0.3 }}>
+                  <div className="relative h-28 overflow-hidden">
+                    <img src={s.image} alt={s.label} className="w-full h-full object-cover" style={{ filter: 'brightness(0.6)' }} />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,#fff,transparent 60%)' }} />
                   </div>
                   <div className="p-6 text-center">
-                    <stat.icon size={32} className="text-red-600 mx-auto mb-3" />
-                    <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                    <div className="text-gray-600 text-sm">{stat.label}</div>
+                    <s.icon size={26} className="mx-auto mb-3" style={{ color: RED }} />
+                    <p className="text-3xl font-black text-gray-900 mb-1">{s.value}</p>
+                    <p className="text-sm text-gray-500">{s.label}</p>
                   </div>
-                </HoverCard>
-              </TiltCard>
+                </motion.div>
+              </Card3D>
             ))}
           </div>
         </Reveal>
@@ -822,50 +808,50 @@ function TechnologyShowcase() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// IMPACT METRICS (LIGHT MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// IMPACT METRICS
+// ═══════════════════════════════════════════════════════════════════════════
 
 function ImpactMetricsSection() {
   const metrics = [
-    { value: 27100, suffix: '+', label: 'Total Lives Touched', icon: Users },
-    { value: 6000, suffix: '+', label: 'Women/Girls in Tech', icon: Heart },
-    { value: 10, suffix: 'K+', label: 'Children in Coding', icon: Code },
-    { value: 4, suffix: '', label: 'Partner Countries', icon: Globe },
-    { value: 2100, suffix: '+', label: 'Certifications Issued', icon: Award },
-    { value: 800, suffix: '+', label: 'Corporate Training', icon: Building2 },
+    { target: 27100, suffix: '+', label: 'Total Lives Touched', icon: Users },
+    { target: 6000, suffix: '+', label: 'Women & Girls in Tech', icon: Heart },
+    { target: 10000, suffix: '+', label: 'Children in Coding', icon: Code },
+    { target: 4, suffix: '', label: 'Partner Countries', icon: Globe },
+    { target: 2100, suffix: '+', label: 'Certifications Issued', icon: Award },
+    { target: 800, suffix: '+', label: 'Corporate Training', icon: Building2 },
   ];
 
   return (
-    <section className="py-28 bg-gray-50">
+    <section className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-16">
           <SectionLabel>Measurable Impact</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            Key Impact <GradientText>Metrics</GradientText>
+          <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
+            Key Impact <span style={{ color: RED }}>Metrics</span>
           </h2>
-          <p className="text-gray-500 mt-4 max-w-3xl mx-auto text-lg">
-            Our ecosystem's measurable contributions to sustainable development.
-          </p>
         </Reveal>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {metrics.map((metric, index) => (
-            <ParallaxScroll key={metric.label} direction={index % 2 === 0 ? 'up' : 'down'}>
-              <Reveal delay={index * 0.08}>
-                <TiltCard intensity={4}>
-                  <HoverCard className="text-center p-8">
-                    <div className="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-4">
-                      <metric.icon size={32} className="text-red-600" />
-                    </div>
-                    <div className="text-4xl font-bold text-gray-900">
-                      <AnimatedCounter value={metric.value} suffix={metric.suffix} />
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">{metric.label}</p>
-                  </HoverCard>
-                </TiltCard>
-              </Reveal>
-            </ParallaxScroll>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {metrics.map((m, i) => (
+            <Reveal key={m.label} delay={i * 0.07}>
+              <Card3D depth={5} className="rounded-2xl bg-white border border-gray-100">
+                <motion.div className="rounded-2xl bg-white p-8 text-center"
+                  whileHover={{ boxShadow: `0 24px 64px -12px rgba(0,0,0,0.12), 0 0 0 1px ${RED}18`, y: -5 }}
+                  transition={{ duration: 0.3 }}>
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                    style={{ background: `${RED}12` }}>
+                    <m.icon size={28} style={{ color: RED }} />
+                  </div>
+                  <p className="text-5xl font-black text-gray-900 mb-2 tracking-tight">
+                    <AnimatedCounter target={m.target} suffix={m.suffix} />
+                  </p>
+                  <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">{m.label}</p>
+                  {/* Red underline */}
+                  <div className="mt-4 mx-auto h-0.5 w-12 rounded-full" style={{ background: RED }} />
+                </motion.div>
+              </Card3D>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -873,108 +859,88 @@ function ImpactMetricsSection() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PARTNERSHIP (LIGHT MODE)
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// PARTNERSHIP
+// ═══════════════════════════════════════════════════════════════════════════
 
 function PartnershipSection() {
-  const partners = [
-    'Ministry of Education', 'Ministry of Industry', 'ACLEDA Bank',
-    'Microsoft Cambodia', 'Google for Education', 'AWS Partner Network',
-    'UNICEF', 'UNESCO', 'ASEAN Secretariat', 'World Bank'
-  ];
+  const partners = ['Ministry of Education', 'Ministry of Industry', 'ACLEDA Bank', 'Microsoft Cambodia', 'Google for Education', 'AWS Partner Network', 'UNICEF', 'UNESCO', 'ASEAN Secretariat', 'World Bank'];
 
   return (
-    <section className="py-28 bg-white">
+    <section className="py-28" style={{ background: '#f8f8f8' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-16">
           <SectionLabel>Collaboration</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            Partnership <GradientText>Model</GradientText>
+          <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
+            Partnership <span style={{ color: RED }}>Model</span>
           </h2>
-          <p className="text-gray-500 mt-4 max-w-3xl mx-auto text-lg">
+          <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
             Collaborate with us to drive sustainable impact in your organization and community.
           </p>
         </Reveal>
 
-        <div className="grid lg:grid-cols-2 gap-12 mb-12">
-          <ParallaxScroll direction="up">
-            <Reveal direction="left">
-              <TiltCard>
-                <HoverCard>
-                  <div className="p-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-6">How to Collaborate</h3>
-                    <div className="space-y-6">
-                      {[
-                        { step: '01', title: 'Funding & Sponsorship', desc: 'Support our programs through targeted funding or sponsorship opportunities.' },
-                        { step: '02', title: 'Curriculum Co-Creation', desc: 'Partner to develop customized training programs that meet your industry needs.' },
-                        { step: '03', title: 'Accreditation & Certification', desc: 'Joint certification programs with industry recognition.' },
-                        { step: '04', title: 'Large-Scale Training', desc: 'Comprehensive upskilling programs for your workforce.' },
-                      ].map((item) => (
-                        <div key={item.step} className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-bold">{item.step}</span>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-gray-900 mb-1">{item.title}</h4>
-                            <p className="text-gray-600 text-sm">{item.desc}</p>
-                          </div>
-                        </div>
-                      ))}
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          <Reveal dir="left">
+            <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
+              <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
+                whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
+                transition={{ duration: 0.3 }}>
+                <h3 className="text-xl font-black text-gray-900 mb-8">How to Collaborate</h3>
+                <div className="space-y-7">
+                  {[
+                    { n: '01', t: 'Funding & Sponsorship', d: 'Support our programs through targeted funding or sponsorship opportunities.' },
+                    { n: '02', t: 'Curriculum Co-Creation', d: 'Develop customized training programs that meet your industry needs.' },
+                    { n: '03', t: 'Accreditation & Certification', d: 'Joint certification programs with industry recognition.' },
+                    { n: '04', t: 'Large-Scale Training', d: 'Comprehensive upskilling programs for your workforce.' },
+                  ].map(item => (
+                    <div key={item.n} className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-white text-sm shadow-lg"
+                        style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 6px 20px ${RED}44` }}>
+                        {item.n}
+                      </div>
+                      <div className="pt-1">
+                        <h4 className="font-black text-gray-900 mb-1">{item.t}</h4>
+                        <p className="text-gray-500 text-sm leading-relaxed">{item.d}</p>
+                      </div>
                     </div>
-                  </div>
-                </HoverCard>
-              </TiltCard>
-            </Reveal>
-          </ParallaxScroll>
+                  ))}
+                </div>
+              </motion.div>
+            </Card3D>
+          </Reveal>
 
-          <ParallaxScroll direction="down">
-            <Reveal direction="right">
-              <TiltCard>
-                <HoverCard>
-                  <div className="p-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-6">Past & Current Partners</h3>
-                    <div className="grid grid-cols-2 gap-3 mb-8">
-                      {partners.map((partner) => (
-                        <div key={partner} className="bg-gray-50 p-3 rounded-lg text-center">
-                          <span className="text-sm font-medium text-gray-700">{partner}</span>
-                        </div>
-                      ))}
+          <Reveal dir="right">
+            <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
+              <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
+                whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
+                transition={{ duration: 0.3 }}>
+                <h3 className="text-xl font-black text-gray-900 mb-7">Partners & Collaborators</h3>
+                <div className="grid grid-cols-2 gap-2.5 mb-8">
+                  {partners.map(p => (
+                    <motion.div key={p} className="rounded-xl border border-gray-100 bg-gray-50 hover:bg-red-50 hover:border-red-100 px-3 py-2.5 text-center cursor-default transition-colors duration-200"
+                      whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+                      <span className="text-xs font-semibold text-gray-700">{p}</span>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="rounded-xl bg-blue-50 border border-blue-100 p-5">
+                  <h4 className="font-black text-blue-900 text-sm mb-3">Success Metrics</h4>
+                  {['500+ government officials trained in digital governance', '15 corporate clients achieved 25% productivity gains', '200+ SMEs digitized through our ecosystem', 'Regional expansion to 4 countries'].map(m => (
+                    <div key={m} className="flex items-center gap-2 mb-2">
+                      <CheckCircle size={13} className="text-blue-500 flex-shrink-0" />
+                      <span className="text-xs text-blue-800">{m}</span>
                     </div>
-                    <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
-                      <h4 className="font-semibold text-blue-900 mb-3">Success Metrics</h4>
-                      <ul className="space-y-2 text-blue-800 text-sm">
-                        <li className="flex items-center gap-2">
-                          <CheckCircle size={14} className="flex-shrink-0" />
-                          500+ government officials trained in digital governance
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle size={14} className="flex-shrink-0" />
-                          15 corporate clients achieved 25% productivity gains
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle size={14} className="flex-shrink-0" />
-                          200+ SMEs digitized through our ecosystem
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <CheckCircle size={14} className="flex-shrink-0" />
-                          Regional expansion to 4 countries
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </HoverCard>
-              </TiltCard>
-            </Reveal>
-          </ParallaxScroll>
+                  ))}
+                </div>
+              </motion.div>
+            </Card3D>
+          </Reveal>
         </div>
 
         <Reveal className="text-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-10 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 transition-all"
-          >
+          <motion.button whileHover={{ scale: 1.05, boxShadow: `0 0 40px ${RED}55` }} whileTap={{ scale: 0.97 }}
+            className="px-10 py-4 text-white font-black rounded-2xl shadow-lg text-sm tracking-wide transition-all"
+            style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
             Become a Partner →
           </motion.button>
         </Reveal>
@@ -983,61 +949,20 @@ function PartnershipSection() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// CTA SECTION
-// ─────────────────────────────────────────────────────────────────────────────
-
-function CTASection() {
-  return (
-    <section className="py-24 bg-gradient-to-r from-red-600 to-red-800 text-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
-        <Reveal>
-          <SectionLabel>
-            <span className="text-red-200">Take Action</span>
-          </SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Join Our ESG Impact Journey
-          </h2>
-          <p className="text-xl text-red-100 max-w-2xl mx-auto mb-10">
-            Take action today to contribute to sustainable development through technology and education.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 bg-white text-red-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              Join a Course
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 border-2 border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 font-bold rounded-xl transition-all"
-            >
-              Partner With Us
-            </motion.button>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SIMPLE NAVIGATION & FOOTER
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// CTA
+// ═══════════════════════════════════════════════════════════════════════════
 
 
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN APP
-// ─────────────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// PAGE
+// ═══════════════════════════════════════════════════════════════════════════
 
 export default function ESGPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-     <Navigation />
+      <Navigation />
       <div className="pt-20">
         <HeroSection />
         <ESGSDGSection />

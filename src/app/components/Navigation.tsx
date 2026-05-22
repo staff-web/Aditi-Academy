@@ -48,7 +48,7 @@ export function Navigation() {
               <img
                 src={logoUrl}
                 alt="ADITI Academy logo"
-                className="w-48 h-48 sm:w-48sm:h-48 object-contain rounded-2xl"
+                className="w-55 h-55 sm:w-48sm:h-48 object-contain rounded-2xl"
               />
             </motion.div>
             <div className="hidden xs:block">

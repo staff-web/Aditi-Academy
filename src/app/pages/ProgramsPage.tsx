@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform, useInView, useSpring, useMotionValue, AnimatePresence } from 'motion/react';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import {
   GraduationCap, Building2, Globe, Award, CheckCircle, Sparkles, Rocket,
@@ -8,11 +8,13 @@ import {
   BarChart3, Calendar, CheckSquare, DollarSign, Headphones, FileText,
   School, UserCheck, ThumbsUp, MessageCircle, Phone, Mail, MapPin,
   Upload, Search, AlertCircle, CheckSquare as CheckSq, ShieldCheck,
-  FileCheck, Eye, Loader2, BadgeCheck, Hash, Share2,
+  FileCheck, Eye, Loader2, BadgeCheck, Hash, Share2, Lightbulb,
+  Heart, Zap as ZapIcon,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
+
 const certificateImageUrl = new URL("../../assets/certificate.jpg", import.meta.url).href;
 
 
@@ -35,6 +37,9 @@ const IMGS = {
   corporateHero:  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
   govHero:        'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1600&q=80',
   govMeeting:     'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1200&q=80',
+  codingClass:    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
+  aiTech:         'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
+  cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
 };
 
 const CATEGORIES = [
@@ -63,16 +68,17 @@ const CERT_DB = {
   'ADT-2024-205': { name: 'Virak Chan',   course: 'Project Management Professional', date: 'August 5, 2024', grade: 'Pass', id: 'ADT-2024-205', hours: '48 CPD Hours' },
 };
 
-// ─── ANIMATION PRIMITIVES ────────────────────────────────────────────────────
+// ─── 3D ANIMATION COMPONENTS ────────────────────────────────────────────────────
 
-function Reveal({ children, delay = 0, direction = 'up', className = '', style = {} }) {
+// Enhanced Reveal with 3D rotation
+function Reveal({ children, delay = 0, direction = 'up', className = '', style = {}, rotate = false }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
-  const dirs = { up: { y: 50, x: 0 }, down: { y: -50, x: 0 }, left: { y: 0, x: 50 }, right: { y: 0, x: -50 } };
-  const { y, x } = dirs[direction] || dirs.up;
+  const dirs = { up: { y: 50, x: 0, rotateX: rotate ? 15 : 0 }, down: { y: -50, x: 0, rotateX: rotate ? -15 : 0 }, left: { y: 0, x: 50, rotateY: rotate ? 15 : 0 }, right: { y: 0, x: -50, rotateY: rotate ? -15 : 0 } };
+  const { y, x, rotateX, rotateY } = dirs[direction] || dirs.up;
   return (
-    <motion.div ref={ref} initial={{ opacity: 0, y, x }}
-      animate={inView ? { opacity: 1, y: 0, x: 0 } : {}}
+    <motion.div ref={ref} initial={{ opacity: 0, y, x, rotateX, rotateY }}
+      animate={inView ? { opacity: 1, y: 0, x: 0, rotateX: 0, rotateY: 0 } : {}}
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className} style={style}>
       {children}
@@ -80,11 +86,121 @@ function Reveal({ children, delay = 0, direction = 'up', className = '', style =
   );
 }
 
-function ParallaxScroll({ children, className = '' }) {
+// 3D Tilt Card on hover
+function TiltCard({ children, intensity = 8, className = '', style = {} }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [intensity, -intensity]), { stiffness: 300, damping: 30 });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-intensity, intensity]), { stiffness: 300, damping: 30 });
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 1200, ...style }}
+      className={className}
+      onMouseMove={(e) => {
+        const rect = ref.current?.getBoundingClientRect();
+        if (rect) {
+          x.set((e.clientX - rect.left) / rect.width - 0.5);
+          y.set((e.clientY - rect.top) / rect.height - 0.5);
+        }
+      }}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Hover card with lift and 3D effect
+function HoverCard({ children, className = '', style = {} }) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <motion.div
+      className={className}
+      style={{
+        borderRadius: 24,
+        border: `1px solid ${isHovered ? BRAND + '30' : '#e5e7eb'}`,
+        background: '#fff',
+        boxShadow: isHovered 
+          ? `0 20px 40px -12px rgba(0,0,0,0.15), 0 0 0 1px ${BRAND}10`
+          : '0 1px 3px rgba(0,0,0,0.05)',
+        transition: 'all 0.3s ease',
+        transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
+        ...style,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Parallax scroll effect
+function ParallaxScroll({ children, speed = 0.02, direction = 'up', className = '' }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], [30, -30]);
-  return <motion.div ref={ref} style={{ y }} className={className}>{children}</motion.div>;
+  const y = useTransform(scrollYProgress, [0, 1], direction === 'up' ? [60, -60] : [-60, 60]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.5, 1, 1, 0.4]);
+  
+  return (
+    <motion.div ref={ref} style={{ y, opacity }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+// Floating animation for elements
+function Floating({ children, delay = 0, amplitude = 10, duration = 3 }) {
+  return (
+    <motion.div
+      animate={{ y: [0, -amplitude, 0, amplitude, 0] }}
+      transition={{ duration, repeat: Infinity, delay, ease: 'easeInOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// 3D Scene with floating cards
+function ThreeDCardGrid({ children }) {
+  return (
+    <div className="relative" style={{ perspective: '1200px' }}>
+      <div className="relative transform-gpu" style={{ transformStyle: 'preserve-3d' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Staggered reveal with 3D rotation
+function StaggerContainer({ children, className = '' }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ staggerChildren: 0.1 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function StaggerItem({ children, className = '' }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, rotateX: 10 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0 }}
+      transition={{ duration: 0.5 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 function Eyebrow({ children, dark = false }) {
@@ -126,12 +242,11 @@ const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: 12, bord
 function CourseModal({ course, onClose, onRegister }) {
   if (!course) return null;
   return (
-
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
         onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 30 }}
+        <motion.div initial={{ scale: 0.9, y: 30, rotateX: 20 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 30, rotateX: 20 }}
           onClick={e => e.stopPropagation()}
           className="w-full max-w-[740px] max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
           <div className="relative h-72">
@@ -184,7 +299,7 @@ function RegModal({ show, onClose, course }) {
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
+        <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
           onClick={e => e.stopPropagation()} className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
           <h3 className="text-2xl font-bold text-gray-900 mb-1">Register for <GradientText>Course</GradientText></h3>
@@ -214,11 +329,22 @@ const SERVICES = [
   { id: 'other', name: 'Other (Custom Program)', icon: Sparkles, description: 'Tell us what you\'d like to study' },
 ];
 
-function QuoteModal({ show, onClose }) {
+function QuoteModal({ show, onClose, preselectedService = null }) {
   const [step, setStep] = useState<'select' | 'details'>('select');
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<string | null>(preselectedService);
   const [customTopic, setCustomTopic] = useState('');
   const [formData, setFormData] = useState({ name: '', company: '', phone: '', email: '' });
+
+  // Auto-advance to details if preselected service is provided
+  useEffect(() => {
+    if (preselectedService && show) {
+      setSelectedService(preselectedService);
+      setStep('details');
+    } else if (show && !preselectedService) {
+      setStep('select');
+      setSelectedService(null);
+    }
+  }, [preselectedService, show]);
 
   const handleSelect = (serviceId: string) => {
     setSelectedService(serviceId);
@@ -233,7 +359,6 @@ function QuoteModal({ show, onClose }) {
     }
     alert(message);
     onClose();
-    // Reset state after closing
     setTimeout(() => {
       setStep('select');
       setSelectedService(null);
@@ -254,7 +379,7 @@ function QuoteModal({ show, onClose }) {
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
+        <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
           onClick={e => e.stopPropagation()} className="w-full max-w-2xl bg-white rounded-3xl p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
           
@@ -351,7 +476,7 @@ function PartnerModal({ show, onClose }) {
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 24 }}
+        <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
           onClick={e => e.stopPropagation()} className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
           <h3 className="text-2xl font-bold text-gray-900 mb-1">Request <GradientText>Partnership</GradientText></h3>
@@ -374,7 +499,7 @@ function PartnerModal({ show, onClose }) {
 
 function CertificateCenter() {
   const [certId, setCertId] = useState('');
-  const [status, setStatus] = useState('idle'); // idle | loading | found | error
+  const [status, setStatus] = useState('idle');
   const [cert, setCert] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef(null);
@@ -398,11 +523,9 @@ function CertificateCenter() {
     if (!file) return;
     setStatus('loading');
     setCert(null);
-    // Simulate OCR / ID scan
     setTimeout(() => {
       const keys = Object.keys(CERT_DB);
       const random = keys[Math.floor(Math.random() * keys.length)];
-      // 70% chance of finding
       if (Math.random() > 0.3) {
         setCert(CERT_DB[random]);
         setStatus('found');
@@ -416,7 +539,6 @@ function CertificateCenter() {
 
   return (
     <section className="py-24 bg-gray-950 relative overflow-hidden">
-      {/* Background geometric decoration */}
       <div style={{
         position: 'absolute', inset: 0,
         background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(220,38,38,0.08) 0%, transparent 70%)',
@@ -442,16 +564,13 @@ function CertificateCenter() {
           </p>
         </Reveal>
 
-        {/* Single Column Layout */}
         <div className="flex flex-col gap-8">
-          {/* Input Panel */}
           <Reveal delay={0.1}>
             <div style={{
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 24, padding: 32,
             }}>
-              {/* Certificate ID Input */}
               <div className="mb-6">
                 <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600, marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                   Certificate ID
@@ -494,11 +613,9 @@ function CertificateCenter() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
                 <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-                
                 <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
               </div>
 
-              {/* Demo IDs */}
               <div className="mt-6">
                 <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>
                   Try demo certificate IDs:
@@ -519,7 +636,6 @@ function CertificateCenter() {
             </div>
           </Reveal>
 
-          {/* Result Panel */}
           <Reveal delay={0.2}>
             <AnimatePresence mode="wait">
               {status === 'idle' && (
@@ -637,30 +753,23 @@ function CertificateCenter() {
   );
 }
 
-
-
-
-
-// Then replace the CertificateCard component with this:
 function CertificateCard({ cert }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { const t = setTimeout(() => setVisible(true), 100); return () => clearTimeout(t); }, []);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 20 }}
+      initial={{ opacity: 0, y: 20, rotateX: 15 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 20, rotateX: visible ? 0 : 15 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="relative"
     >
-      {/* Certificate Body - Horizontal with Image */}
       <div style={{
         background: 'white',
         borderRadius: 24,
         overflow: 'hidden',
         boxShadow: '0 20px 35px -8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)',
       }}>
-        {/* Header with red accent */}
         <div style={{
           background: '#dc2626',
           padding: '12px 20px',
@@ -681,7 +790,6 @@ function CertificateCard({ cert }) {
           </div>
         </div>
 
-        {/* Horizontal Layout with Image */}
         <div style={{ padding: '28px' }}>
           <div style={{
             display: 'flex',
@@ -690,7 +798,6 @@ function CertificateCard({ cert }) {
             flexWrap: 'wrap',
             alignItems: 'center',
           }}>
-            {/* Left Column - Large Image */}
             <div style={{
               flex: '0 0 auto',
               width: '320px',
@@ -708,7 +815,6 @@ function CertificateCard({ cert }) {
                 textAlign: 'center',
                 border: '1px solid #fecaca',
               }}>
-                {/* USING THE SAME PATTERN AS MASCOT AND LOGO */}
                 <img 
                   src={certificateImageUrl}
                   alt="Certificate Seal" 
@@ -728,9 +834,7 @@ function CertificateCard({ cert }) {
               </div>
             </div>
 
-            {/* Right Column - Compact Certificate Details */}
             <div style={{ flex: 1, minWidth: '240px' }}>
-              {/* Certificate Title - Smaller */}
               <div style={{ marginBottom: 12 }}>
                 <h3 style={{
                   color: '#dc2626',
@@ -749,7 +853,6 @@ function CertificateCard({ cert }) {
                 }} />
               </div>
 
-              {/* Awarded To - Smaller */}
               <div style={{ marginBottom: 16 }}>
                 <p style={{ color: '#6b7280', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
                   Awarded To
@@ -759,7 +862,6 @@ function CertificateCard({ cert }) {
                 </h4>
               </div>
 
-              {/* Course/Program - More compact */}
               <div style={{
                 background: '#fef2f2',
                 padding: '10px 14px',
@@ -775,7 +877,6 @@ function CertificateCard({ cert }) {
                 </p>
               </div>
 
-              {/* Details Grid - 2 columns, more compact */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -831,7 +932,6 @@ function CertificateCard({ cert }) {
                 </div>
               </div>
 
-              {/* Action Buttons - More compact */}
               <div style={{
                 display: 'flex',
                 gap: 8,
@@ -886,7 +986,6 @@ function CertificateCard({ cert }) {
             </div>
           </div>
 
-          {/* Footer with verification - More compact */}
           <div style={{
             marginTop: 20,
             paddingTop: 12,
@@ -921,7 +1020,7 @@ function CertificateCard({ cert }) {
   );
 }
 
-// ─── HERO ─────────────────────────────────────────────────────────────────────
+// ─── HERO WITH 3D BACKGROUND ─────────────────────────────────────────────────
 
 function HeroSection({ onExplore }) {
   const heroRef = useRef(null);
@@ -929,6 +1028,7 @@ function HeroSection({ onExplore }) {
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.5], [0, 8]);
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
@@ -936,11 +1036,19 @@ function HeroSection({ onExplore }) {
         <img src={IMGS.hero} alt="Technology Training" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
       </motion.div>
-      <motion.div className="relative z-10 text-center px-6 max-w-4xl mx-auto" style={{ y: heroY, opacity: heroOpacity }}>
+      
+      {/* Animated tech particles */}
+      <div className="absolute inset-0 z-0 opacity-20">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-red-600 rounded-full filter blur-[100px] animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-500 rounded-full filter blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-red-400 rounded-full filter blur-[80px] animate-pulse delay-500" />
+      </div>
+      
+      <motion.div className="relative z-10 text-center px-6 max-w-4xl mx-auto" style={{ y: heroY, opacity: heroOpacity, rotateX }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <Eyebrow dark={true}>Technology Training Programs</Eyebrow>
         </motion.div>
-        <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.9 }}
+        <motion.h1 initial={{ opacity: 0, y: 40, rotateX: 15 }} animate={{ opacity: 1, y: 0, rotateX: 0 }} transition={{ delay: 0.45, duration: 0.9 }}
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
           Empower Your Future<br />
           <span className="bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">with Professional IT</span>
@@ -982,9 +1090,7 @@ function HeroSection({ onExplore }) {
   );
 }
 
-// ─── AUDIENCE SWITCHER (redesigned as clear tabbed interface) ─────────────────
-
-// ─── AUDIENCE SWITCHER (Full Width, Large, Noticeable Cards) ─────────────────
+// ─── ENHANCED WHO ARE YOU SECTION WITH 3D CARDS ─────────────────────────────
 
 function WhoAreYouSection({ activeTab, setActiveTab }) {
   const audiences = [
@@ -1015,7 +1121,7 @@ function WhoAreYouSection({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-white to-gray-50">
+    <section className="py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-4">
           <Eyebrow>Choose Your Path</Eyebrow>
@@ -1027,258 +1133,210 @@ function WhoAreYouSection({ activeTab, setActiveTab }) {
           </p>
         </Reveal>
 
-        {/* Large Noticeable Cards */}
         <div className="grid md:grid-cols-3 gap-6 mt-12">
           {audiences.map(({ tab, badge, title, desc, cta, icon: Icon, img, features, color }) => {
             const active = activeTab === tab;
             return (
-              <motion.div
-                key={tab}
-                animate={{
-                  scale: active ? 1.02 : 1,
-                  y: active ? -8 : 0,
-                }}
-                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-                onClick={() => setActiveTab(tab)}
-                whileHover={{ scale: 1.02, y: -4 }}
-                style={{
-                  borderRadius: 24,
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  border: active ? `3px solid ${color}` : '2px solid #e5e7eb',
-                  boxShadow: active 
-                    ? `0 25px 50px -12px ${color}80, 0 4px 16px rgba(0,0,0,0.1)` 
-                    : '0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02)',
-                  background: active ? `linear-gradient(135deg, white, ${color}08)` : 'white',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                }}
-              >
-                {/* Hover indicator - subtle overlay */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.02) 100%)',
-                  pointerEvents: 'none',
-                  opacity: 0,
-                  transition: 'opacity 0.3s ease',
-                }} className="hover-overlay" />
-                
-                {/* Active glow top bar */}
-                <motion.div
-                  animate={{ scaleX: active ? 1 : 0 }}
-                  style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, height: 4,
-                    background: `linear-gradient(90deg, ${color}, ${color}cc)`,
-                    transformOrigin: 'left', zIndex: 10,
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-
-                {/* Clickable badge - always visible for inactive cards */}
-                {!active && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    zIndex: 10,
-                    background: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(8px)',
-                    borderRadius: 30,
-                    padding: '6px 14px',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'white',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                  }}>
-                    <ArrowRight size={12} />
-                    Click to select
-                  </div>
-                )}
-
-                {/* Active badge */}
-                {active && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    zIndex: 10,
-                    background: color,
-                    borderRadius: 30,
-                    padding: '6px 14px',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'white',
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    boxShadow: `0 2px 12px ${color}80`,
-                  }}>
-                    <CheckCircle size={12} />
-                    Active • {badge}
-                  </div>
-                )}
-
-                {/* Image Section - Larger */}
-                <div className="relative h-56 overflow-hidden">
-                  <motion.img
-                    animate={{ scale: active ? 1.08 : 1 }}
-                    transition={{ duration: 0.5 }}
-                    src={img} 
-                    alt={title} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  
-                  {/* Large Icon Overlay */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 16,
-                    left: 16,
-                    width: 56,
-                    height: 56,
-                    borderRadius: 16,
-                    background: active ? color : 'rgba(255,255,255,0.95)',
-                    backdropFilter: 'blur(12px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                  }}>
-                    <Icon size={28} color={active ? 'white' : color} />
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  {/* Badge and Title */}
-                  <div style={{
-                    display: 'inline-block',
-                    background: active ? `${color}15` : '#f3f4f6',
-                    color: active ? color : '#6b7280',
-                    padding: '4px 12px',
-                    borderRadius: 20,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    marginBottom: 12,
-                    letterSpacing: '0.05em',
-                  }}>
-                    {badge}
-                  </div>
-                  
-                  <h3 style={{ 
-                    fontSize: 22, 
-                    fontWeight: 700, 
-                    color: active ? color : '#111827', 
-                    marginBottom: 10, 
-                    transition: 'color 0.2s' 
-                  }}>
-                    {title}
-                  </h3>
-                  
-                  <p style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
-                    {desc}
-                  </p>
-
-                  {/* Feature chips - Larger and more visible */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                    {features.map(f => (
-                      <span key={f} style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        padding: '5px 14px',
-                        borderRadius: 30,
-                        border: `1.5px solid ${active ? color + '40' : '#e5e7eb'}`,
-                        background: active ? color + '10' : '#f9fafb',
-                        color: active ? color : '#4b5563',
-                        transition: 'all 0.2s',
-                      }}>
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* CTA Button - Always visible, more prominent */}
+              <TiltCard key={tab} intensity={5}>
+                <HoverCard>
                   <motion.div
-                    animate={active ? { x: 0 } : { x: 0 }}
+                    animate={{
+                      scale: active ? 1.02 : 1,
+                      y: active ? -8 : 0,
+                    }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+                    onClick={() => setActiveTab(tab)}
+                    whileHover={{ scale: 1.02, y: -4 }}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginTop: 8,
-                      paddingTop: 16,
-                      borderTop: `1.5px solid ${active ? color + '30' : '#e5e7eb'}`,
+                      borderRadius: 24,
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: active ? `3px solid ${color}` : '2px solid #e5e7eb',
+                      boxShadow: active 
+                        ? `0 25px 50px -12px ${color}80, 0 4px 16px rgba(0,0,0,0.1)` 
+                        : '0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02)',
+                      background: active ? `linear-gradient(135deg, white, ${color}08)` : 'white',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
                     }}
                   >
-                    <span style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: active ? color : '#9ca3af',
-                      transition: 'color 0.2s',
-                    }}>
-                      {active ? `✓ Selected: ${cta}` : cta}
-                    </span>
                     <motion.div
-                      animate={active ? { x: 5 } : { x: 0 }}
+                      animate={{ scaleX: active ? 1 : 0 }}
                       style={{
-                        width: 36,
-                        height: 36,
+                        position: 'absolute', top: 0, left: 0, right: 0, height: 4,
+                        background: `linear-gradient(90deg, ${color}, ${color}cc)`,
+                        transformOrigin: 'left', zIndex: 10,
+                      }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+
+                    {!active && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        zIndex: 10,
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
                         borderRadius: 30,
-                        background: active ? color : '#f3f4f6',
+                        padding: '6px 14px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: 'white',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      }}>
+                        <ArrowRight size={12} />
+                        Click to select
+                      </div>
+                    )}
+
+                    {active && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        zIndex: 10,
+                        background: color,
+                        borderRadius: 30,
+                        padding: '6px 14px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: 'white',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        boxShadow: `0 2px 12px ${color}80`,
+                      }}>
+                        <CheckCircle size={12} />
+                        Active • {badge}
+                      </div>
+                    )}
+
+                    <div className="relative h-56 overflow-hidden">
+                      <motion.img
+                        animate={{ scale: active ? 1.08 : 1 }}
+                        transition={{ duration: 0.5 }}
+                        src={img} 
+                        alt={title} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 16,
+                        left: 16,
+                        width: 56,
+                        height: 56,
+                        borderRadius: 16,
+                        background: active ? color : 'rgba(255,255,255,0.95)',
+                        backdropFilter: 'blur(12px)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      <ArrowRight size={16} color={active ? 'white' : '#9ca3af'} />
-                    </motion.div>
-                  </motion.div>
-                </div>
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                      }}>
+                        <Icon size={28} color={active ? 'white' : color} />
+                      </div>
+                    </div>
 
-                {/* Click instruction on hover */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  style={{
-                    position: 'absolute',
-                    bottom: 20,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: 'rgba(0,0,0,0.8)',
-                    backdropFilter: 'blur(8px)',
-                    padding: '6px 14px',
-                    borderRadius: 30,
-                    fontSize: 11,
-                    fontWeight: 500,
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    pointerEvents: 'none',
-                    whiteSpace: 'nowrap',
-                    zIndex: 20,
-                  }}
-                >
-                  <span>👆 Click to switch</span>
-                  <ArrowRight size={10} />
-                </motion.div>
-              </motion.div>
+                    <div className="p-6">
+                      <div style={{
+                        display: 'inline-block',
+                        background: active ? `${color}15` : '#f3f4f6',
+                        color: active ? color : '#6b7280',
+                        padding: '4px 12px',
+                        borderRadius: 20,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        marginBottom: 12,
+                        letterSpacing: '0.05em',
+                      }}>
+                        {badge}
+                      </div>
+                      
+                      <h3 style={{ 
+                        fontSize: 22, 
+                        fontWeight: 700, 
+                        color: active ? color : '#111827', 
+                        marginBottom: 10, 
+                        transition: 'color 0.2s' 
+                      }}>
+                        {title}
+                      </h3>
+                      
+                      <p style={{ color: '#6b7280', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
+                        {desc}
+                      </p>
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+                        {features.map(f => (
+                          <span key={f} style={{
+                            fontSize: 12,
+                            fontWeight: 600,
+                            padding: '5px 14px',
+                            borderRadius: 30,
+                            border: `1.5px solid ${active ? color + '40' : '#e5e7eb'}`,
+                            background: active ? color + '10' : '#f9fafb',
+                            color: active ? color : '#4b5563',
+                            transition: 'all 0.2s',
+                          }}>
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+
+                      <motion.div
+                        animate={active ? { x: 0 } : { x: 0 }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: 8,
+                          paddingTop: 16,
+                          borderTop: `1.5px solid ${active ? color + '30' : '#e5e7eb'}`,
+                        }}
+                      >
+                        <span style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: active ? color : '#9ca3af',
+                          transition: 'color 0.2s',
+                        }}>
+                          {active ? `✓ Selected: ${cta}` : cta}
+                        </span>
+                        <motion.div
+                          animate={active ? { x: 5 } : { x: 0 }}
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 30,
+                            background: active ? color : '#f3f4f6',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          <ArrowRight size={16} color={active ? 'white' : '#9ca3af'} />
+                        </motion.div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </HoverCard>
+              </TiltCard>
             );
           })}
         </div>
 
-        {/* Visual indicator showing current selection */}
         <Reveal delay={0.2}>
           <div style={{
             marginTop: 32,
@@ -1315,15 +1373,14 @@ function WhoAreYouSection({ activeTab, setActiveTab }) {
           0%, 100% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.5; transform: scale(1.2); }
         }
-        .hover-overlay:hover {
-          opacity: 1;
-        }
       `}</style>
     </section>
   );
 }
 
-// ─── COURSE BROWSER ───────────────────────────────────────────────────────────
+// ─── ENHANCED CATEGORY FILTER WITH 3D ────────────────────────────────────────
+
+// ─── ENHANCED CATEGORY FILTER - NO PARALLAX (FIXED) ─────────────────────────
 
 function CategoryFilter({ selected, onChange }) {
   return (
@@ -1332,57 +1389,79 @@ function CategoryFilter({ selected, onChange }) {
         const Icon = cat.icon;
         const active = selected === cat.id;
         return (
-          <button key={cat.id} onClick={() => onChange(cat.id)}
+          <motion.button
+            key={cat.id}
+            onClick={() => onChange(cat.id)}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
               active ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
             <Icon size={14} />{cat.name}
-          </button>
+          </motion.button>
         );
       })}
     </div>
   );
 }
 
+// ─── ENHANCED COURSE CARD WITH 3D EFFECT ─────────────────────────────────────
+
 function CourseCard({ course, index, onClick }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
   const [isHovered, setIsHovered] = useState(false);
+  
   return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-      onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
-      className={`bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border ${isHovered ? 'border-red-300 shadow-xl shadow-red-500/10' : 'border-gray-100 shadow-md'}`}>
-      <div className="flex flex-col md:flex-row">
-        <div className="relative md:w-64 h-48 md:h-auto overflow-hidden">
-          <img src={course.img} alt={course.title}
-            className={`w-full h-full object-cover transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'}`} />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
-          <div className="absolute top-3 left-3 px-2 py-1 rounded-lg text-white text-xs font-bold" style={{ background: course.color }}>{course.level}</div>
-        </div>
-        <div className="flex-1 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center gap-1">
-              <Star size={14} fill="#f59e0b" stroke="none" />
-              <span className="text-sm font-semibold text-gray-900">{course.rating}</span>
-            </div>
-            <span className="text-gray-400 text-xs">· {course.students} students · {course.duration}</span>
+    <TiltCard intensity={4}>
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 30, rotateX: 10 }}
+        animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+        transition={{ duration: 0.5, delay: index * 0.08 }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={onClick}
+        className={`bg-white rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border ${isHovered ? 'border-red-300 shadow-xl shadow-red-500/10' : 'border-gray-100 shadow-md'}`}>
+        <div className="flex flex-col md:flex-row">
+          <div className="relative md:w-64 h-48 md:h-auto overflow-hidden">
+            <motion.img
+              src={course.img}
+              alt={course.title}
+              animate={{ scale: isHovered ? 1.1 : 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+            <div className="absolute top-3 left-3 px-2 py-1 rounded-lg text-white text-xs font-bold" style={{ background: course.color }}>{course.level}</div>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
-          <p className="text-gray-500 text-sm mb-3 line-clamp-2">{course.description}</p>
-          <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100">
-            <span className="text-xl font-bold text-gray-900">{course.price}</span>
-            <div className={`flex items-center gap-1 text-sm font-semibold text-red-600 transition-all ${isHovered ? 'translate-x-1' : ''}`}>
-              View Course <ArrowRight size={14} />
+          <div className="flex-1 p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-1">
+                <Star size={14} fill="#f59e0b" stroke="none" />
+                <span className="text-sm font-semibold text-gray-900">{course.rating}</span>
+              </div>
+              <span className="text-gray-400 text-xs">· {course.students} students · {course.duration}</span>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+            <p className="text-gray-500 text-sm mb-3 line-clamp-2">{course.description}</p>
+            <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100">
+              <span className="text-xl font-bold text-gray-900">{course.price}</span>
+              <motion.div
+                animate={{ x: isHovered ? 5 : 0 }}
+                className="flex items-center gap-1 text-sm font-semibold text-red-600">
+                View Course <ArrowRight size={14} />
+              </motion.div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </TiltCard>
   );
 }
 
-// ─── CAREER BOOST ────────────────────────────────────────────────────────────
+// ─── CAREER BOOST SECTION WITH 3D ────────────────────────────────────────────
+
+// ─── AUDIENCE-SPECIFIC CAREER BOOST SECTION ─────────────────────────────────
 
 function CareerBoostSection({ onRegister }) {
   const benefits = [
@@ -1394,43 +1473,76 @@ function CareerBoostSection({ onRegister }) {
     { title: 'Global Opportunities', desc: 'Eligible to participate in overseas partner programs and awards.', icon: Globe },
     { title: 'Official Certification', desc: 'Receive an official certificate upon successful course completion.', icon: Award },
   ];
+  
+  // Duplicate benefits for seamless looping
+  const loopingBenefits = [...benefits, ...benefits, ...benefits];
+  
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gray-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-12">
           <Eyebrow>Career Support</Eyebrow>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Your Career <GradientText>Boost</GradientText></h2>
           <p className="text-gray-500 mt-3 max-w-md mx-auto">A complete ecosystem of support to accelerate your professional journey.</p>
         </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {benefits.map((benefit, i) => (
-            <Reveal key={benefit.title} delay={i * 0.05}>
-              <div className="p-5 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-red-200 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-                    <benefit.icon size={20} className="text-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1">{benefit.title}</h3>
-                    <p className="text-gray-500 text-xs leading-relaxed">{benefit.desc}</p>
-                  </div>
-                </div>
+        
+        {/* Horizontal Looping Carousel */}
+        <div className="relative overflow-hidden py-8">
+          <motion.div
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ 
+              duration: 30, 
+              repeat: Infinity, 
+              ease: "linear",
+              repeatType: "loop"
+            }}
+            className="flex gap-6 w-max"
+            style={{ willChange: "transform" }}
+          >
+            {loopingBenefits.map((benefit, idx) => (
+              <div
+                key={`${benefit.title}-${idx}`}
+                className="w-72 h-80 flex-shrink-0"
+              >
+                <TiltCard intensity={3} className="h-full">
+                  <HoverCard className="p-6 h-full flex flex-col">
+                    <div className="flex flex-col items-center text-center h-full">
+                      <div className="w-16 h-16 rounded-xl bg-red-100 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                        <benefit.icon size={28} className="text-red-600 group-hover:text-white transition-colors" />
+                      </div>
+                      <h3 className="font-bold text-gray-900 mb-3 text-lg">{benefit.title}</h3>
+                      <p className="text-gray-500 text-sm leading-relaxed flex-1">{benefit.desc}</p>
+                      <div className="mt-4 w-12 h-0.5 bg-red-200 rounded-full" />
+                    </div>
+                  </HoverCard>
+                </TiltCard>
               </div>
-            </Reveal>
-          ))}
+            ))}
+          </motion.div>
         </div>
-        <Reveal className="flex gap-4 justify-center mt-10">
-          <button onClick={onRegister}
-            className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold cursor-pointer shadow-lg shadow-red-500/30 transition-all">
+        
+        {/* Gradient fade effects on sides */}
+        <div className="relative -mt-8">
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10" />
+        </div>
+        
+        <Reveal className="flex gap-4 justify-center mt-12">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onRegister}
+            className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold cursor-pointer shadow-lg shadow-red-500/30 transition-all"
+          >
             Register for New Course <ArrowRight size={16} className="inline ml-1" />
-          </button>
+          </motion.button>
         </Reveal>
       </div>
     </section>
   );
 }
 
-// ─── INDUSTRY PROGRAMS ───────────────────────────────────────────────────────
+// ─── INDUSTRY PROGRAMS SECTION ───────────────────────────────────────────────
 
 function IndustryProgramsSection() {
   const programs = [
@@ -1438,8 +1550,9 @@ function IndustryProgramsSection() {
     { title: 'Internship Program', subtitle: 'Practical Experience', features: ['Partnerships with leading companies', 'Hands-on experience in diverse industries', 'Mentorship from experienced professionals'], img: IMGS.internship, icon: Briefcase },
     { title: 'Work Global Virtual Company', subtitle: 'Global Opportunities', features: ['Remote work and project-based learning', 'Cross-cultural collaboration', 'Agile methodologies training'], img: IMGS.global, icon: Globe },
   ];
+  
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-12">
           <Eyebrow>Industry Programs</Eyebrow>
@@ -1447,25 +1560,77 @@ function IndustryProgramsSection() {
         </Reveal>
         <div className="grid md:grid-cols-3 gap-6">
           {programs.map((prog, i) => (
-            <Reveal key={prog.title} delay={i * 0.1}>
-              <div className="rounded-xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-lg hover:border-red-200 transition-all">
-                <div className="relative h-48 overflow-hidden">
-                  <img src={prog.img} alt={prog.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-3">
-                    <div className="text-xs text-white/60 uppercase tracking-wide">{prog.subtitle}</div>
-                    <h3 className="text-lg font-bold text-white">{prog.title}</h3>
-                  </div>
-                </div>
-                <div className="p-5">
-                  {prog.features.map(f => (
-                    <div key={f} className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                      <CheckCircle size={12} className="text-red-600 flex-shrink-0" />
-                      <span>{f}</span>
+            <ParallaxScroll key={prog.title} direction={i % 2 === 0 ? 'up' : 'down'}>
+              <TiltCard intensity={4}>
+                <HoverCard className="overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
+                    <img src={prog.img} alt={prog.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3">
+                      <div className="text-xs text-white/60 uppercase tracking-wide">{prog.subtitle}</div>
+                      <h3 className="text-lg font-bold text-white">{prog.title}</h3>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                  <div className="p-5">
+                    {prog.features.map(f => (
+                      <div key={f} className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <CheckCircle size={12} className="text-red-600 flex-shrink-0" />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </HoverCard>
+              </TiltCard>
+            </ParallaxScroll>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── TECHNOLOGY SHOWCASE SECTION (NEW - ADDING TECH FOCUS) ────────────────────
+
+// ─── TECHNOLOGY SHOWCASE SECTION - NO MOVEMENT ────────────────────────────────
+
+function TechnologyShowcase() {
+  const techImages = [
+    { src: IMGS.aiTech, title: 'Artificial Intelligence', description: 'Cutting-edge AI and Machine Learning programs', icon: Brain },
+    { src: IMGS.security, title: 'Cybersecurity', description: 'Advanced security training and ethical hacking', icon: Shield },
+    { src: IMGS.cloudComputing, title: 'Cloud Computing', description: 'AWS, Azure, and cloud architecture', icon: Database },
+  ];
+
+  return (
+    <section className="py-24 bg-gray-50 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <Reveal className="text-center mb-16">
+          <Eyebrow>Our Technology Focus</Eyebrow>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
+            Cutting-Edge <GradientText>Technologies</GradientText>
+          </h2>
+          <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
+            We train on the latest technologies to ensure our students are industry-ready.
+          </p>
+        </Reveal>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {techImages.map((tech, index) => (
+            <Reveal key={tech.title} delay={index * 0.15}>
+              <TiltCard intensity={5}>
+                <HoverCard className="overflow-hidden">
+                  <div className="relative h-64 overflow-hidden">
+                    <img src={tech.src} alt={tech.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <tech.icon size={20} className="text-red-500" />
+                        <h3 className="text-xl font-bold text-white mb-1">{tech.title}</h3>
+                      </div>
+                      <p className="text-gray-200 text-sm">{tech.description}</p>
+                    </div>
+                  </div>
+                </HoverCard>
+              </TiltCard>
             </Reveal>
           ))}
         </div>
@@ -1474,9 +1639,9 @@ function IndustryProgramsSection() {
   );
 }
 
-// ─── ENHANCED CORPORATE SECTION WITH SERVICE SELECTION ABOVE QUOTE ───────────
+// ─── ENHANCED CORPORATE SECTION WITH 3D ──────────────────────────────────────
 
-function CorporateSection({ onQuote }) {
+function CorporateSection({ onQuote, onServiceSelect }) {
   const stats = [
     { value: 98, suffix: '%', label: 'Client Satisfaction', icon: ThumbsUp },
     { value: 500, suffix: '+', label: 'Corporate Clients', icon: Building2 },
@@ -1484,28 +1649,12 @@ function CorporateSection({ onQuote }) {
     { value: 100, suffix: '%', label: 'Customizable', icon: Target },
   ];
   
-  // Services data - now used for both display and quote selection
   const services = [
     { id: 'ondemand', title: 'On-Demand Training', desc: 'Self-paced programs with structured content. Access anytime for continuous upskilling.', icon: Cpu, duration: '24/7 Access', students: '10,000+' },
     { id: 'live', title: 'Live Training / Short Courses', desc: 'Instructor-led sessions with practical focus and immediate application.', icon: Users, duration: '2-12 weeks', students: '5,000+' },
     { id: 'group', title: 'Group Training', desc: 'Customized programs for entire teams, tailored to specific organizational objectives.', icon: Target, duration: 'Custom', students: '500+ Teams' },
     { id: 'elearning', title: 'Digital E-Learning', desc: 'Structured digital solution combining video, assessments, and materials for remote training.', icon: Globe, duration: 'Self-paced', students: '25,000+' },
   ];
-  
-  // New service selection state for quote modal pre-selection
-  const [selectedServiceForQuote, setSelectedServiceForQuote] = useState<string | null>(null);
-  
-  // Handle service selection that triggers quote modal with pre-selected service
-  const handleServiceSelect = (serviceId: string) => {
-    setSelectedServiceForQuote(serviceId);
-    onQuote(); // This opens the quote modal - we'll need to modify QuoteModal to accept preselection
-  };
-  
-  // Original onQuote handler for the main CTA button
-  const handleMainQuote = () => {
-    setSelectedServiceForQuote(null);
-    onQuote();
-  };
   
   const testimonials = [
     { quote: 'ADITI Academy transformed our IT department\'s capabilities. The custom training program was exactly what we needed.', author: 'Michael Chen', role: 'CTO, TechCorp', rating: 5 },
@@ -1515,22 +1664,24 @@ function CorporateSection({ onQuote }) {
   
   return (
     <div>
-      
       <section className="py-16 bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
-                <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
-                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                <TiltCard intensity={3}>
+                  <div className="p-4">
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
+                    <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
+                    <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                  </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
       
-      {/* What We Provide Section - Enhanced with clickable cards that open quote modal */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
@@ -1542,32 +1693,35 @@ function CorporateSection({ onQuote }) {
             {services.map((service, i) => {
               const Icon = service.icon;
               return (
-                <Reveal key={service.title} delay={i * 0.1}>
-                  <motion.div 
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                    onClick={() => handleServiceSelect(service.id)}
-                    className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-red-300 transition-all cursor-pointer group h-full"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
-                      <Icon size={24} className="text-red-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
-                    <p className="text-gray-500 text-sm mb-4">{service.desc}</p>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <span className="text-xs text-gray-400">⏱ {service.duration}</span>
-                      <span className="text-xs text-red-600 group-hover:text-red-700 font-medium flex items-center gap-1">
-                        Get Quote <ArrowRight size={12} />
-                      </span>
-                    </div>
-                  </motion.div>
-                </Reveal>
+                <ParallaxScroll key={service.title} direction={i % 2 === 0 ? 'up' : 'down'}>
+                  <Reveal delay={i * 0.1}>
+                    <TiltCard intensity={5}>
+                      <motion.div
+                        whileHover={{ y: -4 }}
+                        onClick={() => onServiceSelect?.(service.id)}
+                        className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-red-300 transition-all cursor-pointer group h-full"
+                      >
+                        <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+                          <Icon size={24} className="text-red-600 group-hover:text-white transition-colors" />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">{service.title}</h3>
+                        <p className="text-gray-500 text-sm mb-4">{service.desc}</p>
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <span className="text-xs text-gray-400">⏱ {service.duration}</span>
+                          <span className="text-xs text-red-600 group-hover:text-red-700 font-medium flex items-center gap-1">
+                            Get Quote <ArrowRight size={12} />
+                          </span>
+                        </div>
+                      </motion.div>
+                    </TiltCard>
+                  </Reveal>
+                </ParallaxScroll>
               );
             })}
           </div>
-          
         </div>
       </section>
+      
       <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={IMGS.corporateHero} alt="Corporate Training" className="w-full h-full object-cover" />
@@ -1579,8 +1733,19 @@ function CorporateSection({ onQuote }) {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Enterprise Training<br /><span className="text-red-500">Solutions</span></h1>
             <p className="text-xl text-gray-200 max-w-2xl mb-8">Empower your workforce with customized IT training programs designed to close skill gaps and drive business growth.</p>
             <div className="flex gap-4">
-              <button onClick={handleMainQuote} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">Request Enterprise Quote</button>
-              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all"><Phone size={16} className="inline mr-2" /> Schedule Call</button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onQuote}
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
+                Request Enterprise Quote
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
+                <Phone size={16} className="inline mr-2" /> Schedule Call
+              </motion.button>
             </div>
           </Reveal>
         </div>
@@ -1595,11 +1760,13 @@ function CorporateSection({ onQuote }) {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {testimonials.map((t, i) => (
               <Reveal key={t.author} delay={i * 0.15}>
-                <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                  <div className="flex gap-1 mb-4">{[...Array(t.rating)].map((_, j) => <Star key={j} size={16} fill="#f59e0b" stroke="none" />)}</div>
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6">"{t.quote}"</p>
-                  <div><p className="font-bold text-gray-900">{t.author}</p><p className="text-sm text-gray-500">{t.role}</p></div>
-                </div>
+                <TiltCard intensity={3}>
+                  <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+                    <div className="flex gap-1 mb-4">{[...Array(t.rating)].map((_, j) => <Star key={j} size={16} fill="#f59e0b" stroke="none" />)}</div>
+                    <p className="text-gray-700 text-lg leading-relaxed mb-6">"{t.quote}"</p>
+                    <div><p className="font-bold text-gray-900">{t.author}</p><p className="text-sm text-gray-500">{t.role}</p></div>
+                  </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
@@ -1615,7 +1782,7 @@ function CorporateSection({ onQuote }) {
   );
 }
 
-// ─── GOVERNMENT ───────────────────────────────────────────────────────────────
+// ─── GOVERNMENT SECTION WITH 3D ──────────────────────────────────────────────
 
 function GovernmentSection({ onPartner }) {
   const stats = [
@@ -1636,6 +1803,7 @@ function GovernmentSection({ onPartner }) {
     { title: 'Student Certification', desc: 'Provide industry-recognized certifications to your students', icon: Award },
     { title: 'Research Collaboration', desc: 'Partner on technology research and innovation projects', icon: Target },
   ];
+  
   return (
     <div>
       <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
@@ -1649,25 +1817,42 @@ function GovernmentSection({ onPartner }) {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Government &<br /><span className="text-red-500">University Partnerships</span></h1>
             <p className="text-xl text-gray-200 max-w-2xl mb-8">Driving digital transformation through strategic collaboration and accredited training programs.</p>
             <div className="flex gap-4">
-              <button onClick={onPartner} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">Request Partnership Info</button>
-              <button className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all"><Mail size={16} className="inline mr-2" /> Contact Government Team</button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onPartner}
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
+                Request Partnership Info
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
+                <Mail size={16} className="inline mr-2" /> Contact Government Team
+              </motion.button>
             </div>
           </Reveal>
         </div>
       </section>
+      
       <section className="py-16 bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
-                <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
-                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                <TiltCard intensity={3}>
+                  <div className="p-4">
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
+                    <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
+                    <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
+                  </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
+      
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
@@ -1677,24 +1862,27 @@ function GovernmentSection({ onPartner }) {
           <div className="grid md:grid-cols-2 gap-6">
             {programs.map((program, i) => (
               <Reveal key={program.title} delay={i * 0.1}>
-                <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={24} className="text-red-600" /></div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">{program.title}</h3>
-                      <p className="text-gray-500 text-sm mb-3">{program.desc}</p>
-                      <div className="flex items-center gap-4 text-xs">
-                        <span className="text-gray-400">📅 {program.duration}</span>
-                        <span className="text-red-600">👥 {program.participants} trained</span>
+                <TiltCard intensity={3}>
+                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={24} className="text-red-600" /></div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">{program.title}</h3>
+                        <p className="text-gray-500 text-sm mb-3">{program.desc}</p>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="text-gray-400">📅 {program.duration}</span>
+                          <span className="text-red-600">👥 {program.participants} trained</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
+      
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -1722,13 +1910,20 @@ function GovernmentSection({ onPartner }) {
           </div>
         </div>
       </section>
+      
       <section className="py-16 bg-red-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
           <Reveal>
             <Award size={48} className="text-red-600 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Officially Accredited by MoEYS</h3>
             <p className="text-gray-600 max-w-2xl mx-auto mb-6">Our programs are fully aligned with the Ministry of Education, Youth and Sport standards</p>
-            <button onClick={onPartner} className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all">Request Accreditation Information</button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onPartner}
+              className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all">
+              Request Accreditation Information
+            </motion.button>
           </Reveal>
         </div>
       </section>
@@ -1745,10 +1940,16 @@ export function ProgramsPageEnhanced() {
   const [showRegForm, setShowRegForm] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
   const [showPartner, setShowPartner] = useState(false);
+  const [preselectedService, setPreselectedService] = useState<string | null>(null);
   const coursesRef = useRef(null);
 
   const filteredCourses = selectedCategory === 'all' ? COURSES : COURSES.filter(c => c.category === selectedCategory);
   const scrollToCourses = () => coursesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  
+  const handleServiceSelect = (serviceId: string) => {
+    setPreselectedService(serviceId);
+    setShowQuote(true);
+  };
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -1759,49 +1960,69 @@ export function ProgramsPageEnhanced() {
 
       <AnimatePresence mode="wait">
         {activeTab === 'individual' && (
-          <motion.div key="individual" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+          <motion.div
+            key="individual"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+          >
             <section ref={coursesRef} className="py-20 bg-gray-50">
-              <div className="max-w-7xl mx-auto px-6 lg:px-10">
-                <Reveal className="mb-8">
-                  <Eyebrow>Course Catalog</Eyebrow>
-                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Explore by <GradientText>Category</GradientText></h2>
-                </Reveal>
-                <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
-                <div className="space-y-4">
-                  {filteredCourses.map((course, i) => (
-                    <CourseCard key={course.id} course={course} index={i} onClick={() => setSelectedCourse(course)} />
-                  ))}
-                </div>
-              </div>
-            </section>
-            <CareerBoostSection onRegister={() => setShowRegForm(true)} />
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <Reveal className="mb-8">
+          <Eyebrow>Course Catalog</Eyebrow>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Explore by <GradientText>Category</GradientText></h2>
+        </Reveal>
+        <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
+        <div className="space-y-4">
+          {filteredCourses.map((course, i) => (
+            <CourseCard key={course.id} course={course} index={i} onClick={() => setSelectedCourse(course)} />
+          ))}
+        </div>
+      </div>
+    </section>
+            
+            {/* Technology Showcase added for individual tab */}
+            <TechnologyShowcase />
+            
+                <CareerBoostSection audienceType="individual" onRegister={() => setShowRegForm(true)} />
             <IndustryProgramsSection />
           </motion.div>
         )}
 
         {activeTab === 'corporate' && (
-          <motion.div key="corporate" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
-            <CorporateSection onQuote={() => setShowQuote(true)} />
+          <motion.div
+            key="corporate"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+          >
+            <CorporateSection onQuote={() => setShowQuote(true)} onServiceSelect={handleServiceSelect} />
           </motion.div>
         )}
 
         {activeTab === 'government' && (
-          <motion.div key="government" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+          <motion.div
+            key="government"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+          >
             <GovernmentSection onPartner={() => setShowPartner(true)} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Certificate Center — always visible below all tab content */}
       <CertificateCenter />
 
-      {/* <CTASection /> */}
       <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} onRegister={() => { setSelectedCourse(null); setShowRegForm(true); }} />
       <RegModal show={showRegForm} onClose={() => setShowRegForm(false)} course={selectedCourse} />
-      <QuoteModal show={showQuote} onClose={() => setShowQuote(false)} />
+      <QuoteModal show={showQuote} onClose={() => { setShowQuote(false); setPreselectedService(null); }} preselectedService={preselectedService} />
       <PartnerModal show={showPartner} onClose={() => setShowPartner(false)} />
-        <CTASection />
-     <Footer />
+      <CTASection />
+      <Footer />
     </div>
   );
 }
