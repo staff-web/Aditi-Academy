@@ -49,7 +49,8 @@ export function ChatbotWidget() {
   const [messages, setMessages]       = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [draft, setDraft]             = useState('');
   const [isTyping, setIsTyping]       = useState(false);
-  const [showGreeting, setShowGreeting] = useState(true);
+  const [showGreeting, setShowGreeting] = useState(true);   // visible on first load
+  const [hasInteracted, setHasInteracted] = useState(false); // tracks first click
   const [scanPos, setScanPos]         = useState(0);
   const messagesEndRef                = useRef<HTMLDivElement>(null);
   const greetingTimer                 = useRef<ReturnType<typeof setTimeout>>();
@@ -59,12 +60,20 @@ export function ChatbotWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, open]);
 
+  // Greeting logic:
+  // - Before first interaction: show forever (no auto-hide timer)
+  // - After first interaction (chat closed): show for 3s, then hide; repeat on each close
   useEffect(() => {
-    if (showGreeting && !open) {
-      greetingTimer.current = setTimeout(() => setShowGreeting(false), 5000);
+    clearTimeout(greetingTimer.current);
+
+    if (showGreeting && !open && hasInteracted) {
+      // Post-interaction: auto-hide after 3s
+      greetingTimer.current = setTimeout(() => setShowGreeting(false), 3000);
     }
+    // Pre-interaction (!hasInteracted): no timer → stays visible forever
+
     return () => clearTimeout(greetingTimer.current);
-  }, [showGreeting, open]);
+  }, [showGreeting, open, hasInteracted]);
 
   useEffect(() => {
     if (!open) return;
@@ -79,7 +88,17 @@ export function ChatbotWidget() {
     return () => cancelAnimationFrame(raf);
   }, [open]);
 
-  const closeChat = () => { setOpen(false); setShowGreeting(true); };
+  const openChat = () => {
+    setOpen(true);
+    setShowGreeting(false);
+    setHasInteracted(true);
+  };
+
+  const closeChat = () => {
+    setOpen(false);
+    // Re-show greeting immediately; timer in the effect above will hide it after 3s
+    setShowGreeting(true);
+  };
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +193,29 @@ export function ChatbotWidget() {
     .ac-tr { top:10px;    right:10px; border-width:1px 1px 0 0; }
     .ac-bl { bottom:10px; left:10px;  border-width:0 0 1px 1px; }
     .ac-br { bottom:10px; right:10px; border-width:0 1px 1px 0; }
+
+    /* ── Responsiveness ── */
+    .ac-greeting-bubble {
+      position: fixed !important;
+      bottom: 116px !important;
+      right: 80px !important;
+      left: auto !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+      z-index: 10000 !important;
+    }
+    @media (max-width: 480px) {
+      .ac-chat-panel {
+        width: calc(100vw - 24px) !important;
+        border-radius: 18px !important;
+        left: 10px !important;
+      }
+      .ac-greeting-bubble {
+        right: 60px !important;
+        bottom: 116px !important;
+        white-space: nowrap !important;
+      }
+    }
   `;
 
   const outfit = { fontFamily: "'Outfit', sans-serif" };
@@ -190,7 +232,7 @@ export function ChatbotWidget() {
           {open && (
             <motion.div
               key="panel"
-              className="ac-panel"
+              className="ac-panel ac-chat-panel"
               exit={{ opacity: 0, scale: 0.9, y: 14 }}
               style={{
                 width: 348, borderRadius: 24, overflow: 'hidden',
@@ -344,39 +386,37 @@ export function ChatbotWidget() {
         {/* ═══ LAUNCHER ═══════════════════════════════════════════════════ */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', position: 'relative' }}>
 
+          {/* ── Greeting bubble ──
+              Desktop: to the left of the button (right: 100%)
+              Mobile (@media): above the button, right-aligned (via .ac-greeting-bubble CSS class)
+          */}
           <AnimatePresence>
             {showGreeting && !open && (
               <motion.div
-  initial={{ opacity: 0, scale: 0.82, x: 10 }}
-  animate={{ opacity: 1, scale: 1, x: 0 }}
-  exit={{ opacity: 0, scale: 0.82, x: 10 }}
-  transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
-  style={{ 
-    position: 'absolute', 
-    bottom: '100%',    // above mascot
-    right: '100%',     // to the left
-    marginBottom: 2,   // VERY CLOSE - almost touching
-    marginRight: 2,    // VERY CLOSE - almost touching
-    whiteSpace: 'nowrap' 
-  }}
->
-  <div style={{ 
-    background: 'white',
-    border: '1px solid #dc2626',
-    borderRadius: '12px 12px 4px 12px', 
-    padding: '12px 18px', 
-    boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
-  }}>
-    <p style={{ 
-      fontSize: 16, 
-      color: '#dc2626',
-      fontWeight: 600, 
-      margin: 0 
-    }}>
-      Would you like to talk with me? 🎀
-    </p>
-  </div>
-</motion.div>
+                initial={{ opacity: 0, scale: 0.82, x: 10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.82, x: 10 }}
+                transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                className="ac-greeting-bubble"
+                style={{ }}
+              >
+                <div style={{
+                  background: 'white',
+                  border: '1px solid #dc2626',
+                  borderRadius: '12px 12px 4px 12px',
+                  padding: '12px 18px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                }}>
+                  <p style={{
+                    fontSize: 15,
+                    color: '#dc2626',
+                    fontWeight: 600,
+                    margin: 0,
+                  }}>
+                    Would you like to talk with me? 🎀
+                  </p>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
 
@@ -384,19 +424,18 @@ export function ChatbotWidget() {
           <button
             type="button"
             className="ac-launch"
-            onClick={() => { setOpen(true); setShowGreeting(false); }}
+            onClick={openChat}
             aria-expanded={open}
             aria-label="Open Aditi Assist"
             style={{ position: 'relative', border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, width: 82, height: 82, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-           
             <div style={{ position: 'absolute', background: 'transparent' }}>
-  <img
-    src={mascotUrl}
-    alt="Aditi Mascot"
-    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }}
-  />
-</div>
+              <img
+                src={mascotUrl}
+                alt="Aditi Mascot"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }}
+              />
+            </div>
           </button>
         </div>
 

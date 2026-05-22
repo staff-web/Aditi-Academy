@@ -30,7 +30,7 @@ export function Footer() {
   </motion.div>
   <div className="block">
     <div className="text-[#B21D38] font-bold text-[10px] sm:text-sm md:text-base tracking-tight leading-tight">
-      ADITI ACADEMY
+      Aditi Academy
     </div>
     <div className="text-white text-[6px] sm:text-[8px] md:text-[10px] tracking-[0.15em] font-medium mt-0.5">
       HUMAN-CENTERED TECHNOLOGY

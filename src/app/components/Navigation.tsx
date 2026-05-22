@@ -52,7 +52,7 @@ export function Navigation() {
             {/* Changed from 'hidden xs:block' to proper responsive classes */}
             <div className="block">
               <div className="text-[#B21D38] font-bold text-xs sm:text-base md:text-lg tracking-tight leading-none">
-                ADITI ACADEMY
+                ADITI Academy
               </div>
               <div className="text-white text-[8px] sm:text-[10px] md:text-xs tracking-[0.15em] font-medium mt-0.5">
                 HUMAN-CENTERED TECHNOLOGY
