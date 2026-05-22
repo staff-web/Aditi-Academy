@@ -293,26 +293,257 @@ function CourseModal({ course, onClose, onRegister }) {
   );
 }
 
+// Replace your existing RegModal with this enhanced version
+
 function RegModal({ show, onClose, course }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const [applicationId, setApplicationId] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: ''
+  });
+  const formRef = useRef(null);
+  const hasSubmitted = useRef(false);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!show) {
+      setIsSubmitting(false);
+      setSubmitted(false);
+      setError('');
+      setApplicationId('');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: ''
+      });
+      hasSubmitted.current = false;
+    }
+  }, [show]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (error) setError('');
+  };
+
+  const handleSubmit = async () => {
+    // Prevent double submission
+    if (hasSubmitted.current || isSubmitting) return;
+    
+    // Validate required fields
+    if (!formData.name.trim()) {
+      setError('Please enter your full name');
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError('Please enter your email address');
+      return;
+    }
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      setError('Please enter your phone number');
+      return;
+    }
+
+    setError('');
+    hasSubmitted.current = true;
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generate a random application ID
+      const newAppId = Math.random().toString(36).substring(2, 10).toUpperCase();
+      setApplicationId(newAppId);
+      
+      console.log('Registration submitted:', { 
+        ...formData, 
+        course: course?.title,
+        applicationId: newAppId,
+        timestamp: new Date().toISOString()
+      });
+      
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('There was an error submitting your registration. Please try again.');
+      hasSubmitted.current = false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!show) return null;
+
   return (
     <AnimatePresence>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
-          onClick={e => e.stopPropagation()} className="w-full max-w-md bg-white rounded-3xl p-8 relative shadow-2xl">
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center"><X size={14} /></button>
-          <h3 className="text-2xl font-bold text-gray-900 mb-1">Register for <GradientText>Course</GradientText></h3>
-          {course && <p className="text-sm text-gray-500 mb-6">{course.title}</p>}
-          <div className="flex flex-col gap-3">
-            {['Your Name *', 'Email Address *', 'Phone Number *', 'Company / Organization (Optional)'].map(ph => (
-              <input key={ph} type="text" placeholder={ph} style={inputStyle} />
-            ))}
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              onClick={() => { alert('Registration submitted! Our team will contact you.'); onClose(); }}
-              className="py-4 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg mt-2">
-              Complete Registration
-            </motion.button>
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md" 
+        onClick={onClose}
+      >
+        <motion.div 
+          initial={{ scale: 0.9, y: 24, rotateX: 15 }} 
+          animate={{ scale: 1, y: 0, rotateX: 0 }} 
+          exit={{ scale: 0.9, y: 24, rotateX: 15 }}
+          onClick={e => e.stopPropagation()} 
+          className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl"
+        >
+          {/* Header */}
+          <div className="p-6 bg-gradient-to-r from-red-50 to-white border-b border-gray-100 flex justify-between items-center">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {submitted ? 'Application Received!' : `Register for ${course?.title || 'Course'}`}
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {submitted ? "We'll be in touch soon" : 'Please fill in your details below'}
+              </p>
+            </div>
+            <button 
+              onClick={onClose} 
+              className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
+              <X size={16} className="text-gray-500" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {submitted ? (
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }} 
+                className="text-center"
+              >
+                <motion.div 
+                  initial={{ scale: 0 }} 
+                  animate={{ scale: 1 }} 
+                  transition={{ type: 'spring', stiffness: 400, delay: 0.1 }}
+                  className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5"
+                >
+                  <CheckCircle size={42} className="text-red-600" />
+                </motion.div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Registration Submitted! 🎉
+                </h3>
+                
+                <p className="text-gray-600 mb-2">
+                  Thank you, <strong className="text-gray-900">{formData.name}</strong>!
+                </p>
+                
+                <p className="text-sm text-gray-500 mb-5">
+                  We've sent a confirmation to <strong>{formData.email}</strong>. Our team will review your application and get back to you within 2-3 business days via email.
+                </p>
+                
+                <div className="bg-red-50 rounded-xl p-4 mb-5">
+                  <p className="text-xs text-red-600 font-mono mb-1">
+                    ✓ Application ID: <strong>{applicationId}</strong>
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    ✓ Please keep this for reference
+                  </p>
+                </div>
+                
+                <motion.button 
+                  whileHover={{ scale: 1.02 }} 
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="w-full py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer shadow-lg hover:bg-red-700 transition-all"
+                >
+                  Close
+                </motion.button>
+              </motion.div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <input 
+                      type="text" 
+                      name="name"
+                      placeholder="Full Name *" 
+                      value={formData.name}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 rounded-xl border ${error && !formData.name ? 'border-red-400' : 'border-gray-200'} focus:border-red-400 focus:outline-none transition-colors`}
+                    />
+                  </div>
+                  
+                  <div>
+                    <input 
+                      type="email" 
+                      name="email"
+                      placeholder="Email Address *" 
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 rounded-xl border ${error && (!formData.email || !formData.email.includes('@')) ? 'border-red-400' : 'border-gray-200'} focus:border-red-400 focus:outline-none transition-colors`}
+                    />
+                  </div>
+                  
+                  <div>
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      placeholder="Phone Number *" 
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 rounded-xl border ${error && !formData.phone ? 'border-red-400' : 'border-gray-200'} focus:border-red-400 focus:outline-none transition-colors`}
+                    />
+                  </div>
+                  
+                  <div>
+                    <input 
+                      type="text" 
+                      name="company"
+                      placeholder="Company / Organization (Optional)" 
+                      value={formData.company}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+                
+                {error && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-sm mt-3"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={isSubmitting}
+                  onClick={handleSubmit}
+                  className={`w-full mt-6 py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer shadow-lg transition-all ${
+                    isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-red-700'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 size={18} className="animate-spin" />
+                      Submitting...
+                    </div>
+                  ) : (
+                    'Complete Registration →'
+                  )}
+                </motion.button>
+              </>
+            )}
           </div>
         </motion.div>
       </motion.div>

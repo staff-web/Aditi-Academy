@@ -4,7 +4,7 @@ import {
 } from 'motion/react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import {
   Briefcase, GraduationCap, Trophy, Code, Zap, Award,
   UserPlus, Calendar, Clock, ArrowRight,
@@ -145,29 +145,345 @@ const ACTIVITIES = {
   ],
 };
 
-/* ─── REGISTRATION MODAL (with success + email message) ────────────────────── */
+/* ─── SCHEDULE MODAL (FIXED: shows schedule from Google Sheets) ────────────── */
+// Simulated Google Sheets schedule data - in production, this would come from an API
+const GOOGLE_SCHEDULE_DATA = {
+  'Tech Workshop Series': [
+    { topic: 'Cloud Computing Fundamentals', date: 'Saturday, Nov 16', time: '10:00 AM - 1:00 PM', instructor: 'Dr. Sarah Chen', location: 'Online (Zoom)' },
+    { topic: 'DevOps & CI/CD Pipeline', date: 'Saturday, Nov 23', time: '10:00 AM - 1:00 PM', instructor: 'Michael Rodriguez', location: 'Lab 301' },
+    { topic: 'AI & Machine Learning Basics', date: 'Saturday, Nov 30', time: '10:00 AM - 1:00 PM', instructor: 'Prof. Emily Watson', location: 'Online (Zoom)' },
+    { topic: 'Cybersecurity Essentials', date: 'Saturday, Dec 7', time: '10:00 AM - 1:00 PM', instructor: 'James Liu', location: 'Lab 302' },
+    { topic: 'Full Stack Development', date: 'Saturday, Dec 14', time: '10:00 AM - 1:00 PM', instructor: 'Dr. Sarah Chen', location: 'Online (Zoom)' },
+  ],
+  default: [
+    { topic: 'Introduction Session', date: 'Coming Soon', time: 'TBD', instructor: 'TBD', location: 'TBD' },
+  ]
+};
+
+function ScheduleModal({ item, onClose }: { item: any; onClose: () => void }) {
+  // Get schedule data for this workshop, fallback to default
+  const scheduleData = GOOGLE_SCHEDULE_DATA[item.title] || GOOGLE_SCHEDULE_DATA.default;
+  const [expandedSession, setExpandedSession] = useState<number | null>(null);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 999,
+        background: 'rgba(0,0,0,0.85)',
+        backdropFilter: 'blur(12px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, y: 30, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.9, y: 30, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#fff',
+          width: '100%',
+          maxWidth: 800,
+          maxHeight: '85vh',
+          borderRadius: 28,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.3)',
+        }}
+      >
+        <div
+          style={{
+            padding: '20px 28px',
+            background: `linear-gradient(135deg, ${BRAND}10, #fff)`,
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: 0 }}>
+              Schedule: {item?.title}
+            </h2>
+            <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
+              Upcoming sessions and workshops
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 50,
+              background: '#fff',
+              border: '1px solid #e5e7eb',
+              cursor: 'pointer',
+            }}
+          >
+            <X size={16} color="#555" />
+          </button>
+        </div>
+
+        <div style={{ overflowY: 'auto', flex: 1, padding: '28px 32px' }}>
+          <div style={{ marginBottom: 24 }}>
+            <div
+              style={{
+                background: '#fef2f2',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 24,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+              }}
+            >
+              <Calendar size={20} color={BRAND} />
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#0a0a0a', margin: 0 }}>
+                  Workshop Series Schedule
+                </p>
+                <p style={{ fontSize: 12, color: '#666', margin: 0 }}>
+                  All sessions are recorded and available for replay
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {scheduleData.map((session: any, idx: number) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  style={{
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setExpandedSession(expandedSession === idx ? null : idx)}
+                >
+                  <div
+                    style={{
+                      padding: '20px 24px',
+                      background: expandedSession === idx ? '#fef2f2' : '#fff',
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 12,
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ fontSize: 18, fontWeight: 700, color: '#0a0a0a', marginBottom: 6 }}>
+                          {session.topic}
+                        </h3>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 16,
+                            alignItems: 'center',
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: 13,
+                              color: '#666',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 5,
+                            }}
+                          >
+                            <Calendar size={12} color={BRAND} /> {session.date}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              color: '#666',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 5,
+                            }}
+                          >
+                            <Clock size={12} color={BRAND} /> {session.time}
+                          </span>
+                        </div>
+                      </div>
+                      <motion.div
+                        animate={{ rotate: expandedSession === idx ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown size={20} color={BRAND} />
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {expandedSession === idx && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        style={{
+                          borderTop: '1px solid #e5e7eb',
+                          background: '#fafafa',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div style={{ padding: '20px 24px' }}>
+                          <div
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                              gap: 16,
+                            }}
+                          >
+                            <div>
+                              <p
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  color: '#999',
+                                  marginBottom: 4,
+                                }}
+                              >
+                                INSTRUCTOR
+                              </p>
+                              <p style={{ fontSize: 14, color: '#333', fontWeight: 500 }}>
+                                {session.instructor}
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  color: '#999',
+                                  marginBottom: 4,
+                                }}
+                              >
+                                LOCATION
+                              </p>
+                              <p style={{ fontSize: 14, color: '#333', fontWeight: 500 }}>
+                                {session.location}
+                              </p>
+                            </div>
+                          </div>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            style={{
+                              marginTop: 20,
+                              padding: '10px 20px',
+                              background: BRAND,
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 50,
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Add to Calendar →
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ─── REGISTRATION MODAL (FIXED: prevents double submission) ───────────────────── */
+/* ─── REGISTRATION MODAL (Enhanced with success card and no double submission) ───────────────────── */
 function RegistrationModal({ item, onClose }: { item: any; onClose: () => void }) {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [applicationId, setApplicationId] = useState('');
+  const hasSubmitted = useRef(false);
 
-  const handleSubmit = () => {
-    if (!formData.name.trim()) { setError('Please enter your full name'); return; }
-    if (!formData.email.trim()) { setError('Please enter your email address'); return; }
-    if (!formData.email.includes('@')) { setError('Please enter a valid email address'); return; }
+  const handleSubmit = useCallback(() => {
+    // Prevent double submission
+    if (hasSubmitted.current || loading) return;
+    
+    if (!formData.name.trim()) { 
+      setError('Please enter your full name'); 
+      return; 
+    }
+    if (!formData.email.trim()) { 
+      setError('Please enter your email address'); 
+      return; 
+    }
+    if (!formData.email.includes('@')) { 
+      setError('Please enter a valid email address'); 
+      return; 
+    }
+    if (!formData.phone.trim()) { 
+      setError('Please enter your phone number'); 
+      return; 
+    }
     
     setError('');
+    hasSubmitted.current = true;
     setLoading(true);
+    
+    // Simulate API call
     setTimeout(() => {
+      // Generate application ID
+      const newAppId = Math.random().toString(36).substring(2, 10).toUpperCase();
+      setApplicationId(newAppId);
+      
+      console.log('Registration submitted:', { 
+        ...formData, 
+        activity: item?.title,
+        applicationId: newAppId,
+        timestamp: new Date().toISOString()
+      });
+      
       setSubmitted(true);
       setLoading(false);
     }, 1500);
-  };
+  }, [formData, loading, item]);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (item) {
+      setFormData({ name: '', email: '', phone: '' });
+      setSubmitted(false);
+      setLoading(false);
+      setError('');
+      setApplicationId('');
+      hasSubmitted.current = false;
+    }
+  }, [item]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.9, y: 30, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.9, y: 30, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 28 }} onClick={e => e.stopPropagation()}
@@ -175,43 +491,114 @@ function RegistrationModal({ item, onClose }: { item: any; onClose: () => void }
         
         <div style={{ padding: '24px 28px', background: `linear-gradient(135deg, ${BRAND}10, #fff)`, borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: 0 }}>{submitted ? 'Application Received!' : `Register for ${item?.title}`}</h2>
-            <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>{submitted ? 'We\'ll be in touch soon' : 'Please fill in your details below'}</p>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#0a0a0a', margin: 0 }}>
+              {submitted ? 'Application Received!' : `Register for ${item?.title || 'Activity'}`}
+            </h2>
+            <p style={{ fontSize: 13, color: '#666', marginTop: 4 }}>
+              {submitted ? "We'll be in touch soon" : 'Please fill in your details below'}
+            </p>
           </div>
-          <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 50, background: '#fff', border: '1px solid #e5e7eb', cursor: 'pointer' }}><X size={16} color="#555" /></button>
+          <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: 50, background: '#fff', border: '1px solid #e5e7eb', cursor: 'pointer' }}>
+            <X size={16} color="#555" />
+          </button>
         </div>
 
         <div style={{ padding: '32px' }}>
           {submitted ? (
             <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ textAlign: 'center' }}>
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400 }}
-                style={{ width: 80, height: 80, borderRadius: 40, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <motion.div 
+                initial={{ scale: 0 }} 
+                animate={{ scale: 1 }} 
+                transition={{ type: 'spring', stiffness: 400, delay: 0.1 }}
+                style={{ width: 80, height: 80, borderRadius: 40, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}
+              >
                 <CheckCircle size={40} color={BRAND} />
               </motion.div>
-              <h3 style={{ fontSize: 24, fontWeight: 800, color: '#0a0a0a', marginBottom: 12 }}>Application Submitted! 🎉</h3>
+              <h3 style={{ fontSize: 24, fontWeight: 800, color: '#0a0a0a', marginBottom: 12 }}>Registration Submitted! 🎉</h3>
               <p style={{ fontSize: 15, color: '#666', marginBottom: 8 }}>Thank you, <strong>{formData.name}</strong>!</p>
-              <p style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>We've sent a confirmation to <strong>{formData.email}</strong>. Our team will review your application and get back to you within 2-3 business days via email.</p>
+              <p style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
+                We've sent a confirmation to <strong>{formData.email}</strong>. Our team will review your registration and get back to you within 2-3 business days.
+              </p>
               <div style={{ background: '#fef2f2', borderRadius: 16, padding: 16, marginBottom: 24 }}>
-                <p style={{ fontSize: 12, color: BRAND, margin: 0 }}>✓ Application ID: {Math.random().toString(36).substring(2, 10).toUpperCase()}</p>
-                <p style={{ fontSize: 12, color: '#666', marginTop: 8 }}>✓ Keep this for reference</p>
+                <p style={{ fontSize: 12, color: BRAND, margin: 0, fontFamily: 'monospace' }}>
+                  ✓ Registration ID: <strong>{applicationId}</strong>
+                </p>
+                <p style={{ fontSize: 12, color: '#666', marginTop: 8 }}>✓ Please keep this for reference</p>
               </div>
-              <motion.button whileHover={{ scale: 1.02 }} onClick={onClose} style={{ width: '100%', padding: '14px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, cursor: 'pointer' }}>Close</motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }} 
+                onClick={onClose} 
+                style={{ width: '100%', padding: '14px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, cursor: 'pointer' }}
+              >
+                Close
+              </motion.button>
             </motion.div>
           ) : (
             <>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <input type="text" placeholder="Full Name *" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  style={{ padding: '14px 18px', borderRadius: 14, border: error && !formData.name ? '1px solid #ef4444' : '1px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
-                <input type="email" placeholder="Email Address *" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  style={{ padding: '14px 18px', borderRadius: 14, border: error && (!formData.email || !formData.email.includes('@')) ? '1px solid #ef4444' : '1px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
-                <input type="tel" placeholder="Phone Number (Optional)" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                  style={{ padding: '14px 18px', borderRadius: 14, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none' }} />
+                <input 
+                  type="text" 
+                  placeholder="Full Name *" 
+                  value={formData.name} 
+                  onChange={e => setFormData({ ...formData, name: e.target.value })}
+                  style={{ 
+                    padding: '14px 18px', 
+                    borderRadius: 14, 
+                    border: error && !formData.name ? '1px solid #ef4444' : '1px solid #e5e7eb', 
+                    fontSize: 14, 
+                    outline: 'none',
+                    transition: 'border-color 0.2s'
+                  }} 
+                />
+                <input 
+                  type="email" 
+                  placeholder="Email Address *" 
+                  value={formData.email} 
+                  onChange={e => setFormData({ ...formData, email: e.target.value })}
+                  style={{ 
+                    padding: '14px 18px', 
+                    borderRadius: 14, 
+                    border: error && (!formData.email || !formData.email.includes('@')) ? '1px solid #ef4444' : '1px solid #e5e7eb', 
+                    fontSize: 14, 
+                    outline: 'none' 
+                  }} 
+                />
+                <input 
+                  type="tel" 
+                  placeholder="Phone Number *" 
+                  value={formData.phone} 
+                  onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                  style={{ 
+                    padding: '14px 18px', 
+                    borderRadius: 14, 
+                    border: error && !formData.phone ? '1px solid #ef4444' : '1px solid #e5e7eb', 
+                    fontSize: 14, 
+                    outline: 'none' 
+                  }} 
+                />
               </div>
               {error && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 12 }}>{error}</p>}
-              <motion.button whileHover={{ scale: 1.02, boxShadow: `0 10px 25px ${BRAND}50` }} whileTap={{ scale: 0.98 }}
-                onClick={handleSubmit} disabled={loading}
-                style={{ width: '100%', marginTop: 28, padding: '16px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, fontSize: 15, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
-                {loading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} /> : `Submit Application →`}
+              <motion.button 
+                whileHover={{ scale: 1.02, boxShadow: `0 10px 25px ${BRAND}50` }} 
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSubmit} 
+                disabled={loading}
+                style={{ 
+                  width: '100%', 
+                  marginTop: 28, 
+                  padding: '16px', 
+                  background: BRAND, 
+                  color: '#fff', 
+                  border: 'none', 
+                  borderRadius: 50, 
+                  fontWeight: 700, 
+                  fontSize: 15, 
+                  cursor: loading ? 'not-allowed' : 'pointer', 
+                  opacity: loading ? 0.7 : 1,
+                  transition: 'all 0.2s'
+                }}
+              >
+                {loading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} /> : `Submit Registration →`}
               </motion.button>
             </>
           )}
@@ -227,13 +614,18 @@ function AssessmentModal({ onClose, onComplete }: { onClose: () => void; onCompl
   const [answers, setAnswers] = useState<string[]>([]);
   const [result, setResult] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
+  const hasCompleted = useRef(false);
 
-  const handleAnswer = (answer: string) => {
+  const handleAnswer = useCallback((answer: string) => {
+    // Prevent multiple completions
+    if (hasCompleted.current) return;
+    
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
     if (step + 1 < ASSESSMENT_QUESTIONS.length) {
       setStep(step + 1);
     } else {
+      hasCompleted.current = true;
       setSubmitting(true);
       setTimeout(() => {
         const recommendation = COURSE_RECOMMENDATIONS[newAnswers[0]] || COURSE_RECOMMENDATIONS.default;
@@ -242,7 +634,16 @@ function AssessmentModal({ onClose, onComplete }: { onClose: () => void; onCompl
         onComplete(recommendation);
       }, 2000);
     }
-  };
+  }, [answers, step, onComplete]);
+
+  // Reset state when modal opens
+  useEffect(() => {
+    setStep(0);
+    setAnswers([]);
+    setResult(null);
+    setSubmitting(false);
+    hasCompleted.current = false;
+  }, []);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -307,82 +708,92 @@ function AssessmentModal({ onClose, onComplete }: { onClose: () => void; onCompl
   );
 }
 
-/* ─── DETAIL DRAWER (simplified) ─────────────────────────────────────────── */
+/* ─── DETAIL DRAWER (FIXED: handles View Schedule correctly) ───────────────── */
+/* ─── DETAIL DRAWER (FIXED: No duplicate form - directly opens RegistrationModal) ───────────────── */
 function Drawer({ act, onClose, onRegister, onStartAssessment }: any) {
   const Icon = act.icon;
-  const [showRegForm, setShowRegForm] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
 
-  useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
+  useEffect(() => { 
+    document.body.style.overflow = 'hidden'; 
+    return () => { document.body.style.overflow = ''; }; 
+  }, []);
+
+  // Handle View Schedule action
+  const handleViewSchedule = () => {
+    setShowSchedule(true);
+  };
 
   const handleMainAction = () => {
-    if (act.id === 'c1') { onClose(); onStartAssessment(); }
-    else { setShowRegForm(true); }
+    // Check if this is a workshop with "View Schedule" button
+    if (act.cta === 'View Schedule') {
+      handleViewSchedule();
+    } 
+    // Check if this is the Career Path Assessment
+    else if (act.id === 'c1') { 
+      onClose(); 
+      onStartAssessment(); 
+    } 
+    // For all other actions (Register Now, Join Hackathon, Schedule Booking, Apply Now, etc.)
+    // Directly open the registration modal - NO intermediate form in drawer
+    else { 
+      onClose(); // Close the drawer first
+      onRegister(act); // Open the registration modal directly
+    }
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <motion.div initial={{ scale: 0.9, y: 30, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.9, y: 30, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 28 }} onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', width: '100%', maxWidth: 720, maxHeight: '85vh', borderRadius: 28, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 40px 80px rgba(0,0,0,0.3)' }}>
-        
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid #f0f0f0', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon size={20} color={BRAND} /></div>
-            <div><div style={{ fontSize: 14, fontWeight: 700, color: BRAND }}>{act.subtitle}</div><div style={{ fontSize: 12, color: '#aaa' }}>{act.date} · {act.duration}</div></div>
-          </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <motion.button whileHover={{ scale: 1.05, boxShadow: `0 8px 20px ${BRAND}50` }} whileTap={{ scale: 0.97 }}
-              onClick={handleMainAction} style={{ padding: '10px 24px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-              {act.cta} →
-            </motion.button>
-            <motion.button onClick={onClose} whileHover={{ scale: 1.1, background: '#fee2e2' }}
-              style={{ width: 40, height: 40, borderRadius: 50, background: '#f4f4f5', border: 'none', cursor: 'pointer' }}><X size={18} color="#555" /></motion.button>
-          </div>
-        </div>
-        
-        <div style={{ overflowY: 'auto', flex: 1 }}>
-          {showRegForm ? (
-            <div style={{ padding: '32px 36px' }}>
-              <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0a0a0a', marginBottom: 8 }}>Register for {act.title}</h2>
-              <p style={{ fontSize: 14, color: '#666', marginBottom: 28 }}>Complete the form to secure your spot</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <input type="text" placeholder="Full Name *" id="regName" style={{ padding: '14px 18px', borderRadius: 14, border: '1px solid #e5e7eb', fontSize: 14 }} />
-                <input type="email" placeholder="Email Address *" id="regEmail" style={{ padding: '14px 18px', borderRadius: 14, border: '1px solid #e5e7eb', fontSize: 14 }} />
-                <input type="tel" placeholder="Phone Number" id="regPhone" style={{ padding: '14px 18px', borderRadius: 14, border: '1px solid #e5e7eb', fontSize: 14 }} />
-              </div>
-              <motion.button whileHover={{ scale: 1.02 }} onClick={() => {
-                const name = (document.getElementById('regName') as HTMLInputElement)?.value;
-                const email = (document.getElementById('regEmail') as HTMLInputElement)?.value;
-                const phone = (document.getElementById('regPhone') as HTMLInputElement)?.value;
-                if (name && email) onRegister({ ...act, name, email, phone });
-                else alert('Please fill name and email');
-              }} style={{ width: '100%', marginTop: 28, padding: '16px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Submit Registration →</motion.button>
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
+        <motion.div initial={{ scale: 0.9, y: 30, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.9, y: 30, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }} onClick={e => e.stopPropagation()}
+          style={{ background: '#fff', width: '100%', maxWidth: 720, maxHeight: '85vh', borderRadius: 28, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 40px 80px rgba(0,0,0,0.3)' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px', borderBottom: '1px solid #f0f0f0', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon size={20} color={BRAND} /></div>
+              <div><div style={{ fontSize: 14, fontWeight: 700, color: BRAND }}>{act.subtitle}</div><div style={{ fontSize: 12, color: '#aaa' }}>{act.date} · {act.duration}</div></div>
             </div>
-          ) : (
-            <>
-              <div style={{ height: 260, overflow: 'hidden', position: 'relative' }}>
-                <img src={act.image} alt={act.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)' }} />
-                <div style={{ position: 'absolute', bottom: 20, left: 24 }}><Pill>{act.badge}</Pill></div>
-              </div>
-              <div style={{ padding: '32px 36px 48px' }}>
-                <h2 style={{ fontSize: 32, fontWeight: 800, color: '#0a0a0a', marginBottom: 8 }}>{act.title}</h2>
-                <p style={{ fontSize: 14, color: BRAND, fontWeight: 600, marginBottom: 20 }}>{act.subtitle}</p>
-                <p style={{ fontSize: 15, color: '#555', lineHeight: 1.75, marginBottom: 28 }}>{act.desc}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>{act.tags?.map((t: string) => <Chip key={t}>{t}</Chip>)}</div>
-                <div style={{ background: '#fef2f2', borderRadius: 20, padding: 24, marginBottom: 20 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0a0a0a', marginBottom: 16 }}>What You'll Gain</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    {act.gains?.map((g: string, i: number) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#444' }}><CheckCircle size={14} color={BRAND} />{g}</div>))}
-                  </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <motion.button whileHover={{ scale: 1.05, boxShadow: `0 8px 20px ${BRAND}50` }} whileTap={{ scale: 0.97 }}
+                onClick={handleMainAction} style={{ padding: '10px 24px', background: BRAND, color: '#fff', border: 'none', borderRadius: 50, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                {act.cta} →
+              </motion.button>
+              <motion.button onClick={onClose} whileHover={{ scale: 1.1, background: '#fee2e2' }}
+                style={{ width: 40, height: 40, borderRadius: 50, background: '#f4f4f5', border: 'none', cursor: 'pointer' }}><X size={18} color="#555" /></motion.button>
+            </div>
+          </div>
+          
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            <div style={{ height: 260, overflow: 'hidden', position: 'relative' }}>
+              <img src={act.image} alt={act.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5), transparent)' }} />
+              <div style={{ position: 'absolute', bottom: 20, left: 24 }}><Pill>{act.badge}</Pill></div>
+            </div>
+            <div style={{ padding: '32px 36px 48px' }}>
+              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#0a0a0a', marginBottom: 8 }}>{act.title}</h2>
+              <p style={{ fontSize: 14, color: BRAND, fontWeight: 600, marginBottom: 20 }}>{act.subtitle}</p>
+              <p style={{ fontSize: 15, color: '#555', lineHeight: 1.75, marginBottom: 28 }}>{act.desc}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>{act.tags?.map((t: string) => <Chip key={t}>{t}</Chip>)}</div>
+              <div style={{ background: '#fef2f2', borderRadius: 20, padding: 24, marginBottom: 20 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0a0a0a', marginBottom: 16 }}>What You'll Gain</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {act.gains?.map((g: string, i: number) => (<div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#444' }}><CheckCircle size={14} color={BRAND} />{g}</div>))}
                 </div>
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+      
+      {/* Schedule Modal */}
+      <AnimatePresence>
+        {showSchedule && (
+          <ScheduleModal item={act} onClose={() => setShowSchedule(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -532,9 +943,15 @@ export function StudentActivitiesPage() {
   const [showAssessment, setShowAssessment] = useState(false);
 
   const handleOpenDrawer = (item: any) => { setDrawer(item); };
-  const handleRegister = (item: any) => { setDrawer(null); setRegisteringItem(item); setShowRegistration(true); };
+  const handleRegister = (item: any) => { 
+    setDrawer(null); 
+    setRegisteringItem(item); 
+    setShowRegistration(true); 
+  };
   const handleStartAssessment = () => { setShowAssessment(true); };
-  const handleAssessmentComplete = () => { setTimeout(() => setShowAssessment(false), 3000); };
+  const handleAssessmentComplete = () => { 
+    setTimeout(() => setShowAssessment(false), 3000); 
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#fff', overflowX: 'hidden', fontFamily: '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif' }}>
