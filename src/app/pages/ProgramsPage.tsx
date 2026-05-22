@@ -1031,7 +1031,7 @@ function HeroSection({ onExplore }) {
   const rotateX = useTransform(scrollYProgress, [0, 0.5], [0, 8]);
 
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black mt-16relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-16 sm:pt-20 mt-10">
       <motion.div className="absolute inset-0 z-0" style={{ scale: imageScale }}>
         <img src={IMGS.hero} alt="Technology Training" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />

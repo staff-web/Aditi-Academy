@@ -963,7 +963,7 @@ export default function ESGPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <Navigation />
-      <div className="pt-20">
+      <div className="h-16 sm:h-20">
         <HeroSection />
         <ESGSDGSection />
         <EcosystemSection />
