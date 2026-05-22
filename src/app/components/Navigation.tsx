@@ -17,7 +17,6 @@ export function Navigation() {
     { to: "/student-activities", label: "Student Activities" },
     { to: "/innovation-insight", label: "Innovation & Insight" },
     { to: "/esg", label: "ESG / SDG" },
-    
   ];
 
   useEffect(() => {
@@ -27,7 +26,6 @@ export function Navigation() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
 
   return (
     <motion.nav
@@ -42,21 +40,22 @@ export function Navigation() {
     >
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
+          {/* Logo - Fixed visibility */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 group relative z-10">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
               <img
                 src={logoUrl}
                 alt="ADITI Academy logo"
-                className="w-55 h-55 sm:w-48sm:h-48 object-contain rounded-2xl"
+                className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain rounded-2xl"
               />
             </motion.div>
-            <div className="hidden xs:block">
-              <div className="text-white font-bold text-base sm:text-xl tracking-tight leading-none">
+            {/* Changed from 'hidden xs:block' to proper responsive classes */}
+            <div className="block">
+              <div className="text-[#B21D38] font-bold text-xs sm:text-base md:text-lg tracking-tight leading-none">
                 ADITI ACADEMY
               </div>
-              <div className="text-red-500 text-[10px] sm:text-xs tracking-[0.15em] font-medium mt-0.5">
-                TECHNOLOGY EXCELLENCE
+              <div className="text-white text-[8px] sm:text-[10px] md:text-xs tracking-[0.15em] font-medium mt-0.5">
+                HUMAN-CENTERED TECHNOLOGY
               </div>
             </div>
           </Link>

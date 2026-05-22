@@ -20,23 +20,23 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12">
           {/* About Column - Fixed alignment */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:block">
-              <a href="/" className="inline-flex items-center gap-2 group mb-3">
-                <img
-                  src={logoUrl}
-                  alt="ADITI Academy logo"
-                  className="w-32 sm:w-40 md:w-48 h-auto object-contain rounded-2xl"
-                />
-                <div className="hidden xs:block">
-                  <div className="text-white font-bold text-base sm:text-xl tracking-tight leading-none">
-                    ADITI ACADEMY
-                  </div>
-                  <div className="text-red-500 text-[10px] sm:text-xs tracking-[0.15em] font-medium mt-0.5">
-                    TECHNOLOGY EXCELLENCE
-                  </div>
-                </div>
-              </a>
-            </div>
+            <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group relative z-10">
+  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="relative">
+    <img
+      src={logoUrl}
+      alt="ADITI Academy logo"
+      className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain rounded-2xl"
+    />
+  </motion.div>
+  <div className="block">
+    <div className="text-[#B21D38] font-bold text-[10px] sm:text-sm md:text-base tracking-tight leading-tight">
+      ADITI ACADEMY
+    </div>
+    <div className="text-white text-[6px] sm:text-[8px] md:text-[10px] tracking-[0.15em] font-medium mt-0.5">
+      HUMAN-CENTERED TECHNOLOGY
+    </div>
+  </div>
+</Link>
             <p className="text-gray-400 text-sm leading-relaxed">
               ADITI Academy develops curriculums designed to deliver the latest
               and most effective training to tech enthusiasts and engineers,
