@@ -10,6 +10,7 @@ import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
 
+
 // ─── BRAND TOKEN — never changes ───────────────────────────────────────────
 const RED = '#dc2626';
 const RED_DARK = '#b91c1c';
@@ -18,18 +19,27 @@ const RED_LIGHT = '#fca5a5';
 // ─── IMAGES ────────────────────────────────────────────────────────────────
 const IMGS = {
   hero: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1800&q=80',
-  digitalTransformation: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
-  techEducation: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
-  kidsCoding: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&q=80',
-  womenInTech: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&q=80',
-  healthcare: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80',
-  sustainability: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&q=80',
+  digitalTransformation: '/assets/esg/aditi.jpg',
+  techEducation: '/assets/esg/hero2.jpg',
+  kidsCoding: '/assets/esg/techforkid.jpg',
+  womenInTech: '/assets/esg/social.jpg',
+  healthcare: '/assets/esg/nironecare.jpg',
+  sustainability: '/assets/esg/hero1.jpg',
+  environmental: '/assets/esg/environmental.jpg',
   globalPartners: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80',
   aiTechnology: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&q=80',
-  cybersecurity: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80',
+  cybersecurity: '/assets/esg/governance.jpg',
   cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
   teamwork: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80',
   innovation: 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=1200&q=80',
+};
+// Option 1: Direct path from public folder (Recommended for Vite)
+const LOGOS = {
+  aditi: '/assets/esg/logo/aditi.png',
+  aditiAcademy: '/assets/esg/logo/aditiacademy.png',
+  techForKids: '/assets/esg/logo/techforkid.png',
+  technovationGirls: '/assets/esg/logo/technovationforgril.png',
+  nironcare: '/assets/esg/logo/nironecare.jpg',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -489,7 +499,7 @@ function ESGSDGSection() {
   const bgY = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   const esgPillars = [
-    { title: 'Environmental', image: IMGS.sustainability, items: ['Digital transformation & cyber resiliency in 10+ countries', 'Technology driving lower carbon emissions through AI', 'Paperless workflows, cloud efficiency, greener operations', 'Energy-per-user tracking, low-carbon infrastructure preference'] },
+    { title: 'Environmental', image: IMGS.environmental, items: ['Digital transformation & cyber resiliency in 10+ countries', 'Technology driving lower carbon emissions through AI', 'Paperless workflows, cloud efficiency, greener operations', 'Energy-per-user tracking, low-carbon infrastructure preference'] },
     { title: 'Social', image: IMGS.womenInTech, items: ['6,000+ girls trained in technology & leadership', '10,000+ children introduced to coding & AI', 'Thousands of SMEs & government officers upskilled', 'Inclusive technology education for all communities'] },
     { title: 'Governance', image: IMGS.cybersecurity, items: ['AI ethics advocacy & responsible tech adoption across ASEAN', 'AI Governance-by-Design: Bias testing, human oversight', 'Privacy-by-Design: Consent, minimization, strong security', 'Transparent Reporting: Impact, safety, reliability metrics'] },
   ];
@@ -661,13 +671,52 @@ function ESGSDGSection() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function EcosystemSection() {
-  const pillars = [
-    { name: 'ADITI', icon: Cpu, description: 'Sustainable digital transformation, software solutions, global software engineer outsourcing', countries: 'Cambodia, Singapore, Japan, EU', impact: 'Carbon-aware coding, ethical hiring, 40% women in engineering', image: IMGS.digitalTransformation },
-    { name: 'ADITI Academy', icon: GraduationCap, description: 'Upskilling IT students, professors, SMEs, government staff, women leaders', stats: '1,500+ students · 600+ professionals · 500+ government officers', impact: 'Industry-aligned curriculum, career support, certification programs', image: IMGS.techEducation },
-    { name: 'Tech For Kids Academy', icon: Code, description: '10,000+ children learning coding, AI, and entrepreneurship', stats: 'Ages 8–16 · 65% from underserved communities', impact: 'Building future innovators, digital literacy for next generation', image: IMGS.kidsCoding },
-    { name: 'Technovation Girls Cambodia', icon: Users, description: '6,000 girls trained in tech, leadership, and entrepreneurship', stats: '6,000+ girls · 200+ mentors · Inspiring millions globally', impact: 'Gender equality in tech, SDG-focused problem solving', image: IMGS.womenInTech },
-    { name: 'Nironcare', icon: Heart, description: 'Groundbreaking AI-powered digital health platform', impact: 'Reduces emissions, ensures inclusivity, expands healthcare access, safeguards data privacy', image: IMGS.healthcare },
-  ];
+const pillars = [
+  { 
+    name: 'ADITI', 
+    logo: LOGOS.aditi,
+    icon: Cpu,
+    description: 'Sustainable digital transformation, software solutions, global software engineer outsourcing', 
+    countries: 'Cambodia, Singapore, Japan, EU', 
+    impact: 'Carbon-aware coding, ethical hiring, 40% women in engineering', 
+    image: IMGS.digitalTransformation 
+  },
+  { 
+    name: 'ADITI Academy', 
+    logo: LOGOS.aditiAcademy,
+    icon: GraduationCap, 
+    description: 'Upskilling IT students, professors, SMEs, government staff, women leaders', 
+    stats: '1,500+ students · 600+ professionals · 500+ government officers', 
+    impact: 'Industry-aligned curriculum, career support, certification programs', 
+    image: IMGS.techEducation 
+  },
+  { 
+    name: 'Tech For Kids Academy', 
+    logo: LOGOS.techForKids,
+    icon: Code, 
+    description: '10,000+ children learning coding, AI, and entrepreneurship', 
+    stats: 'Ages 8–16 · 65% from underserved communities', 
+    impact: 'Building future innovators, digital literacy for next generation', 
+    image: IMGS.kidsCoding 
+  },
+  { 
+    name: 'Technovation Girls Cambodia', 
+    logo: LOGOS.technovationGirls,
+    icon: Users, 
+    description: '6,000 girls trained in tech, leadership, and entrepreneurship', 
+    stats: '6,000+ girls · 200+ mentors · Inspiring millions globally', 
+    impact: 'Gender equality in tech, SDG-focused problem solving', 
+    image: IMGS.womenInTech 
+  },
+  { 
+    name: 'Nironcare', 
+    logo: LOGOS.nironcare,
+    icon: Heart, 
+    description: 'Groundbreaking AI-powered digital health platform', 
+    impact: 'Reduces emissions, ensures inclusivity, expands healthcare access, safeguards data privacy', 
+    image: IMGS.healthcare 
+  },
+];
 
   return (
     <section className="py-28 bg-white">
@@ -690,11 +739,19 @@ function EcosystemSection() {
                   whileHover={{ boxShadow: `0 24px 64px -12px rgba(0,0,0,0.14), 0 0 0 1px ${RED}15` }}
                   transition={{ duration: 0.3 }}>
                   <div className="p-8 lg:p-10">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
-                      style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
-                      <p.icon size={26} className="text-white" />
-                    </div>
-                    <h3 className="text-2xl font-black text-gray-900 mb-3">{p.name}</h3>
+                    {p.logo ? (
+                      <img 
+                        src={p.logo} 
+                        alt={p.name}
+                        className={`mb-6 object-contain ${p.name === 'Nironcare' ? 'h-20 w-auto' : 'h-14 w-auto'}`}
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+                        style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
+                        <p.icon size={26} className="text-white" />
+                      </div>
+                    )}
+
                     <p className="text-gray-500 leading-relaxed mb-5">{p.description}</p>
                     {p.countries && (
                       <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">

@@ -16,19 +16,20 @@ const BRAND_LITE = '#ef4444';
 // Technology-relevant images for IT Academy
 const IMGS = {
   // Hero & main visuals
-  heroMain: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1600&q=80',
-  codingClass: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
-  cybersecurity: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80',
+  heroMain: '/assets/about/heromain.jpg',
+  hero1: '/assets/about/hero1.jpg',
+  hero2: '/assets/about/hero2.jpg',
+  cybersecurity: 'https://certiprof.com/cdn/shop/articles/Cybersecurity_certiprof.webp?v=1741879682',
   aiTech: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
   cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
   
   // Section specific
-  vision: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=900&q=80',
-  mission: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&q=80',
+  vision: '/assets/about/vision/vision.jpg',
+  mission: '/assets/about/mission/mission.jpg',
   students: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',
-  classroom: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=600&q=80',
-  techLab: 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=600&q=80',
-  teamwork: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80',
+  classroom: '/assets/about/corevalue/innovation.png',
+  techLab: '/assets/about/corevalue/innovation.png',
+  teamwork: '/assets/about/corevalue/trust.jpg',
   milestones: 'https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?w=900&q=80',
   stats: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=900&q=80',
   cta: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1800&q=80',
@@ -261,13 +262,13 @@ function HeroSection() {
             <div className="relative h-[500px]">
               <TiltCard intensity={6} className="absolute top-0 left-0 w-[70%] h-[60%]">
                 <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                  <img src={IMGS.codingClass} alt="Students coding" className="w-full h-full object-cover" />
+                  <img src={IMGS.hero1} alt="Students coding" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
               </TiltCard>
               <TiltCard intensity={6} className="absolute bottom-0 right-0 w-[65%] h-[55%]">
                 <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                  <img src={IMGS.cybersecurity} alt="Cybersecurity" className="w-full h-full object-cover" />
+                  <img src={IMGS.hero2} alt="Cybersecurity" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
               </TiltCard>

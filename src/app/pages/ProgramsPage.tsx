@@ -24,19 +24,19 @@ const BRAND_DARK = '#b91c1c';
 const BRAND_LITE = '#ef4444';
 
 const IMGS = {
-  hero:           'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1800&q=80',
-  individual:     'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&q=80',
-  corporate:      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80',
-  government:     'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?w=1200&q=80',
+  hero:           '/assets/program/heromain.png',
+  individual:     '/assets/program/choose_your_path/individual.png',
+  corporate:      '/assets/program/choose_your_path/cooporate.png',
+  government:     '/assets/program/choose_your_path/govern.png',
   ai:             'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80',
   security:       'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&q=80',
   training:       'https://images.unsplash.com/photo-1629904853893-c2c8981a1dc5?w=600&q=80',
   global:         'https://images.unsplash.com/photo-1621977717126-e29965156a27?w=900&q=80',
   internship:     'https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=900&q=80',
   career:         'https://images.unsplash.com/photo-1528901166007-3784c7dd3653?w=900&q=80',
-  corporateHero:  'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80',
-  govHero:        'https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?w=1600&q=80',
-  govMeeting:     'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1200&q=80',
+  corporateHero:  '/public/assets/program/B2B/image.png',
+  govHero:        '/assets/program/B2C/hero.png',
+  govMeeting:     '/assets/program/B2C/image.png',
   codingClass:    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
   aiTech:         'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
   cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
@@ -1871,8 +1871,19 @@ function TechnologyShowcase() {
 }
 
 // ─── ENHANCED CORPORATE SECTION WITH 3D ──────────────────────────────────────
-
 function CorporateSection({ onQuote, onServiceSelect }) {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]  // ← KEY CHANGE: tracks during section view
+  });
+  
+  // Parallax: image moves as you scroll THROUGH the section
+  const imageY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.05, 1.1, 1.05]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 0.85, 0.95]);
+  
   const stats = [
     { value: 98, suffix: '%', label: 'Client Satisfaction', icon: ThumbsUp },
     { value: 500, suffix: '+', label: 'Corporate Clients', icon: Building2 },
@@ -1895,15 +1906,94 @@ function CorporateSection({ onQuote, onServiceSelect }) {
   
   return (
     <div>
-      <section className="py-16 bg-white border-b">
+      {/* HERO SECTION WITH PARALLAX THAT TRIGGERS DURING SCROLL */}
+      <section 
+        ref={sectionRef} 
+        className="relative h-[80vh] min-h-[600px] flex items-center overflow-hidden"
+      >
+        {/* Parallax Background Image - moves as you scroll within section */}
+        <motion.div 
+          className="absolute inset-0 z-0"
+          style={{ 
+            y: imageY,
+            scale: imageScale,
+          }}
+        >
+          <img 
+            src={IMGS.corporateHero} 
+            alt="Corporate Training" 
+            className="w-full h-full object-cover will-change-transform"
+            style={{ objectPosition: "center 30%" }}
+          />
+        </motion.div>
+        
+        {/* Gradient Overlay with subtle opacity change */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40 z-10"
+          style={{ opacity: overlayOpacity }}
+        />
+        
+        {/* Additional overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10" />
+        
+        {/* Content with slight parallax (moves opposite direction) */}
+        <motion.div 
+          className="relative z-20 max-w-7xl mx-auto px-6 lg:px-10 text-white w-full"
+          style={{ y: contentY }}
+        >
+          <Reveal>
+            <Eyebrow dark={true}>B2B Solutions</Eyebrow>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
+              Enterprise Training<br />
+              <span className="text-red-500">Solutions</span>
+            </h1>
+            <p className="text-xl text-gray-200 max-w-2xl mb-8 leading-relaxed">
+              Empower your workforce with customized IT training programs designed to close skill gaps and drive business growth.
+            </p>
+            <div className="flex gap-4 flex-wrap">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onQuote}
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all shadow-lg shadow-red-900/30 cursor-pointer"
+              >
+                Request Enterprise Quote
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all cursor-pointer"
+              >
+                <Phone size={16} className="inline mr-2" /> Schedule Call
+              </motion.button>
+            </div>
+          </Reveal>
+        </motion.div>
+        
+        {/* Scroll hint indicator */}
+        <motion.div 
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 1.8 }}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-white/60"
+        >
+          <ChevronDown size={24} />
+        </motion.div>
+      </section>
+      
+      {/* Rest of your sections remain the same */}
+      <section className="py-16 bg-white border-b relative z-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.1} className="text-center">
                 <TiltCard intensity={3}>
                   <div className="p-4">
-                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
-                    <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3">
+                      <stat.icon size={24} className="text-red-600" />
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                    </div>
                     <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
                   </div>
                 </TiltCard>
@@ -1953,35 +2043,6 @@ function CorporateSection({ onQuote, onServiceSelect }) {
         </div>
       </section>
       
-      <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={IMGS.corporateHero} alt="Corporate Training" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 text-white">
-          <Reveal>
-            <Eyebrow dark={true}>B2B Solutions</Eyebrow>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Enterprise Training<br /><span className="text-red-500">Solutions</span></h1>
-            <p className="text-xl text-gray-200 max-w-2xl mb-8">Empower your workforce with customized IT training programs designed to close skill gaps and drive business growth.</p>
-            <div className="flex gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onQuote}
-                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
-                Request Enterprise Quote
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
-                <Phone size={16} className="inline mr-2" /> Schedule Call
-              </motion.button>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-      
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
@@ -1993,9 +2054,14 @@ function CorporateSection({ onQuote, onServiceSelect }) {
               <Reveal key={t.author} delay={i * 0.15}>
                 <TiltCard intensity={3}>
                   <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
-                    <div className="flex gap-1 mb-4">{[...Array(t.rating)].map((_, j) => <Star key={j} size={16} fill="#f59e0b" stroke="none" />)}</div>
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(t.rating)].map((_, j) => <Star key={j} size={16} fill="#f59e0b" stroke="none" />)}
+                    </div>
                     <p className="text-gray-700 text-lg leading-relaxed mb-6">"{t.quote}"</p>
-                    <div><p className="font-bold text-gray-900">{t.author}</p><p className="text-sm text-gray-500">{t.role}</p></div>
+                    <div>
+                      <p className="font-bold text-gray-900">{t.author}</p>
+                      <p className="text-sm text-gray-500">{t.role}</p>
+                    </div>
                   </div>
                 </TiltCard>
               </Reveal>
@@ -2003,7 +2069,7 @@ function CorporateSection({ onQuote, onServiceSelect }) {
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-400 uppercase tracking-wide mb-6">Trusted Partners</p>
-            <div className="flex flex-wrap justify-center gap-8 opacity-60">
+            <div className="flex flex-wrap justify-center gap-8 opacity-70">
               {partners.map(p => <span key={p} className="text-gray-500 font-semibold text-lg">{p}</span>)}
             </div>
           </div>
@@ -2016,18 +2082,32 @@ function CorporateSection({ onQuote, onServiceSelect }) {
 // ─── GOVERNMENT SECTION WITH 3D ──────────────────────────────────────────────
 
 function GovernmentSection({ onPartner }) {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]  // Parallax triggers while scrolling through this section
+  });
+  
+  // Parallax effects
+  const imageY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.05, 1.1, 1.05]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 0.85, 0.95]);
+  
   const stats = [
     { value: 25, suffix: '+', label: 'Government Partners', icon: Landmark },
     { value: 15, suffix: 'K+', label: 'Civil Servants Trained', icon: Users },
     { value: 10, suffix: '+', label: 'Universities', icon: School },
     { value: 100, suffix: '%', label: 'MoEYS Aligned', icon: Award },
   ];
+  
   const programs = [
     { title: 'Government Digital Transformation', desc: 'Comprehensive training for public sector digital initiatives', duration: '12 weeks', participants: '500+', icon: BarChart3 },
     { title: 'Cybersecurity for Public Sector', desc: 'Secure government infrastructure and data protection', duration: '8 weeks', participants: '300+', icon: Shield },
     { title: 'Data Analytics for Policy Making', desc: 'Data-driven decision making for government officials', duration: '10 weeks', participants: '400+', icon: TrendingUp },
     { title: 'Leadership in Technology', desc: 'Executive program for technology leaders in government', duration: '6 weeks', participants: '200+', icon: UserCheck },
   ];
+  
   const universityPrograms = [
     { title: 'Curriculum Integration', desc: 'Integrate our certified courses into your university programs', icon: BookOpen },
     { title: 'Faculty Development', desc: 'Train your faculty members on the latest technologies', icon: Users },
@@ -2037,44 +2117,93 @@ function GovernmentSection({ onPartner }) {
   
   return (
     <div>
-      <section className="relative h-[60vh] min-h-[500px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={IMGS.govHero} alt="Government Partnership" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
-        </div>
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 text-white">
+      {/* HERO SECTION WITH PARALLAX */}
+      <section 
+        ref={sectionRef}
+        className="relative h-[70vh] min-h-[550px] flex items-center overflow-hidden"
+      >
+        {/* Parallax Background Image */}
+        <motion.div 
+          className="absolute inset-0 z-0"
+          style={{ 
+            y: imageY,
+            scale: imageScale,
+          }}
+        >
+          <img 
+            src={IMGS.govHero}  // Your new govHero image path
+            alt="Government Partnership" 
+            className="w-full h-full object-cover will-change-transform"
+            style={{ objectPosition: "center 30%" }}
+          />
+        </motion.div>
+        
+        {/* Gradient Overlay with parallax fade */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40 z-10"
+          style={{ opacity: overlayOpacity }}
+        />
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10" />
+        
+        {/* Content with slight parallax */}
+        <motion.div 
+          className="relative z-20 max-w-7xl mx-auto px-6 lg:px-10 text-white w-full"
+          style={{ y: contentY }}
+        >
           <Reveal>
             <Eyebrow dark={true}>Public Sector & Education</Eyebrow>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">Government &<br /><span className="text-red-500">University Partnerships</span></h1>
-            <p className="text-xl text-gray-200 max-w-2xl mb-8">Driving digital transformation through strategic collaboration and accredited training programs.</p>
-            <div className="flex gap-4">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
+              Government &<br />
+              <span className="text-red-500">University Partnerships</span>
+            </h1>
+            <p className="text-xl text-gray-200 max-w-2xl mb-8 leading-relaxed">
+              Driving digital transformation through strategic collaboration and accredited training programs.
+            </p>
+            <div className="flex gap-4 flex-wrap">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onPartner}
-                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all">
+                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all shadow-lg shadow-red-900/30 cursor-pointer"
+              >
                 Request Partnership Info
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all">
+                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all cursor-pointer"
+              >
                 <Mail size={16} className="inline mr-2" /> Contact Government Team
               </motion.button>
             </div>
           </Reveal>
-        </div>
+        </motion.div>
+        
+        {/* Scroll hint */}
+        <motion.div 
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 1.8 }}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-white/60"
+        >
+          <ChevronDown size={24} />
+        </motion.div>
       </section>
       
-      <section className="py-16 bg-white border-b">
+      {/* Stats Section */}
+      <section className="py-16 bg-white border-b relative z-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.1} className="text-center">
                 <TiltCard intensity={3}>
                   <div className="p-4">
-                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3"><stat.icon size={24} className="text-red-600" /></div>
-                    <div className="text-3xl font-bold text-gray-900"><AnimatedCounter value={stat.value} suffix={stat.suffix} /></div>
+                    <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mx-auto mb-3">
+                      <stat.icon size={24} className="text-red-600" />
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                    </div>
                     <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
                   </div>
                 </TiltCard>
@@ -2084,6 +2213,7 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
+      {/* Government Programs Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
@@ -2096,7 +2226,9 @@ function GovernmentSection({ onPartner }) {
                 <TiltCard intensity={3}>
                   <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={24} className="text-red-600" /></div>
+                      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <program.icon size={24} className="text-red-600" />
+                      </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-gray-900 mb-2">{program.title}</h3>
                         <p className="text-gray-500 text-sm mb-3">{program.desc}</p>
@@ -2114,13 +2246,16 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
+      {/* University Partnerships Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <Reveal direction="left">
               <div className="relative">
                 <img src={IMGS.govMeeting} alt="University Partnership" className="rounded-2xl shadow-xl w-full" />
-                <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-4 rounded-xl shadow-lg"><School size={32} /></div>
+                <div className="absolute -bottom-6 -right-6 bg-red-600 text-white p-4 rounded-xl shadow-lg">
+                  <School size={32} />
+                </div>
               </div>
             </Reveal>
             <Reveal direction="right">
@@ -2131,8 +2266,13 @@ function GovernmentSection({ onPartner }) {
                 <div className="grid gap-4">
                   {universityPrograms.map((program) => (
                     <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0"><program.icon size={16} className="text-red-600" /></div>
-                      <div><h4 className="font-semibold text-gray-900">{program.title}</h4><p className="text-sm text-gray-500">{program.desc}</p></div>
+                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <program.icon size={16} className="text-red-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{program.title}</h4>
+                        <p className="text-sm text-gray-500">{program.desc}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -2142,6 +2282,7 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
+      {/* Accreditation Section */}
       <section className="py-16 bg-red-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
           <Reveal>
@@ -2152,7 +2293,8 @@ function GovernmentSection({ onPartner }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={onPartner}
-              className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all">
+              className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all cursor-pointer"
+            >
               Request Accreditation Information
             </motion.button>
           </Reveal>

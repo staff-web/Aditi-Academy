@@ -20,7 +20,7 @@ const BRAND_LITE = '#ef4444';
 
 /* ─── Images ─────────────────────────────────────────── */
 const IMG = {
-  hero:        'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1800&q=85',
+  hero:        '/assets/studentactivities/hero.png',
   career:      'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=900&q=80',
   competition: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=900&q=80',
   scholarship1: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=900&q=80',
