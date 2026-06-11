@@ -2624,79 +2624,129 @@ function QualityAssuranceSectionInline() {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], [80, -80]);
-
+ 
   const qualityStats = [
-    { label: 'Curriculum Alignment', value: 'MoEYS Standard', icon: Shield,    img: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&q=80' },
-    { label: 'Learner Success Rate', value: '98%',            icon: TrendingUp, img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80' },
-    { label: 'Expert Trainers',      value: '50+',            icon: Users,      img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80' },
-    { label: 'Quality Reviews',      value: '100+',           icon: Award,      img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80' },
+    { label: 'Curriculum Alignment', value: 'MoEYS', icon: Shield },
+    { label: 'Learner Success Rate',  value: '98%',   icon: TrendingUp },
+    { label: 'Expert Trainers',       value: '50+',   icon: Users },
+    { label: 'Quality Reviews',       value: '100+',  icon: Award },
   ];
+ 
   const qualityFeatures = [
     'MoEYS-aligned learning process',
     'Structured curriculum verification',
     'Continuous learner assessment',
     'Dedicated student support',
   ];
-
-
+ 
   return (
     <section ref={containerRef} className="relative py-28 bg-white overflow-hidden">
+      {/* Top edge line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-200 to-transparent" />
-   
-
+ 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-20">
-          <SectionLabel>Quality Assurance</SectionLabel>
+ 
+        {/* ── Heading ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          {/* Label pill */}
+          <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-1.5 mb-5">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 block" />
+            <span className="text-xs font-semibold uppercase tracking-widest text-red-700">
+              Quality Assurance
+            </span>
+          </div>
+ 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight max-w-4xl mx-auto">
             Quality Assurance{' '}
             <span className="text-red-600">Aligned with MoEYS</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-            The whole organization process is aligned with Ministry of Education standards, ensuring consistent quality and trusted outcomes.
+            The whole organization process is aligned with Ministry of Education standards, ensuring
+            consistent quality and trusted outcomes.
           </p>
         </motion.div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-14">
+ 
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-16" />
+ 
+        {/* ── Stat Cards ── */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {qualityStats.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <motion.div key={stat.label} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.08 }}>
-                <Card3D
-                  className="group relative rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm hover:shadow-xl hover:shadow-red-50/60 hover:border-red-100 transition-shadow duration-400 h-full"
-                  strength={12}
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                whileHover={{
+                  y: -5,
+                  rotateX: 3,
+                  scale: 1.01,
+                  transition: { duration: 0.25 },
+                }}
+                style={{ perspective: 600, transformStyle: 'preserve-3d' }}
+              >
+                <div
+                  className="
+                    relative rounded-2xl border border-gray-100 bg-white
+                    shadow-sm hover:shadow-xl hover:shadow-red-50/60 hover:border-red-200
+                    transition-all duration-300 h-full overflow-hidden
+                    text-center px-5 pt-8 pb-7
+                  "
                 >
-                  <div className="relative h-32 overflow-hidden">
-                    <ParallaxImg
-                      src={stat.img}
-                      alt={stat.label}
-                      className="absolute inset-0 w-full h-full"
-                      speed={0.1}
-                      style={{ filter: 'brightness(0.7) saturate(0.8)' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/90" />
-                    {/* Icon bubble */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-10 h-10 bg-white rounded-full border-2 border-red-100 shadow-lg flex items-center justify-center z-10">
-                      <Icon className="w-4 h-4 text-red-600" />
-                    </div>
+                  {/* Radial glow */}
+                  <div className="absolute inset-0 pointer-events-none"
+                    style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(226,75,74,0.06) 0%, transparent 70%)' }}
+                  />
+ 
+                  {/* Icon */}
+                  <div
+                    className="w-12 h-12 rounded-[14px] flex items-center justify-center mx-auto mb-5 shadow-lg"
+                    style={{
+                      background: 'linear-gradient(135deg, #E24B4A, #c03333)',
+                      boxShadow: '0 4px 12px rgba(226,75,74,0.30), inset 0 1px 0 rgba(255,255,255,0.15)',
+                    }}
+                  >
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
-                  <div className="pt-9 pb-6 px-5 text-center">
-                    <div className="text-3xl font-extrabold text-gray-900">{stat.value}</div>
-                    <p className="mt-1 text-sm font-medium text-gray-500">{stat.label}</p>
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      whileInView={{ scaleX: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.9, delay: index * 0.08 + 0.4 }}
-                      className="mt-4 h-[3px] bg-gradient-to-r from-red-600 to-red-400 rounded-full origin-left"
-                    />
-                  </div>
-                </Card3D>
+ 
+                  {/* Value */}
+                  <div className="text-3xl font-extrabold text-gray-900">{stat.value}</div>
+ 
+                  {/* Label */}
+                  <p className="mt-1.5 text-sm font-medium text-gray-500">{stat.label}</p>
+ 
+                  {/* Animated bar */}
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, delay: index * 0.08 + 0.4 }}
+                    className="mt-5 h-[3px] rounded-full origin-left"
+                    style={{ background: 'linear-gradient(90deg, #E24B4A, #f09595)' }}
+                  />
+                </div>
               </motion.div>
             );
           })}
         </div>
-
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+ 
+        {/* ── Feature Pills ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16"
+        >
           {qualityFeatures.map((feature, index) => (
             <motion.div
               key={feature}
@@ -2705,27 +2755,62 @@ function QualityAssuranceSectionInline() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 + index * 0.08 }}
               whileHover={{ y: -3 }}
-              className="flex items-center gap-3 p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-red-200 hover:bg-red-50/30 hover:shadow-sm transition-all duration-300"
+              className="
+                flex items-center gap-3 p-5
+                bg-gray-50 rounded-2xl border border-gray-100
+                hover:border-red-200 hover:bg-red-50/30 hover:shadow-sm
+                transition-all duration-300
+              "
             >
-              <div className="flex-shrink-0 w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center shadow-sm">
+              <div
+                className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #E24B4A, #c03333)',
+                  boxShadow: '0 3px 8px rgba(226,75,74,0.25), inset 0 1px 0 rgba(255,255,255,0.15)',
+                }}
+              >
                 <Check className="w-4 h-4 text-white" />
               </div>
               <span className="text-sm font-medium text-gray-700">{feature}</span>
             </motion.div>
           ))}
         </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.6 }} className="mt-16 flex justify-center">
-          <motion.div whileHover={{ y: -4, scale: 1.01 }} className="inline-flex items-center gap-5 px-8 py-5 bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg hover:border-red-200 transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center shadow-sm flex-shrink-0">
+ 
+        {/* ── Cert Banner ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="flex justify-center"
+        >
+          <motion.div
+            whileHover={{ y: -4, scale: 1.01 }}
+            className="
+              inline-flex items-center gap-5 px-8 py-5
+              bg-white border border-gray-200 rounded-2xl
+              shadow-md hover:shadow-lg hover:border-red-200
+              transition-all duration-300
+            "
+          >
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, #E24B4A, #c03333)',
+                boxShadow: '0 4px 12px rgba(226,75,74,0.28), inset 0 1px 0 rgba(255,255,255,0.15)',
+              }}
+            >
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="text-left">
               <p className="font-bold text-gray-900">Certified &amp; Accredited</p>
-              <p className="text-sm text-gray-400 mt-0.5">Recognized by leading technology organizations</p>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Recognized by leading technology organizations
+              </p>
             </div>
           </motion.div>
         </motion.div>
+ 
       </div>
     </section>
   );

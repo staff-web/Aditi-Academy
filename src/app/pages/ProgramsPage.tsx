@@ -3347,12 +3347,12 @@ function CorporateSection({ onQuote, onServiceSelect }) {
               </Reveal>
             ))}
           </div>
-          <div className="text-center">
+          {/* <div className="text-center">
             <p className="text-sm text-gray-400 uppercase tracking-wide mb-6">Trusted Partners</p>
             <div className="flex flex-wrap justify-center gap-8 opacity-70">
               {partners.map(p => <span key={p} className="text-gray-500 font-semibold text-lg">{p}</span>)}
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
     </div>
