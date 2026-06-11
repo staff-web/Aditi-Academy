@@ -272,7 +272,7 @@ function CertificationCard({ cert, onClick }: { cert: CertificationCategory; onC
           <div className="flex items-center justify-between pt-4 border-t border-gray-100">
             <div>
               <div className="text-[10px] text-gray-400 uppercase tracking-wider">From</div>
-              <div className="text-lg font-extrabold text-gray-900">${cert.price.toLocaleString()}</div>
+              {/* <div className="text-lg font-extrabold text-gray-900">${cert.price.toLocaleString()}</div> */}
             </div>
             <button
               onClick={() => onClick(cert.path)}

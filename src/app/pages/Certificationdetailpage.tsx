@@ -588,7 +588,8 @@ export default function CertificationDetailPage() {
                   className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-white transition-all"
                   style={{ background: '#dc2626', boxShadow: '0 8px 24px rgba(220,38,38,0.4)' }}
                 >
-                  Enroll Now — ${cert.price.toLocaleString()}
+                  Enroll Now 
+                  {/* — ${cert.price.toLocaleString()} */}
                 </button>
                 <button className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-gray-300 border border-gray-700 hover:border-red-600 hover:text-white transition-all">
                   <Download size={15} /> Download Brochure
@@ -766,9 +767,9 @@ export default function CertificationDetailPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 ml-auto">
-            <div className="text-gray-300 text-sm">
+            {/* <div className="text-gray-300 text-sm">
               From <span className="text-white font-black text-lg">${cert.price.toLocaleString()}</span>
-            </div>
+            </div> */}
             <button
               onClick={() => setShowRegistration(true)}
               className="px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all"

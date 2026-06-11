@@ -9,7 +9,9 @@ import {
   School, UserCheck, ThumbsUp, MessageCircle, Phone, Mail, MapPin,
   Upload, Search, AlertCircle, CheckSquare as CheckSq, ShieldCheck,
   FileCheck, Eye, Loader2, BadgeCheck, Hash, Share2, Lightbulb,
-  Heart, Zap as ZapIcon,
+  Heart, Zap as ZapIcon, ExternalLink,
+  ShoppingCart,
+  Palette,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
@@ -34,7 +36,7 @@ const IMGS = {
   global:         'https://images.unsplash.com/photo-1621977717126-e29965156a27?w=900&q=80',
   internship:     'https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=900&q=80',
   career:         'https://images.unsplash.com/photo-1528901166007-3784c7dd3653?w=900&q=80',
-  corporateHero:  '/public/assets/program/B2B/image.png',
+  corporateHero:  '/assets/program/B2B/hero.png',
   govHero:        '/assets/program/B2C/hero.png',
   govMeeting:     '/assets/program/B2C/image.png',
   codingClass:    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
@@ -278,7 +280,7 @@ function CourseModal({ course, onClose, onRegister }) {
             </div>
             <div className="flex items-center justify-between p-5 rounded-2xl bg-red-50 border-2 border-red-200">
               <div>
-                <div className="text-2xl font-bold text-red-600">{course.price}</div>
+                {/* <div className="text-2xl font-bold text-red-600">{course.price}</div> */}
                 <div className="text-xs text-gray-500">One-time payment</div>
               </div>
               <motion.button onClick={onRegister} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
@@ -292,8 +294,6 @@ function CourseModal({ course, onClose, onRegister }) {
     </AnimatePresence>
   );
 }
-
-// Replace your existing RegModal with this enhanced version
 
 function RegModal({ show, onClose, course }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -437,7 +437,7 @@ function RegModal({ show, onClose, course }) {
                 </motion.div>
                 
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Registration Submitted! 🎉
+                  Registration Submitted!
                 </h3>
                 
                 <p className="text-gray-600 mb-2">
@@ -450,10 +450,10 @@ function RegModal({ show, onClose, course }) {
                 
                 <div className="bg-red-50 rounded-xl p-4 mb-5">
                   <p className="text-xs text-red-600 font-mono mb-1">
-                    ✓ Application ID: <strong>{applicationId}</strong>
+                  Application ID: <strong>{applicationId}</strong>
                   </p>
                   <p className="text-xs text-gray-500">
-                    ✓ Please keep this for reference
+                  Please keep this for reference
                   </p>
                 </div>
                 
@@ -1542,7 +1542,7 @@ function WhoAreYouSection({ activeTab, setActiveTab }) {
                           color: active ? color : '#9ca3af',
                           transition: 'color 0.2s',
                         }}>
-                          {active ? `✓ Selected: ${cta}` : cta}
+                          {active ? `Selected: ${cta}` : cta}
                         </span>
                         <motion.div
                           animate={active ? { x: 5 } : { x: 0 }}
@@ -1609,8 +1609,6 @@ function WhoAreYouSection({ activeTab, setActiveTab }) {
   );
 }
 
-// ─── ENHANCED CATEGORY FILTER WITH 3D ────────────────────────────────────────
-
 // ─── ENHANCED CATEGORY FILTER - NO PARALLAX (FIXED) ─────────────────────────
 
 function CategoryFilter({ selected, onChange }) {
@@ -1676,7 +1674,7 @@ function CourseCard({ course, index, onClick }) {
             <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
             <p className="text-gray-500 text-sm mb-3 line-clamp-2">{course.description}</p>
             <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-100">
-              <span className="text-xl font-bold text-gray-900">{course.price}</span>
+              {/* <span className="text-xl font-bold text-gray-900">{course.price}</span> */}
               <motion.div
                 animate={{ x: isHovered ? 5 : 0 }}
                 className="flex items-center gap-1 text-sm font-semibold text-red-600">
@@ -1691,8 +1689,6 @@ function CourseCard({ course, index, onClick }) {
 }
 
 // ─── CAREER BOOST SECTION WITH 3D ────────────────────────────────────────────
-
-// ─── AUDIENCE-SPECIFIC CAREER BOOST SECTION ─────────────────────────────────
 
 function CareerBoostSection({ onRegister }) {
   const benefits = [
@@ -1774,53 +1770,371 @@ function CareerBoostSection({ onRegister }) {
 }
 
 // ─── INDUSTRY PROGRAMS SECTION ───────────────────────────────────────────────
+// ─── INDUSTRY PROGRAMS SECTION ───────────────────────────────────────────────
+
+// ─── INDUSTRY PROGRAMS SECTION ───────────────────────────────────────────────
 
 function IndustryProgramsSection() {
   const programs = [
-    { title: 'Industry Linkage Program', subtitle: 'Career Support', features: ['Personalized career counseling', 'Job placement assistance', 'Networking with industry professionals'], img: IMGS.career, icon: Users },
-    { title: 'Internship Program', subtitle: 'Practical Experience', features: ['Partnerships with leading companies', 'Hands-on experience in diverse industries', 'Mentorship from experienced professionals'], img: IMGS.internship, icon: Briefcase },
-    { title: 'Work Global Virtual Company', subtitle: 'Global Opportunities', features: ['Remote work and project-based learning', 'Cross-cultural collaboration', 'Agile methodologies training'], img: IMGS.global, icon: Globe },
+    { 
+      title: 'AI for Digital Marketing', 
+      subtitle: '2 Days | Hands-on Workshop', 
+      duration: '2 days',
+      features: ['Google Gemini', 'Viral Content', 'CapCut Editing', 'Social Media AI'],
+      description: 'Use AI as a "smart friend" to grow your business with Google Gemini and CapCut video editing.',
+      img: IMGS.career, 
+      icon: TrendingUp 
+    },
+    { 
+      title: 'AI for Creative & Design', 
+      subtitle: '2 Days | Hands-on Workshop', 
+      duration: '2 days',
+      features: ['Adobe Firefly', 'Branding Kit', 'Canva Magic', 'Generative Fill'],
+      description: 'Design professional branding materials without expert design skills using Adobe Firefly.',
+      img: IMGS.internship, 
+      icon: Palette 
+    },
+    { 
+      title: 'AI for Operation & Admin', 
+      subtitle: '2 Days | Hands-on Workshop', 
+      duration: '2 days',
+      features: ['ChatGPT', 'Otter.ai', 'Notion AI', 'SOP Creation'],
+      description: 'Handle daily tasks faster and more accurately with ChatGPT and Otter.ai.',
+      img: IMGS.global, 
+      icon: Database 
+    },
+    { 
+      title: 'Digital Literacy & Cybersecurity', 
+      subtitle: '2 Days | Awareness Course', 
+      duration: '2 days',
+      features: ['Fake News Detection', 'Phishing Prevention', 'Secure Collaboration', 'Incident Response'],
+      description: 'Navigate the digital world safely and professionally with essential cybersecurity skills.',
+      img: IMGS.security, 
+      icon: Shield 
+    },
+    { 
+      title: 'Sales & Kaizen (Soft Skill)', 
+      subtitle: '2 Days | Professional Development', 
+      duration: '2 days',
+      features: ['Sales Process', 'Kaizen Philosophy', '5S Principles', 'PDCA Problem Solving'],
+      description: 'Integrate high-performance sales techniques with Japanese continuous improvement philosophy.',
+      img: IMGS.training, 
+      icon: ShoppingCart 
+    },
   ];
   
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showRegForm, setShowRegForm] = useState(false);
+  const [regSubmitted, setRegSubmitted] = useState(false);
+  const [regError, setRegError] = useState('');
+  const [applicationId, setApplicationId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    organization: '',
+    programTitle: ''
+  });
+
+  const handleRegisterClick = (program) => {
+    setSelectedProgram(program);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      organization: '',
+      programTitle: program.title
+    });
+    setShowRegForm(true);
+    setRegSubmitted(false);
+    setRegError('');
+  };
+
+  const handleRegChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (regError) setRegError('');
+  };
+
+  const handleRegSubmit = async () => {
+    if (!formData.name.trim()) {
+      setRegError('Please enter your full name');
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes('@')) {
+      setRegError('Please enter a valid email address');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      setRegError('Please enter your phone number');
+      return;
+    }
+
+    setRegError('');
+    setIsSubmitting(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const newAppId = Math.random().toString(36).substring(2, 10).toUpperCase();
+      setApplicationId(newAppId);
+      setRegSubmitted(true);
+    } catch (error) {
+      setRegError('There was an error submitting your registration. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <Reveal className="text-center mb-12">
-          <Eyebrow>Industry Programs</Eyebrow>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Career <GradientText>Pathways</GradientText></h2>
+          <Eyebrow>Professional Workshops</Eyebrow>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+            Industry <GradientText>Programs</GradientText>
+          </h2>
+          <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
+            2-day intensive hands-on training programs designed for business growth
+          </p>
         </Reveal>
-        <div className="grid md:grid-cols-3 gap-6">
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {programs.map((prog, i) => (
-            <ParallaxScroll key={prog.title} direction={i % 2 === 0 ? 'up' : 'down'}>
-              <TiltCard intensity={4}>
-                <HoverCard className="overflow-hidden">
-                  <div className="relative h-48 overflow-hidden">
-                    <img src={prog.img} alt={prog.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-3 left-3">
-                      <div className="text-xs text-white/60 uppercase tracking-wide">{prog.subtitle}</div>
-                      <h3 className="text-lg font-bold text-white">{prog.title}</h3>
+            <Reveal key={prog.title} delay={i * 0.1}>
+              <TiltCard intensity={5}>
+                <motion.div
+                  whileHover={{ y: -8 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  onClick={() => handleRegisterClick(prog)}
+                  className="bg-white rounded-2xl overflow-hidden cursor-pointer group"
+                  style={{
+                    border: '1px solid #e5e7eb',
+                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  {/* Image Section with Overlay */}
+                  <div className="relative h-52 overflow-hidden">
+                    <motion.img
+                      src={prog.img}
+                      alt={prog.title}
+                      className="w-full h-full object-cover"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    
+                    {/* Duration Badge */}
+                    <div className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      {prog.duration}
+                    </div>
+                    
+                    {/* Icon */}
+                    <div className="absolute bottom-4 left-4 w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center">
+                      <prog.icon size={22} className="text-red-600" />
                     </div>
                   </div>
+                  
+                  {/* Content */}
                   <div className="p-5">
-                    {prog.features.map(f => (
-                      <div key={f} className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <CheckCircle size={12} className="text-red-600 flex-shrink-0" />
-                        <span>{f}</span>
+                    <div className="mb-2">
+                      <span className="text-xs text-red-600 font-semibold uppercase tracking-wide">
+                        {prog.subtitle}
+                      </span>
+                      <h3 className="text-xl font-bold text-gray-900 mt-1 group-hover:text-red-600 transition-colors">
+                        {prog.title}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-gray-500 text-sm mb-4 line-clamp-2">
+                      {prog.description}
+                    </p>
+                    
+                    {/* Features Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {prog.features.slice(0, 3).map(f => (
+                        <span key={f} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                          {f}
+                        </span>
+                      ))}
+                      {prog.features.length > 3 && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+                          +{prog.features.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <motion.div
+                      whileHover={{ x: 5 }}
+                      className="flex items-center justify-between pt-3 border-t border-gray-100"
+                    >
+                      <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
+                        View Details & Register
+                        <ArrowRight size={14} />
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-600 transition-colors">
+                        <ExternalLink size={14} className="text-red-600 group-hover:text-white transition-colors" />
                       </div>
-                    ))}
+                    </motion.div>
                   </div>
-                </HoverCard>
+                </motion.div>
               </TiltCard>
-            </ParallaxScroll>
+            </Reveal>
           ))}
         </div>
       </div>
+
+      {/* Program Detail & Registration Modal */}
+      <AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedProgram(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 30, rotateX: 20 }}
+              animate={{ scale: 1, y: 0, rotateX: 0 }}
+              exit={{ scale: 0.9, y: 30, rotateX: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
+            >
+              <div className="sticky top-0 bg-white z-10 p-6 border-b border-gray-100 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                    <selectedProgram.icon size={24} className="text-red-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedProgram.title}</h2>
+                </div>
+                <button
+                  onClick={() => setSelectedProgram(null)}
+                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="bg-red-100 text-red-600 text-sm font-semibold px-3 py-1 rounded-full">
+                      {selectedProgram.duration}
+                    </span>
+                    <span className="text-gray-400 text-sm">Hands-on Workshop</span>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{selectedProgram.description}</p>
+                </div>
+                
+                <div className="bg-gray-50 rounded-xl p-5 mb-6">
+                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <Target size={18} className="text-red-600" /> 
+                    What You'll Learn
+                  </h3>
+                  <div className="grid gap-2">
+                    {selectedProgram.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                        <CheckCircle size={14} className="text-red-500 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="bg-red-50 rounded-xl p-5">
+                  <div className="flex flex-wrap gap-4 justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Ready to enroll?</p>
+                      <p className="text-xs text-gray-500">Limited spots available</p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowRegForm(true)}
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg cursor-pointer"
+                    >
+                      Register Now →
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Registration Modal */}
+      <AnimatePresence>
+        {showRegForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
+            onClick={() => { setShowRegForm(false); setRegSubmitted(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 24, rotateX: 15 }}
+              animate={{ scale: 1, y: 0, rotateX: 0 }}
+              exit={{ scale: 0.9, y: 24, rotateX: 15 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 bg-gradient-to-r from-red-50 to-white border-b border-gray-100 flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {regSubmitted ? 'Registration Submitted!' : `Register for Workshop`}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {regSubmitted ? "We'll be in touch soon" : ` ${selectedProgram?.title}`}
+                  </p>
+                </div>
+                <button onClick={() => { setShowRegForm(false); setRegSubmitted(false); }} className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+                  <X size={16} className="text-gray-500" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                {regSubmitted ? (
+                  <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, delay: 0.1 }} className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
+                      <CheckCircle size={42} className="text-red-600" />
+                    </motion.div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Submitted!</h3>
+                    <p className="text-gray-600 mb-2">Thank you, <strong>{formData.name}</strong>!</p>
+                    <p className="text-sm text-gray-500 mb-5">We've sent a confirmation to <strong>{formData.email}</strong>. Our team will contact you within 2 business days.</p>
+                    <div className="bg-red-50 rounded-xl p-4 mb-5">
+                      <p className="text-xs text-red-600 font-mono mb-1">Application ID: <strong>{applicationId}</strong></p>
+                    </div>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => { setShowRegForm(false); setRegSubmitted(false); }} className="w-full py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer">
+                      Close
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-4">
+                      <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="email" name="email" placeholder="Email Address *" value={formData.email} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="text" name="organization" placeholder="Company / Organization" value={formData.organization} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                    </div>
+                    {regError && <p className="text-red-500 text-sm mt-3">{regError}</p>}
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={isSubmitting} onClick={handleRegSubmit} className={`w-full mt-6 py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer shadow-lg transition-all ${isSubmitting ? 'opacity-70' : 'hover:bg-red-700'}`}>
+                      {isSubmitting ? <div className="flex items-center justify-center gap-2"><Loader2 size={18} className="animate-spin" /> Submitting...</div> : 'Complete Registration →'}
+                    </motion.button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
-
-// ─── TECHNOLOGY SHOWCASE SECTION (NEW - ADDING TECH FOCUS) ────────────────────
 
 // ─── TECHNOLOGY SHOWCASE SECTION - NO MOVEMENT ────────────────────────────────
 
@@ -2079,78 +2393,254 @@ function CorporateSection({ onQuote, onServiceSelect }) {
   );
 }
 
-// ─── GOVERNMENT SECTION WITH 3D ──────────────────────────────────────────────
+// =============================================================================
+// REDESIGNED GOVERNMENT & UNIVERSITY PARTNERSHIPS SECTION
+// Modern, professional, with detailed clickable program cards & registration
+// =============================================================================
+
 
 function GovernmentSection({ onPartner }) {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "end start"]  // Parallax triggers while scrolling through this section
+    offset: ["start end", "end start"]
   });
   
-  // Parallax effects
   const imageY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
   const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.05, 1.1, 1.05]);
   const contentY = useTransform(scrollYProgress, [0, 1], [30, -30]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 0.85, 0.95]);
-  
+
   const stats = [
     { value: 25, suffix: '+', label: 'Government Partners', icon: Landmark },
     { value: 15, suffix: 'K+', label: 'Civil Servants Trained', icon: Users },
-    { value: 10, suffix: '+', label: 'Universities', icon: School },
+    { value: 12, suffix: '+', label: 'Universities', icon: School },
     { value: 100, suffix: '%', label: 'MoEYS Aligned', icon: Award },
   ];
-  
-  const programs = [
-    { title: 'Government Digital Transformation', desc: 'Comprehensive training for public sector digital initiatives', duration: '12 weeks', participants: '500+', icon: BarChart3 },
-    { title: 'Cybersecurity for Public Sector', desc: 'Secure government infrastructure and data protection', duration: '8 weeks', participants: '300+', icon: Shield },
-    { title: 'Data Analytics for Policy Making', desc: 'Data-driven decision making for government officials', duration: '10 weeks', participants: '400+', icon: TrendingUp },
-    { title: 'Leadership in Technology', desc: 'Executive program for technology leaders in government', duration: '6 weeks', participants: '200+', icon: UserCheck },
+
+  // YOUR 5 COMPLETE PROGRAMS WITH ALL DETAILS
+  const governmentPrograms = [
+    { 
+      id: 'ai-marketing',
+      title: 'AI for Digital Marketing', 
+      desc: 'Use AI as a "smart friend" to grow your business with Google Gemini and CapCut', 
+      duration: '2 days', 
+      participants: '150+', 
+      icon: TrendingUp,
+      color: '#dc2626',
+      fullDesc: 'The goal of this 2-day, hands-on workshop is to show business owners and staff how AI can act as a "smart friend" to grow their business.',
+      objectives: [
+        'Learn to use AI as a Business Partner: Set up and use Google Gemini to help with business growth',
+        'Create Content Faster: Use AI to quickly come up with viral ideas and marketing concepts',
+        'Write Better Scripts: Learn how to write 30-second video scripts with a clear start, middle, and end',
+        'Master Easy Video Editing: Use CapCut to turn scripts into professional videos with music and voiceovers',
+        'Boost Social Media Results: Improve marketing on Facebook and TikTok using AI-generated captions and hashtags'
+      ],
+      outcomes: [
+        'Produce Professional Videos: Create high-quality marketing videos with captions that people can watch even without sound',
+        'Adopt New Digital Tools: Successfully use at least three different AI tools in their daily business work',
+        'Think Like a Creator: Understand what makes people stop scrolling and engage with a post',
+        'Work Efficiently: Use the "learn-apply-produce" method to create real marketing materials during the class',
+        'Launch Content: Be ready to post finished videos directly to Facebook, TikTok, or WhatsApp'
+      ],
+      suitableFor: 'Business owners, marketing professionals, content creators, social media managers',
+      tools: ['Google Gemini', 'CapCut', 'ChatGPT', 'Canva']
+    },
+    { 
+      id: 'ai-design',
+      title: 'AI for Creative and Design', 
+      desc: 'Use AI tools to design professional branding materials without expert design skills', 
+      duration: '2 days', 
+      participants: '120+', 
+      icon: Palette,
+      color: '#8b5cf6',
+      fullDesc: 'The goal of this 16-hour, hands-on training is to help business owners and creators use AI tools to design professional branding materials without needing expert design skills.',
+      objectives: [
+        'Master Generative Design: Learn how to use Adobe Firefly to turn text descriptions into high-quality brand images and mood boards',
+        'Speed Up Creative Work: Use AI tools to automate repetitive tasks like changing image backgrounds or resizing posts',
+        'Develop Professional Branding: Create a consistent visual branding kit that includes logos, social media posts, and banners',
+        'Enhance Visual Storytelling: Use AI to create unique text effects and catchy headlines that make a brand stand out'
+      ],
+      outcomes: [
+        'Create Custom Brand Assets: Generate unique Hero Images and 3D lettering using Adobe Firefly',
+        'Design Social Media Suites: Produce professional layouts for Instagram, Facebook, and Stories using Canva Magic Studio',
+        'Edit Images with AI: Use Generative Fill to add or remove objects from images easily',
+        'Ensure Brand Consistency: Instantly convert a single design into multiple formats while keeping a professional look',
+        'Produce a Ready-to-Use Portfolio: Walk away with a library of AI-generated images and a complete set of marketing materials'
+      ],
+      suitableFor: 'Graphic designers, brand managers, small business owners, content creators',
+      tools: ['Adobe Firefly', 'Canva Magic Studio', 'Midjourney', 'Photoshop AI']
+    },
+    { 
+      id: 'ai-operations',
+      title: 'AI for Operation and Administrative', 
+      desc: 'Use AI to handle daily tasks faster and more accurately with ChatGPT and Otter.ai', 
+      duration: '2 days', 
+      participants: '200+', 
+      icon: Database,
+      color: '#06b6d4',
+      fullDesc: 'The goal of this 16-hour, hands-on training is to show business owners and office staff how to use AI to handle daily tasks faster and more accurately.',
+      objectives: [
+        'Modernize Communication: Learn to use ChatGPT to write professional, empathetic, and effective business emails and messages',
+        'Automate Meeting Management: Use Otter.ai to record and transcribe meetings so no details are missed',
+        'Streamline Workflows: Teach participants to organize projects and tasks using Notion with AI support',
+        'Standardize Processes: Help businesses create clear Standard Operating Procedures (SOPs)',
+        'Improve Efficiency: Reduce the manual administrative workload to save time in daily operations'
+      ],
+      outcomes: [
+        'Use a Digital Assistant: Successfully set up and use ChatGPT and Otter.ai on both mobile and desktop',
+        'Create Structured Records: Turn raw meeting transcripts into professional summaries with key decisions and action items',
+        'Build an Operational Dashboard: Create a central workspace in Notion to track projects, timelines, and business growth plans',
+        'Produce Professional Documentation: Turn rough notes into formal SOP manuals that any employee can follow',
+        'Adopt New Tools: Successfully integrate at least three specific AI tools into their daily work'
+      ],
+      suitableFor: 'Office administrators, operations managers, executive assistants, business owners',
+      tools: ['ChatGPT', 'Otter.ai', 'Notion AI', 'Zapier']
+    },
+    { 
+      id: 'cybersecurity',
+      title: 'Digital Literacy and Cybersecurity Awareness', 
+      desc: 'Navigate the digital world safely and professionally', 
+      duration: '2 days', 
+      participants: '300+', 
+      icon: Shield,
+      color: '#ef4444',
+      fullDesc: 'The primary goal of this course is to equip non-technical professionals and small business staff with the fundamental skills needed to navigate the digital world safely and professionally.',
+      objectives: [
+        'Enhance Information Literacy: Teach participants how to evaluate website credibility and identify misinformation or fake news',
+        'Promote Secure Collaboration: Enable the safe use of professional communication and cloud-based collaboration tools',
+        'Strengthen Cyber Defense: Provide the knowledge to recognize and mitigate common threats such as phishing, malware, and ransomware',
+        'Foster Incident Response: Train individuals on how to respond correctly to basic cybersecurity incidents'
+      ],
+      outcomes: [
+        'Understand key digital literacy concepts and evaluate credibility of online information',
+        'Identify misinformation and fake news before sharing information',
+        'Use digital communication and collaboration tools safely',
+        'Recognize common cybersecurity threats including phishing, malware, ransomware, and social engineering',
+        'Apply essential cybersecurity practices including strong passwords and multi-factor authentication',
+        'Protect personal and organizational financial information during online transactions',
+        'Practice safe browsing and remote work security habits',
+        'Respond appropriately to basic cybersecurity incidents'
+      ],
+      suitableFor: 'All staff members, non-technical professionals, small business teams',
+      tools: ['Google Drive', 'Microsoft Teams', 'Password Managers', '2FA Apps']
+    },
+    { 
+      id: 'sales-kaizen',
+      title: 'Sales and Kaizen (Soft Skill)', 
+      desc: 'Integrate high-performance sales with Japanese continuous improvement philosophy', 
+      duration: '2 days', 
+      participants: '180+', 
+      icon: ShoppingCart,
+      color: '#f59e0b',
+      fullDesc: 'The primary objective of this 16-hour physical training program is to integrate high-performance sales techniques with the Japanese philosophy of continuous improvement (Kaizen) to drive organizational growth.',
+      objectives: [
+        'Standardize the Sales Process: Establish a structured and effective sales workflow, from prospecting to after-sales service',
+        'Instill a Continuous Improvement Mindset: Introduce Kaizen philosophy to encourage small, consistent improvements',
+        'Enhance Operational Efficiency: Teach participants how to identify inefficiencies and reduce operational waste using 5S principles',
+        'Develop Problem-Solving Skills: Equip staff with practical tools such as PDCA, 5 Why Analysis, and Fishbone Diagrams',
+        'Build Customer Loyalty: Focus on persuasive communication, objection handling, and long-term relationship building'
+      ],
+      outcomes: [
+        'Execute Strategic Sales: Qualify high-potential prospects and deliver structured, persuasive presentations',
+        'Improve Revenue Performance: Identify root causes of sales challenges and apply effective closing techniques',
+        'Optimize Workplace Organization: Apply 5S concepts and Kaizen processes to improve productivity',
+        'Utilize Analytical Tools: Independently use the PDCA cycle and root cause analysis tools',
+        'Strengthen Professionalism: Provide consistent after-sales support and build trust-based relationships'
+      ],
+      suitableFor: 'Sales professionals, team leaders, business owners, customer service staff',
+      tools: ['PDCA Framework', '5S Methodology', 'Fishbone Diagram', '5 Why Analysis']
+    },
   ];
-  
+
   const universityPrograms = [
     { title: 'Curriculum Integration', desc: 'Integrate our certified courses into your university programs', icon: BookOpen },
     { title: 'Faculty Development', desc: 'Train your faculty members on the latest technologies', icon: Users },
     { title: 'Student Certification', desc: 'Provide industry-recognized certifications to your students', icon: Award },
     { title: 'Research Collaboration', desc: 'Partner on technology research and innovation projects', icon: Target },
   ];
-  
+
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [showRegForm, setShowRegForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [regError, setRegError] = useState('');
+  const [applicationId, setApplicationId] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    organization: '',
+    programId: '',
+    programTitle: ''
+  });
+
+  const handleRegisterClick = (program) => {
+    setSelectedProgram(program);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      organization: '',
+      programId: program.id,
+      programTitle: program.title
+    });
+    setShowRegForm(true);
+    setSubmitted(false);
+    setRegError('');
+  };
+
+  const handleRegChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (regError) setRegError('');
+  };
+
+  const handleRegSubmit = async () => {
+    if (!formData.name.trim()) {
+      setRegError('Please enter your full name');
+      return;
+    }
+    if (!formData.email.trim() || !formData.email.includes('@')) {
+      setRegError('Please enter a valid email address');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      setRegError('Please enter your phone number');
+      return;
+    }
+    if (!formData.organization.trim()) {
+      setRegError('Please enter your organization name');
+      return;
+    }
+
+    setRegError('');
+    setIsSubmitting(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const newAppId = Math.random().toString(36).substring(2, 10).toUpperCase();
+      setApplicationId(newAppId);
+      console.log('Registration submitted:', { ...formData, applicationId: newAppId });
+      setSubmitted(true);
+    } catch (error) {
+      setRegError('There was an error submitting your registration. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div>
-      {/* HERO SECTION WITH PARALLAX */}
-      <section 
-        ref={sectionRef}
-        className="relative h-[70vh] min-h-[550px] flex items-center overflow-hidden"
-      >
-        {/* Parallax Background Image */}
-        <motion.div 
-          className="absolute inset-0 z-0"
-          style={{ 
-            y: imageY,
-            scale: imageScale,
-          }}
-        >
-          <img 
-            src={IMGS.govHero}  // Your new govHero image path
-            alt="Government Partnership" 
-            className="w-full h-full object-cover will-change-transform"
-            style={{ objectPosition: "center 30%" }}
-          />
+      {/* HERO SECTION */}
+      <section ref={sectionRef} className="relative h-[70vh] min-h-[550px] flex items-center overflow-hidden">
+        <motion.div className="absolute inset-0 z-0" style={{ y: imageY, scale: imageScale }}>
+          <img src={IMGS.govHero} alt="Government Partnership" className="w-full h-full object-cover will-change-transform" style={{ objectPosition: "center 30%" }} />
         </motion.div>
-        
-        {/* Gradient Overlay with parallax fade */}
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40 z-10"
-          style={{ opacity: overlayOpacity }}
-        />
-        
+        <motion.div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40 z-10" style={{ opacity: overlayOpacity }} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10" />
         
-        {/* Content with slight parallax */}
-        <motion.div 
-          className="relative z-20 max-w-7xl mx-auto px-6 lg:px-10 text-white w-full"
-          style={{ y: contentY }}
-        >
+        <motion.div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-10 text-white w-full" style={{ y: contentY }}>
           <Reveal>
             <Eyebrow dark={true}>Public Sector & Education</Eyebrow>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
@@ -2161,36 +2651,22 @@ function GovernmentSection({ onPartner }) {
               Driving digital transformation through strategic collaboration and accredited training programs.
             </p>
             <div className="flex gap-4 flex-wrap">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onPartner}
-                className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all shadow-lg shadow-red-900/30 cursor-pointer"
-              >
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onPartner} className="px-8 py-3 bg-red-600 hover:bg-red-700 rounded-xl font-semibold transition-all shadow-lg shadow-red-900/30 cursor-pointer">
                 Request Partnership Info
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all cursor-pointer"
-              >
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="px-8 py-3 bg-white/10 backdrop-blur border border-white/30 hover:bg-white/20 rounded-xl font-semibold transition-all cursor-pointer">
                 <Mail size={16} className="inline mr-2" /> Contact Government Team
               </motion.button>
             </div>
           </Reveal>
         </motion.div>
         
-        {/* Scroll hint */}
-        <motion.div 
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.8 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-white/60"
-        >
+        <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.8 }} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 text-white/60">
           <ChevronDown size={24} />
         </motion.div>
       </section>
       
-      {/* Stats Section */}
+      {/* STATS SECTION */}
       <section className="py-16 bg-white border-b relative z-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-4 gap-8">
@@ -2213,32 +2689,60 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
-      {/* Government Programs Section */}
+      {/* YOUR 5 PROGRAMS - PROFESSIONAL 3D CLICKABLE CARDS */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
-            <Eyebrow>Government Programs</Eyebrow>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Public Sector <GradientText>Training</GradientText></h2>
+            <Eyebrow>Professional Training Programs</Eyebrow>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Workforce <GradientText>Development</GradientText></h2>
+            <p className="text-gray-500 mt-3 max-w-2xl mx-auto">2-day intensive workshops designed for government and public sector employees</p>
           </Reveal>
-          <div className="grid md:grid-cols-2 gap-6">
-            {programs.map((program, i) => (
-              <Reveal key={program.title} delay={i * 0.1}>
-                <TiltCard intensity={3}>
-                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-red-200 transition-all">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-                        <program.icon size={24} className="text-red-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">{program.title}</h3>
-                        <p className="text-gray-500 text-sm mb-3">{program.desc}</p>
-                        <div className="flex items-center gap-4 text-xs">
-                          <span className="text-gray-400">📅 {program.duration}</span>
-                          <span className="text-red-600">👥 {program.participants} trained</span>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {governmentPrograms.map((program, i) => (
+              <Reveal key={program.id} delay={i * 0.1}>
+                <TiltCard intensity={5}>
+                  <motion.div
+                    whileHover={{ y: -6 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    onClick={() => setSelectedProgram(program)}
+                    className="bg-white rounded-2xl overflow-hidden cursor-pointer group h-full flex flex-col"
+                    style={{
+                      border: '1px solid #e5e7eb',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                    }}
+                  >
+                    {/* Card Header with Gradient */}
+                    <div className="relative p-5" style={{ background: `linear-gradient(135deg, ${program.color}10, white)` }}>
+                      <div className="flex items-start justify-between">
+                        <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: `${program.color}15` }}>
+                          <program.icon size={28} style={{ color: program.color }} />
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-600">{program.duration}</span>
                         </div>
                       </div>
+                      <h3 className="text-xl font-bold text-gray-900 mt-4 group-hover:text-red-600 transition-colors">{program.title}</h3>
+                      <p className="text-gray-500 text-sm mt-1 line-clamp-2">{program.desc}</p>
                     </div>
-                  </div>
+                    
+                    {/* Card Body */}
+                    <div className="p-5 pt-0 flex-1">
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {program.tools?.slice(0, 3).map(tool => (
+                          <span key={tool} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{tool}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <Users size={12} /> {program.participants} enrolled
+                        </span>
+                        <motion.div whileHover={{ x: 5 }} className="flex items-center gap-1 text-sm font-semibold" style={{ color: program.color }}>
+                          View Details <ArrowRight size={14} />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </TiltCard>
               </Reveal>
             ))}
@@ -2246,7 +2750,7 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
-      {/* University Partnerships Section */}
+      {/* UNIVERSITY PARTNERSHIPS SECTION */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -2265,9 +2769,9 @@ function GovernmentSection({ onPartner }) {
                 <p className="text-gray-600 mb-8">Collaborate with ADITI Academy to bring industry-recognized technology education to your students and faculty.</p>
                 <div className="grid gap-4">
                   {universityPrograms.map((program) => (
-                    <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
-                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                        <program.icon size={16} className="text-red-600" />
+                    <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:shadow-md transition-all">
+                      <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <program.icon size={18} className="text-red-600" />
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-900">{program.title}</h4>
@@ -2282,24 +2786,154 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
-      {/* Accreditation Section */}
+      {/* ACCREDITATION SECTION */}
       <section className="py-16 bg-red-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
           <Reveal>
             <Award size={48} className="text-red-600 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Officially Accredited by MoEYS</h3>
             <p className="text-gray-600 max-w-2xl mx-auto mb-6">Our programs are fully aligned with the Ministry of Education, Youth and Sport standards</p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onPartner}
-              className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all cursor-pointer"
-            >
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={onPartner} className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-all cursor-pointer">
               Request Accreditation Information
             </motion.button>
           </Reveal>
         </div>
       </section>
+
+      {/* PROGRAM DETAIL MODAL */}
+      <AnimatePresence>
+        {selectedProgram && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedProgram(null)}>
+            <motion.div initial={{ scale: 0.9, y: 30, rotateX: 20 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 30, rotateX: 20 }}
+              onClick={e => e.stopPropagation()} className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
+              <div className="sticky top-0 bg-white z-10 p-6 border-b border-gray-100 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${selectedProgram.color}15` }}>
+                    <selectedProgram.icon size={24} style={{ color: selectedProgram.color }} />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedProgram.title}</h2>
+                </div>
+                <button onClick={() => setSelectedProgram(null)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="bg-red-100 text-red-600 text-sm font-semibold px-3 py-1 rounded-full">{selectedProgram.duration}</span>
+                    <span className="text-gray-400 text-sm">Hands-on Workshop</span>
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{selectedProgram.fullDesc}</p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-gray-50 rounded-xl p-5">
+                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <Target size={18} className="text-red-600" /> Program Objectives
+                    </h3>
+                    <ul className="space-y-2">
+                      {selectedProgram.objectives?.map((obj, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                          <CheckCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                          <span>{obj}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-5">
+                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <Award size={18} className="text-red-600" /> Learning Outcomes
+                    </h3>
+                    <ul className="space-y-2">
+                      {selectedProgram.outcomes?.map((out, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                          <CheckCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                          <span>{out}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="bg-red-50 rounded-xl p-5">
+                  <div className="flex flex-wrap gap-4 justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Program Details</p>
+                      <div className="flex gap-4 text-sm">
+                        <span className="flex items-center gap-1"><Calendar size={14} /> {selectedProgram.duration}</span>
+                        <span className="flex items-center gap-1"><Users size={14} /> {selectedProgram.participants} trained</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Suitable for: {selectedProgram.suitableFor}</p>
+                    </div>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                      onClick={() => handleRegisterClick(selectedProgram)}
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg cursor-pointer">
+                      Register for this Program →
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* REGISTRATION MODAL */}
+      <AnimatePresence>
+        {showRegForm && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
+            onClick={() => { setShowRegForm(false); setSubmitted(false); }}>
+            <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
+              onClick={e => e.stopPropagation()} className="w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl">
+              <div className="p-6 bg-gradient-to-r from-red-50 to-white border-b border-gray-100 flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">{submitted ? 'Registration Submitted!' : `Register for Workshop`}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{submitted ? "We'll be in touch soon" : selectedProgram?.title}</p>
+                </div>
+                <button onClick={() => { setShowRegForm(false); setSubmitted(false); }} className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+                  <X size={16} className="text-gray-500" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                {submitted ? (
+                  <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400, delay: 0.1 }} className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
+                      <CheckCircle size={42} className="text-red-600" />
+                    </motion.div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Submitted!</h3>
+                    <p className="text-gray-600 mb-2">Thank you, <strong>{formData.name}</strong>!</p>
+                    <p className="text-sm text-gray-500 mb-5">We've sent a confirmation to <strong>{formData.email}</strong>. Our team will contact you within 2-3 business days.</p>
+                    <div className="bg-red-50 rounded-xl p-4 mb-5">
+                      <p className="text-xs text-red-600 font-mono mb-1">Application ID: <strong>{applicationId}</strong></p>
+                    </div>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => { setShowRegForm(false); setSubmitted(false); }} className="w-full py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer">
+                      Close
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-4">
+                      <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="email" name="email" placeholder="Email Address *" value={formData.email} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="text" name="organization" placeholder="Government Agency / Organization *" value={formData.organization} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                    </div>
+                    {regError && <p className="text-red-500 text-sm mt-3">{regError}</p>}
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={isSubmitting} onClick={handleRegSubmit} className={`w-full mt-6 py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer shadow-lg transition-all ${isSubmitting ? 'opacity-70' : 'hover:bg-red-700'}`}>
+                      {isSubmitting ? <div className="flex items-center justify-center gap-2"><Loader2 size={18} className="animate-spin" /> Submitting...</div> : 'Submit Registration →'}
+                    </motion.button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

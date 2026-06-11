@@ -461,10 +461,10 @@ function SDGCard({ goal, index }) {
           </div>
 
           {/* Thumbnail */}
-          <div className="w-20 flex-shrink-0 overflow-hidden">
+          {/* <div className="w-20 flex-shrink-0 overflow-hidden">
             <motion.img src={goal.image} alt="" className="w-full h-full object-cover"
               animate={{ scale: hov ? 1.12 : 1 }} transition={{ duration: 0.5 }} />
-          </div>
+          </div> */}
 
           {/* Text */}
           <div className="flex-1 px-5 py-4">
@@ -477,7 +477,7 @@ function SDGCard({ goal, index }) {
           <motion.div className="flex items-center pr-4"
             animate={{ opacity: hov ? 1 : 0, x: hov ? 0 : 6 }}
             transition={{ duration: 0.2 }}>
-            <ArrowRight size={15} color={col} />
+            {/* <ArrowRight size={15} color={col} /> */}
           </motion.div>
 
           {/* Bottom accent */}
@@ -505,12 +505,81 @@ function ESGSDGSection() {
   ];
 
   const sdgGoals = [
-    { number: 4, name: 'Quality Education', description: 'Accessible, high-quality tech education for all learners', image: IMGS.techEducation },
-    { number: 5, name: 'Gender Equality', description: 'Empowering 6,000+ women and girls in technology', image: IMGS.womenInTech },
-    { number: 8, name: 'Decent Work & Growth', description: 'Sustainable employment through digital skill-building', image: IMGS.teamwork },
-    { number: 9, name: 'Industry & Innovation', description: 'Driving technological advancement across ASEAN', image: IMGS.innovation },
-    { number: 17, name: 'Global Partnerships', description: 'Building collaborative ecosystems for lasting impact', image: IMGS.globalPartners },
-  ];
+  { 
+    number: 4, 
+    name: 'Quality Education', 
+    description: 'ADITI Academy delivers industry-aligned, MoEYS endorsed technology training to IT students, professionals, SMEs, and government officers, ensuring equitable access to relevant, high-quality digital skills.',
+    // image: IMGS.techEducation,
+    stats: [
+      '~1,000 IT students trained',
+      '600+ professionals upskilled',
+      'MoEYS endorsed',
+      'Short course graduation',
+      'International certifications'
+    ]
+  },
+  { 
+    number: 5, 
+    name: 'Gender Equality', 
+    description: 'Through Technovation Girls Cambodia and dedicated women in tech programs, ADITI has trained 6,000+ girls in technology, leadership, and entrepreneurship, empowering women to lead in the digital economy.',
+    // image: IMGS.womenInTech,
+    stats: [
+      '6,000+ girls trained',
+      'Technovation Girls Cambodia',
+      'Women leadership programs',
+      'Digital literacy for women'
+    ]
+  },
+  { 
+    number: 8, 
+    name: 'Decent Work & Economic Growth', 
+    description: 'By connecting graduates to internships, industry partners, and virtual company programs, ADITI creates direct pathways to employment and contributes to Cambodia\'s goal of reaching middle income status by 2030.',
+    // image: IMGS.teamwork,
+    stats: [
+      'Industry linkage program',
+      'Job placement support',
+      'Internship partnership',
+      'Virtual company program',
+      'Cambodia 2030 mission'
+    ]
+  },
+  { 
+    number: 9, 
+    name: 'Industry, Innovation & Infrastructure', 
+    description: 'ADITI Academy builds Cambodia\'s technology industry capacity through AI/ML, cybersecurity, cloud, and software development training, equipping the workforce to support digital infrastructure and innovation.',
+    // image: IMGS.innovation,
+    stats: [
+      'AI & Machine learning course',
+      'Cybersecurity training',
+      'Cloud computing certs',
+      'Innovation Award',
+      'Tech for Kids Academy'
+    ]
+  },
+  { 
+    number: 10, 
+    name: 'Reduced Inequalities', 
+    description: 'Training programs target underserved groups, including government officers, SME owners, and the general public, reducing the digital skills gap across income levels, sectors, and geographies in Cambodia.',
+    // image: IMGS.globalPartners, // Update image path as needed
+    stats: [
+      '500+ government officers',
+      '550+ SMEs trained',
+      '1,500+ general public',
+      'Digital literacy programs',
+      'Skills Development Fund'
+    ]
+  },
+  { 
+    number: 17, 
+    name: 'Partnerships for the Goals', 
+    description: 'ADITI Academy builds multi-stakeholder partnerships with government ministries, universities, the CBRD Fund, and industry, creating a collaborative ecosystem for sustainable technology capacity building.',
+    // image: IMGS.globalPartners,
+    stats: [
+      'MoEYS endorsement',
+      'CBRD & Skill Development Fund'
+    ]
+  }
+];
 
   return (
     <section ref={sectionRef} className="relative py-28 overflow-hidden" style={{ background: '#f8f8f8' }}>
@@ -648,7 +717,7 @@ function ESGSDGSection() {
             </div>
 
             {/* SDG mini stats */}
-            <Reveal delay={0.55}>
+            {/* <Reveal delay={0.55}>
               <div className="mt-8 grid grid-cols-3 gap-3">
                 {[{ n: '5', l: 'SDGs Addressed' }, { n: '17', l: 'Total UN Goals' }, { n: '2030', l: 'Target Year' }].map(s => (
                   <div key={s.l} className="rounded-xl bg-white border border-gray-100 p-4 text-center"
@@ -658,7 +727,7 @@ function ESGSDGSection() {
                   </div>
                 ))}
               </div>
-            </Reveal>
+            </Reveal> */}
           </div>
         </div>
       </div>
@@ -920,91 +989,91 @@ function ImpactMetricsSection() {
 // PARTNERSHIP
 // ═══════════════════════════════════════════════════════════════════════════
 
-function PartnershipSection() {
-  const partners = ['Ministry of Education', 'Ministry of Industry', 'ACLEDA Bank', 'Microsoft Cambodia', 'Google for Education', 'AWS Partner Network', 'UNICEF', 'UNESCO', 'ASEAN Secretariat', 'World Bank'];
+// function PartnershipSection() {
+//   const partners = ['Ministry of Education', 'Ministry of Industry', 'ACLEDA Bank', 'Microsoft Cambodia', 'Google for Education', 'AWS Partner Network', 'UNICEF', 'UNESCO', 'ASEAN Secretariat', 'World Bank'];
 
-  return (
-    <section className="py-28" style={{ background: '#f8f8f8' }}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <Reveal className="text-center mb-16">
-          <SectionLabel>Collaboration</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
-            Partnership <span style={{ color: RED }}>Model</span>
-          </h2>
-          <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
-            Collaborate with us to drive sustainable impact in your organization and community.
-          </p>
-        </Reveal>
+//   return (
+//     <section className="py-28" style={{ background: '#f8f8f8' }}>
+//       <div className="max-w-7xl mx-auto px-6 lg:px-10">
+//         <Reveal className="text-center mb-16">
+//           <SectionLabel>Collaboration</SectionLabel>
+//           <h2 className="text-4xl md:text-5xl lg:text-[3.25rem] font-black text-gray-900 leading-tight tracking-tight">
+//             Partnership <span style={{ color: RED }}>Model</span>
+//           </h2>
+//           <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
+//             Collaborate with us to drive sustainable impact in your organization and community.
+//           </p>
+//         </Reveal>
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          <Reveal dir="left">
-            <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
-              <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
-                whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
-                transition={{ duration: 0.3 }}>
-                <h3 className="text-xl font-black text-gray-900 mb-8">How to Collaborate</h3>
-                <div className="space-y-7">
-                  {[
-                    { n: '01', t: 'Funding & Sponsorship', d: 'Support our programs through targeted funding or sponsorship opportunities.' },
-                    { n: '02', t: 'Curriculum Co-Creation', d: 'Develop customized training programs that meet your industry needs.' },
-                    { n: '03', t: 'Accreditation & Certification', d: 'Joint certification programs with industry recognition.' },
-                    { n: '04', t: 'Large-Scale Training', d: 'Comprehensive upskilling programs for your workforce.' },
-                  ].map(item => (
-                    <div key={item.n} className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-white text-sm shadow-lg"
-                        style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 6px 20px ${RED}44` }}>
-                        {item.n}
-                      </div>
-                      <div className="pt-1">
-                        <h4 className="font-black text-gray-900 mb-1">{item.t}</h4>
-                        <p className="text-gray-500 text-sm leading-relaxed">{item.d}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </Card3D>
-          </Reveal>
+//         <div className="grid lg:grid-cols-2 gap-8 mb-12">
+//           <Reveal dir="left">
+//             <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
+//               <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
+//                 whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
+//                 transition={{ duration: 0.3 }}>
+//                 <h3 className="text-xl font-black text-gray-900 mb-8">How to Collaborate</h3>
+//                 <div className="space-y-7">
+//                   {[
+//                     { n: '01', t: 'Funding & Sponsorship', d: 'Support our programs through targeted funding or sponsorship opportunities.' },
+//                     { n: '02', t: 'Curriculum Co-Creation', d: 'Develop customized training programs that meet your industry needs.' },
+//                     { n: '03', t: 'Accreditation & Certification', d: 'Joint certification programs with industry recognition.' },
+//                     { n: '04', t: 'Large-Scale Training', d: 'Comprehensive upskilling programs for your workforce.' },
+//                   ].map(item => (
+//                     <div key={item.n} className="flex items-start gap-4">
+//                       <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-white text-sm shadow-lg"
+//                         style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 6px 20px ${RED}44` }}>
+//                         {item.n}
+//                       </div>
+//                       <div className="pt-1">
+//                         <h4 className="font-black text-gray-900 mb-1">{item.t}</h4>
+//                         <p className="text-gray-500 text-sm leading-relaxed">{item.d}</p>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </motion.div>
+//             </Card3D>
+//           </Reveal>
 
-          <Reveal dir="right">
-            <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
-              <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
-                whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
-                transition={{ duration: 0.3 }}>
-                <h3 className="text-xl font-black text-gray-900 mb-7">Partners & Collaborators</h3>
-                <div className="grid grid-cols-2 gap-2.5 mb-8">
-                  {partners.map(p => (
-                    <motion.div key={p} className="rounded-xl border border-gray-100 bg-gray-50 hover:bg-red-50 hover:border-red-100 px-3 py-2.5 text-center cursor-default transition-colors duration-200"
-                      whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-                      <span className="text-xs font-semibold text-gray-700">{p}</span>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="rounded-xl bg-blue-50 border border-blue-100 p-5">
-                  <h4 className="font-black text-blue-900 text-sm mb-3">Success Metrics</h4>
-                  {['500+ government officials trained in digital governance', '15 corporate clients achieved 25% productivity gains', '200+ SMEs digitized through our ecosystem', 'Regional expansion to 4 countries'].map(m => (
-                    <div key={m} className="flex items-center gap-2 mb-2">
-                      <CheckCircle size={13} className="text-blue-500 flex-shrink-0" />
-                      <span className="text-xs text-blue-800">{m}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </Card3D>
-          </Reveal>
-        </div>
+//           <Reveal dir="right">
+//             <Card3D depth={4} className="h-full rounded-2xl bg-white border border-gray-100">
+//               <motion.div className="h-full rounded-2xl bg-white p-8 lg:p-10"
+//                 whileHover={{ boxShadow: '0 24px 64px -12px rgba(0,0,0,0.12)' }}
+//                 transition={{ duration: 0.3 }}>
+//                 <h3 className="text-xl font-black text-gray-900 mb-7">Partners & Collaborators</h3>
+//                 <div className="grid grid-cols-2 gap-2.5 mb-8">
+//                   {partners.map(p => (
+//                     <motion.div key={p} className="rounded-xl border border-gray-100 bg-gray-50 hover:bg-red-50 hover:border-red-100 px-3 py-2.5 text-center cursor-default transition-colors duration-200"
+//                       whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+//                       <span className="text-xs font-semibold text-gray-700">{p}</span>
+//                     </motion.div>
+//                   ))}
+//                 </div>
+//                 <div className="rounded-xl bg-blue-50 border border-blue-100 p-5">
+//                   <h4 className="font-black text-blue-900 text-sm mb-3">Success Metrics</h4>
+//                   {['500+ government officials trained in digital governance', '15 corporate clients achieved 25% productivity gains', '200+ SMEs digitized through our ecosystem', 'Regional expansion to 4 countries'].map(m => (
+//                     <div key={m} className="flex items-center gap-2 mb-2">
+//                       <CheckCircle size={13} className="text-blue-500 flex-shrink-0" />
+//                       <span className="text-xs text-blue-800">{m}</span>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </motion.div>
+//             </Card3D>
+//           </Reveal>
+//         </div>
 
-        <Reveal className="text-center">
-          <motion.button whileHover={{ scale: 1.05, boxShadow: `0 0 40px ${RED}55` }} whileTap={{ scale: 0.97 }}
-            className="px-10 py-4 text-white font-black rounded-2xl shadow-lg text-sm tracking-wide transition-all"
-            style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
-            Become a Partner →
-          </motion.button>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
+//         <Reveal className="text-center">
+//           <motion.button whileHover={{ scale: 1.05, boxShadow: `0 0 40px ${RED}55` }} whileTap={{ scale: 0.97 }}
+//             className="px-10 py-4 text-white font-black rounded-2xl shadow-lg text-sm tracking-wide transition-all"
+//             style={{ background: `linear-gradient(135deg,${RED},${RED_DARK})`, boxShadow: `0 8px 28px ${RED}44` }}>
+//             Become a Partner →
+//           </motion.button>
+//         </Reveal>
+//       </div>
+//     </section>
+//   );
+// }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CTA
@@ -1026,7 +1095,7 @@ export default function ESGPage() {
         <EcosystemSection />
         <TechnologyShowcase />
         <ImpactMetricsSection />
-        <PartnershipSection />
+        {/* <PartnershipSection /> */}
         <CTASection />
         <Footer />
       </div>

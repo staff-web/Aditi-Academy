@@ -1944,7 +1944,7 @@ function EnterpriseSectionInline() {
         </div>
 
          {/* Partner Showcase - Professional Horizontal Marquee (fully preserved with enhanced 3D) */}
-        <motion.div 
+        {/* <motion.div 
           initial={{ opacity: 0, y: 24 }} 
           whileInView={{ opacity: 1, y: 0 }} 
           viewport={{ once: true }} 
@@ -1973,7 +1973,6 @@ function EnterpriseSectionInline() {
             Working with education, government, and international technology partners.
           </motion.p>
           
-          {/* Horizontal Marquee Container with smooth infinite scroll */}
           <div className="relative w-full overflow-hidden py-8">
             <div className="absolute left-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent" />
             <div className="absolute right-0 top-0 bottom-0 w-32 z-10 pointer-events-none bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent" />
@@ -1989,7 +1988,6 @@ function EnterpriseSectionInline() {
                   repeatType: "loop"
                 }}
               >
-                {/* Partner Cards Array (using placeholder logos) */}
                 {[...Array(2)].flatMap(() => [
                   { name: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
                   { name: "AWS", logo: "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" },
@@ -2066,7 +2064,7 @@ function EnterpriseSectionInline() {
               <ArrowRight className="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110" />
             </Link>
           </motion.div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );
