@@ -12,6 +12,7 @@ import {
   Heart, Zap as ZapIcon, ExternalLink,
   ShoppingCart,
   Palette,
+  Smartphone,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
@@ -42,24 +43,484 @@ const IMGS = {
   codingClass:    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80',
   aiTech:         'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
   cloudComputing: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
+    ios: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=600&q=80',  // ADD for iOS
+  powerbi: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80', // ADD for Power BI
+  datascience: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80', // ADD for Data Science
+  springboot: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=600&q=80', // ADD for Spring Boot
+  oracle: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&q=80', // ADD for Oracle
+  webdev: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=600&q=80', // ADD for Web Dev
+  uxui: 'https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=600&q=80', // ADD for UX/UI
+  fullstack: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80', // ADD for Full Stack
+  aiengineer: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80', // ADD for AI Engineer
 };
 
 const CATEGORIES = [
   { id: 'all',        name: 'All Courses',   icon: Layers,    color: BRAND },
   { id: 'software',   name: 'Software Dev',  icon: Cpu,       color: '#3b82f6' },
   { id: 'ai',         name: 'AI & ML',       icon: Brain,     color: '#8b5cf6' },
-  { id: 'security',   name: 'Cybersecurity', icon: Shield,    color: '#ef4444' },
+  // { id: 'security',   name: 'Cybersecurity', icon: Shield,    color: '#ef4444' },
   { id: 'networking', name: 'Networking',    icon: Database,  color: '#06b6d4' },
   { id: 'pmp',        name: 'PMP',           icon: Trophy,    color: '#f59e0b' },
+  // { id: 'mobile',     name: 'Mobile Dev',    icon: Smartphone, color: '#10b981' },  // ← ADD THIS for iOS
 ];
 
 const COURSES = [
-  { id: 1, category: 'ai',        title: 'Artificial Intelligence & Machine Learning', level: 'Advanced',    duration: '12 weeks', students: '2,400+', rating: 4.9, description: 'Master AI and ML fundamentals, neural networks, deep learning, and real-world applications to build production-ready intelligent systems.', outcomes: ['Build production AI models', 'Deploy ML pipelines', 'Master deep learning algorithms', 'Industry certification recognized globally'], img: IMGS.ai,       price: '$1,299', color: '#8b5cf6' },
-  { id: 2, category: 'security',  title: 'Advanced Cybersecurity',                    level: 'Intermediate', duration: '10 weeks', students: '3,200+', rating: 4.8, description: 'Comprehensive cybersecurity training covering ethical hacking, penetration testing, and defense strategies for enterprise security.',          outcomes: ['EC-Council certification', 'Conduct security audits', 'Build defense systems', 'Career advancement opportunities'], img: IMGS.security, price: '$1,099', color: '#ef4444' },
-  { id: 3, category: 'networking',title: 'Network Engineering & Infrastructure',       level: 'Intermediate', duration: '8 weeks',  students: '2,800+', rating: 4.7, description: 'Learn network design, configuration, troubleshooting, and infrastructure management for enterprise environments.',                            outcomes: ['Cisco certification path', 'Design network architectures', 'Troubleshoot complex issues', 'High-demand networking skills'], img: IMGS.training, price: '$999',  color: '#06b6d4' },
-  { id: 4, category: 'software',  title: 'Full Stack Web Development',                level: 'Beginner',     duration: '14 weeks', students: '4,100+', rating: 4.9, description: 'Build modern web applications with React, Node.js, databases, and deployment strategies from scratch to production.',                            outcomes: ['Launch full-stack apps', 'Master modern frameworks', 'Build professional portfolio', 'Job-ready development skills'], img: IMGS.training, price: '$899',  color: '#3b82f6' },
-  { id: 5, category: 'ai',        title: 'Data Science & Analytics',                  level: 'Advanced',     duration: '12 weeks', students: '1,900+', rating: 4.8, description: 'Transform data into insights with Python, machine learning, visualization, and statistical analysis for business intelligence.',                  outcomes: ['Analyze complex datasets', 'Build predictive models', 'Data storytelling mastery', 'Real industry projects'], img: IMGS.ai,       price: '$1,199', color: '#8b5cf6' },
-  { id: 6, category: 'pmp',       title: 'Project Management Professional (PMP)',     level: 'Professional', duration: '6 weeks',  students: '2,600+', rating: 4.7, description: 'Earn PMP certification with comprehensive training in Agile, Scrum, risk management, and leadership skills.',                                     outcomes: ['PMP certification exam prep', 'Lead projects effectively', 'Increase salary potential', 'Global PMI recognition'], img: IMGS.corporate,price: '$799',  color: '#f59e0b' },
+  { 
+    id: 1, 
+    category: 'mobile', 
+    title: 'Advanced iOS App Development', 
+    level: 'Advanced', 
+    duration: '6 months', 
+    students: '1,200+', 
+    rating: 4.9, 
+    description: 'Master Swift programming, Core Data, API integration, memory management, and publish iOS apps to the App Store.',
+    objectives: [
+      'Learn Swift programming language - Essential iOS Development Skill',
+      'Learn how to save and load data on your iOS device',
+      'Learn how to fetch data from internal and external JSON files using Web APIs',
+      'Integrate with Third-party libraries',
+      'Memory management in iOS',
+      'Build an application screen with UI or Programming',
+      'Learn how to publish iOS apps to the App Store'
+    ],
+    covers: [
+      'Advanced Swift Programming: Generics, closures, functional programming, and protocol-oriented programming',
+      'User Interface Design: Creating custom UI elements, animations, and adaptive layouts for diverse iOS devices',
+      'Data Management: Using Core Data for complex data relationships, migrations, and optimization',
+      'API Integration: Fetching data from internal/external JSON files and integrating third-party libraries via Web APIs',
+      'Advanced Features: Implementing location services, push notifications, multimedia (audio/video/camera), and AR/ML integration',
+      'Performance Optimization: Memory management, CPU optimization, and profiling techniques for efficient apps',
+      'App Store Deployment: Publishing apps, implementing App Store optimization, crash reporting, and analytics integration',
+      'Capstone Project: Developing a fully functional iOS app to demonstrate advanced development skills'
+    ],
+    outcomes: [
+      'Apply advanced Swift concepts, including generics, closures, and functional programming techniques',
+      'Design and implement sophisticated user interfaces with custom UI elements, animations, and adaptive layouts',
+      'Integrate complex APIs and third-party libraries for enhanced app functionality',
+      'Optimize app performance through memory management, CPU optimization, and profiling techniques',
+      'Implement advanced data management using Core Data, including relationships, migration, and optimization',
+      'Incorporate advanced features such as location services, push notifications, multimedia (audio/video/camera), and AR/ML integration'
+    ],
+    img: IMGS.ios, 
+    price: '$1,499', 
+    color: '#10b981' 
+  },
+  
+  { 
+    id: 2, 
+    category: 'ai', 
+    title: 'Data Analysis with Power BI', 
+    level: 'Intermediate', 
+    duration: '3 months', 
+    students: '2,100+', 
+    rating: 4.8, 
+    description: 'Master Power BI for data modeling, transformation, visualization, and DAX calculations to create interactive dashboards.',
+    objectives: [
+      'Understand the fundamental concepts of Power BI, including data modeling, data transformation, and visualization',
+      'Master the process of importing, cleaning, and transforming data from various sources into Power BI',
+      'Create interactive and visually appealing reports and dashboards using a range of visualization techniques and best practices',
+      'Utilize advanced features of Power BI such as DAX (Data Analysis Expressions) for calculations and measures',
+      'Develop proficiency in creating dynamic and visually compelling reports and dashboards to effectively communicate insights to stakeholders',
+      'Utilize advanced data modeling techniques in Power BI to establish relationships between datasets, create calculated columns and measures, and optimize data structures for analysis',
+      'Apply best practices in data visualization to create intuitive and interactive reports that facilitate exploration and understanding of complex datasets'
+    ],
+    covers: [
+      'Introduction to Power BI: Overview of Power BI Desktop, Cloud, and Mobile, and its role in business intelligence',
+      'Data Connectivity: Connecting to data sources like databases, spreadsheets, CSV, XML, and JSON',
+      'Data Transformation: Using Power Query to clean, transform, and automate data tasks',
+      'Data Visualization: Creating interactive visuals, selecting appropriate charts, and using slicers for dynamic reports',
+      'Data Modeling: Building relationships between datasets, creating calculated columns, measures, and calendar tables',
+      'DAX Essentials: Performing powerful calculations and analytics using Data Analysis Expressions',
+      'Report and Dashboard Creation: Designing professional reports and publishing dashboards',
+      'Advanced Features: Working with parameters, R scripts, row-level security, and performance optimization'
+    ],
+    outcomes: [
+      'Understand data and real-world use case',
+      'How interactive visuals can be useful for your business',
+      'The basic rules for building charts',
+      'Connect to nearly ANY data source quickly and easily',
+      'How to choose the right chart for every business case',
+      'How to create interactive visuals in Power BI',
+      'Easily transform data and automate data tasks with Power Query',
+      'Understand the importance of Data Modeling for optimization and performance',
+      'Create powerful calculations and analytics with DAX',
+      'Importance of a Calendar Table',
+      'Picking the right visual based on your data',
+      'Create interactive reports with slicers',
+      'Publishing reports and creating dashboards'
+    ],
+    img: IMGS.powerbi, 
+    price: '$899', 
+    color: '#8b5cf6' 
+  },
+  
+  { 
+    id: 3, 
+    category: 'ai', 
+    title: 'Intensive Data Science', 
+    level: 'Advanced', 
+    duration: '3 months', 
+    students: '1,800+', 
+    rating: 4.9, 
+    description: 'Master Python, Pandas, machine learning, NLP, and time series analysis for real-world data science applications.',
+    objectives: [
+      'Demonstrate knowledge regarding the basics of the Python programming environment, including fundamental Python programming techniques such as lambdas, reading and manipulating CSV files, and the Numpy library',
+      'Apply data manipulation and cleaning techniques using the popular Python Pandas data science library',
+      'Visualize the data using Python libraries such as Matplotlib, and Seaborn',
+      'Discuss the abstraction of the use of statistical analysis and machine learning in data processing and data analysis',
+      'Demonstrate knowledge regarding advanced analytics including data handling, statistical analysis, and predictive modeling',
+      'Apply machine learning techniques using the popular Python Pandas, and Sklearn data science library',
+      'Acquire practical and hands-on skills in machine learning covering both supervised and unsupervised methods, including text mining and natural language programming',
+      'Storytelling about Data'
+    ],
+    covers: [
+      'Introduction to data science, its applications, tasks of a data scientist, and the learning roadmap',
+      'Data Science & Python Basics: Learn Python fundamentals and data manipulation for data science',
+      'Mathematics for Data Science: Master linear algebra, calculus, and probability for analytical tasks using Python',
+      'Statistics for Data Science: Apply descriptive stats, hypothesis testing, and regression analysis in Python',
+      'Data Pre-processing with Pandas: Clean, merge, transform, and prepare datasets for analysis',
+      'Data Visualization: Create insightful visualizations using Matplotlib, Seaborn, and EDA techniques',
+      'Midterm Project: Apply dimensionality reduction techniques like PCA and T-SNE in Python',
+      'Data Extraction & Feature Engineering: Extract, transform, and select features for better model performance',
+      'Machine Learning Basics I: Understand ML types and explore supervised learning methods',
+      'Machine Learning Basics II: Implement ML algorithms with Python in hands-on projects',
+      'Natural Language Processing (NLP): Perform text preprocessing, sentiment analysis, and classification with Python, plus social media analytics',
+      'Time Series Analysis: Forecast and analyze time series data using ARIMA, SARIMA, and decomposition methods',
+      'Model Evaluation & Optimization: Use cross-validation, hyperparameter tuning, and ensemble techniques to improve models',
+      'Capstone Project Mentoring: Guidance and support for real-world project development',
+      'Capstone Project Execution: Apply analytics in domains such as marketing, risk, operations, and finance',
+      'Project Development & Presentation: Finalize and present industry-relevant data science projects'
+    ],
+    outcomes: [
+      'Extract the basic concepts and principles of data science',
+      'Describe basic statistical concepts, Python, and Power BI for data visualization',
+      'Describe basic principles and techniques of supervised and unsupervised machine learning',
+      'Analyze and interpret data using descriptive statistics and hypothesis testing Python and Power BI',
+      'Apply supervised and unsupervised machine-learning techniques to real-world data',
+      'Develop a curiosity and interest in working with data',
+      'Develop a critical and analytical mindset for problem-solving'
+    ],
+    img: IMGS.datascience, 
+    price: '$1,299', 
+    color: '#8b5cf6' 
+  },
+  
+  { 
+    id: 4, 
+    category: 'software', 
+    title: 'Java Spring Boot', 
+    level: 'Intermediate', 
+    duration: '3 months', 
+    students: '1,500+', 
+    rating: 4.8, 
+    description: 'Build robust enterprise applications with Spring Boot, REST APIs, microservices, and Spring Security.',
+    objectives: [
+      'Understand the Spring Boot Ecosystem: Gain a comprehensive understanding of the Spring Boot framework, its philosophy, and how it simplifies Java application development',
+      'Master Data Access: Develop data-driven applications by connecting Spring Boot with databases, creating repositories, and performing CRUD operations with Spring Data JPA',
+      'Implement Security: Secure your applications using Spring Security, including user authentication, authorization, and protecting RESTful APIs',
+      'Write Effective Tests: Write unit tests and integration tests for Spring Boot applications, ensuring code quality, reliability, and maintainability',
+      'Develop RESTful APIs: Design and build RESTful APIs with Spring Boot, manage request/response formats, versioning, and handle exceptions',
+      'Explore Microservices: Understand microservices architecture, implement service discovery with Eureka, and create an API Gateway using Spring Cloud',
+      'Prepare for Deployment: Package Spring Boot applications as JAR or WAR files, deploy them to popular cloud platforms or containers, and manage environment-specific configurations',
+      'Optimize Performance: Apply best practices to optimize the performance of Spring Boot applications, including caching, profiling, and monitoring with Spring Boot Actuator',
+      'Troubleshoot and Debug: Learn to troubleshoot and debug common issues in Spring Boot applications, enhancing your problem-solving skills',
+      'Capstone Project: Apply your knowledge and skills in a real-world scenario by completing a capstone project, demonstrating your ability to build a complete Spring Boot application',
+      'Continued Learning: Develop a strong foundation for further exploration of advanced Spring Boot topics'
+    ],
+    covers: [
+      'Introduction to Spring Boot: Learn the basics of Spring framework, set up your environment, and build your first app',
+      'Spring Boot Fundamentals: Understand project structure, configuration, dependencies, and create RESTful services',
+      'Spring Boot Data Access: Use Spring Data JPA for repositories, CRUD operations, and database integration',
+      'Spring Boot Web Applications: Build web apps with controllers, request handling, and form validation',
+      'Spring Boot Security: Configure authentication, authorization, and secure RESTful APIs',
+      'Spring Boot Testing: Write unit and integration tests using JUnit and Mockito, with best practices',
+      'Spring Boot RESTful APIs: Implement advanced REST concepts, versioning, error handling, and content negotiation',
+      'Spring Boot Microservices: Build microservices with Eureka for discovery and Zuul for API Gateway',
+      'Spring Boot Deployment: Package applications, deploy to cloud (AWS, Heroku), and use Docker containers',
+      'Advanced Topics & Best Practices: Apply monitoring, environment profiles, performance optimization, and troubleshooting',
+      'Capstone Project: Building a complete Spring Boot application to demonstrate practical skills'
+    ],
+    outcomes: [
+      'Proficiency in Spring Boot: Develop a strong command of the Spring Boot framework, enabling you to efficiently build Java applications',
+      'Data Access Skills: Master data access by connecting your Spring Boot applications to databases, implementing repositories, and performing CRUD operations with Spring Data JPA',
+      'Security Expertise: Implement security measures effectively using Spring Security, including user authentication, authorization, and securing RESTful APIs',
+      'Effective Testing: Write comprehensive unit tests and integration tests for Spring Boot applications, ensuring code quality and reliability',
+      'RESTful API Development: Design, build, and document RESTful APIs, manage different versions, and handle request/response formats and exceptions',
+      'Microservices Understanding: Gain a solid grasp of microservices architecture, implement service discovery, and create an API Gateway using Spring Cloud',
+      'Deployment Proficiency: Prepare Spring Boot applications for deployment by packaging them as JAR or WAR files, deploying to cloud platforms or containers, and managing environment specific configurations',
+      'Performance Optimization: Apply best practices to optimize the performance of Spring Boot applications, including caching, profiling, and monitoring with Spring Boot Actuator',
+      'Troubleshooting Skills: Develop the ability to diagnose and resolve common issues that may arise in Spring Boot applications',
+      'Capstone Project: Apply your knowledge and skills to create a complete, real-world Spring Boot application',
+      'Continued Learning: Establish a foundation for continuous learning in the ever-evolving Spring ecosystem'
+    ],
+    img: IMGS.springboot, 
+    price: '$1,099', 
+    color: '#3b82f6' 
+  },
+  
+  { 
+    id: 5, 
+    category: 'networking', 
+    title: 'Oracle Database 19c', 
+    level: 'Professional', 
+    duration: '3 months', 
+    students: '1,400+', 
+    rating: 4.7, 
+    description: 'Master Oracle database architecture, security, backup/recovery, and performance monitoring for enterprise database administration.',
+    objectives: [
+      'Describe Oracle Database architecture',
+      'Configure the database to support your application',
+      'Manage Database security and implement auditing',
+      'Implement basic backup and recovery procedures',
+      'Move data between database and files',
+      'Employ basic monitoring procedures and manage performance'
+    ],
+    covers: [
+      'Introduction to Oracle Database: Learn the Oracle database architecture and core concepts',
+      'Accessing an Oracle Database: Use DBCA tools to connect and interact with Oracle databases',
+      'Creating Databases with DBCA: Build new Container Databases (CDB) using DBCA',
+      'Creating Databases with SQL: Create databases using SQL commands',
+      'Starting & Shutting Down Instances: Manage database lifecycle and pluggable databases (PDBs)',
+      'Managing Database Instances: Configure initialization parameters and view diagnostic info',
+      'Oracle Net Service: Configure and administer Oracle networking services',
+      'Configuring Naming Methods: Set up Oracle network naming for database access',
+      'Listener Configuration: Create, manage, and connect through database listeners',
+      'Shared Server Architecture: Implement and configure shared server mode',
+      'Oracle Connection Manager: Set up multiplexing and access control with Connection Manager',
+      'Creating PDBs from Seed: Provision new pluggable databases from templates',
+      'Advanced PDB Creation: Clone, migrate, and relocate PDBs',
+      'Managing PDBs: Rename, configure, and maintain pluggable databases',
+      'Database Storage Overview: Understand tablespaces, blocks, and storage allocation',
+      'Creating & Managing Tablespaces: Create, modify, and manage temporary and permanent tablespaces',
+      'Improving Space Usage: Use compression and space management features',
+      'Managing Undo Data: Configure undo tablespaces and temporary undo',
+      'User Account Management: Create and manage common/local users with quotas',
+      'Privileges & Roles: Grant and configure roles for database users',
+      'User Resource Limits: Set up default roles and resource limits for users',
+      'Database Auditing: Enable and configure unified auditing for security compliance',
+      'Loading & Transporting Data: Import/export data using various methods and tools',
+      'External Tables for Data Transport: Use external tables for fast data movement',
+      'Automated Maintenance Tasks: Configure maintenance windows and task schedules',
+      'Monitoring & Performance Tuning: Understand performance metrics and monitoring tools',
+      'SQL Optimization: Analyze queries and optimize execution paths',
+      'Final Exam: Test your skills through a practical and theoretical assessment'
+    ],
+    outcomes: [
+      'Create and Administer an Oracle Database',
+      'Configure and Administer Oracle Net Services',
+      'Create and Administer Pluggable Database',
+      'Create and Manage Database Storage',
+      'Load and Transport Data',
+      'Manage Automated Maintenance Task',
+      'Monitor and Tune Database Performance'
+    ],
+    img: IMGS.oracle, 
+    price: '$1,199', 
+    color: '#06b6d4' 
+  },
+  
+  { 
+    id: 6, 
+    category: 'software', 
+    title: 'Web Application Development', 
+    level: 'Beginner', 
+    duration: '3 months', 
+    students: '2,800+', 
+    rating: 4.8, 
+    description: 'Build dynamic websites with HTML, CSS, JavaScript, PHP, and MySQL integration from fundamentals to deployment.',
+    objectives: [
+      'The fundamentals of programing with C',
+      'Teach the fundamental skills and concepts necessary for designing and developing dynamic websites',
+      'Provide hands-on experience working on real-world projects to apply what you have learned and build an impressive portfolio of web development projects',
+      'Cover basic and advanced topics, including HTML, CSS, JavaScript, server-side scripting, API development, and database integration',
+      'Ensure that students gain an understanding of modern standards and best practices for web development'
+    ],
+    covers: [
+      'Programming Fundamentals: Introduction to programming concepts using C',
+      'Front-End Development: Designing and structuring websites with HTML, CSS, and JavaScript/jQuery',
+      'Back-End Development: Server-side scripting with PHP, including data validation, transformation, and formatting',
+      'Database Integration: Interfacing PHP with MySQL, connecting to databases, executing SQL queries, and retrieving datasets',
+      'Dynamic Web Pages: Creating interactive and responsive web applications',
+      'API Development: Building and integrating APIs for web applications',
+      'Capstone Project: Developing a professional-grade dynamic website or web application to demonstrate skills'
+    ],
+    outcomes: [
+      'Basic of programming concept',
+      'Design and develop dynamic websites using HTML, CSS, JavaScript / jQuery, and PHP',
+      'Analyze, describe, design, & develop client-side web-based solutions',
+      'Structure and layout of a website',
+      'Use modern standards and best practices for web development',
+      'Have an impressive portfolio of web development projects to showcase their skills and knowledge',
+      'Be prepared for entry-level positions in web development or further study in the field'
+    ],
+    img: IMGS.webdev, 
+    price: '$799', 
+    color: '#3b82f6' 
+  },
+  
+  { 
+    id: 7, 
+    category: 'pmp', 
+    title: 'UX/UI Design', 
+    level: 'Beginner', 
+    duration: '3 months', 
+    students: '1,900+', 
+    rating: 4.8, 
+    description: 'Learn user-centered design, wireframing, prototyping, and usability testing using Figma and modern design principles.',
+    objectives: [
+      'Follow the design process: empathize with users, define pain points, ideate solutions, create wireframes and prototypes, test and iterate on designs',
+      'Apply foundational UX concepts, like user-centered design, accessibility, and equity-focused design',
+      'Understanding the basic of UX research, like planning research studies and usability studies',
+      'Apply common layouts for web pages',
+      'Master Figma'
+    ],
+    covers: [
+      'Human-Computer Interaction (HCI): Learn how users think and interact through cognitive psychology and UX laws',
+      'UI vs. UX & Design Thinking: Understand their differences and apply research-driven design processes',
+      'Graphic & Visual Design Basics: Master color theory, typography, layout, and design tools like Figma',
+      'UX Research & Usability Testing: Conduct user studies, apply testing methods, and evaluate designs effectively',
+      'Wireframing & Prototyping: Create low/high fidelity designs, user flows, and interactive prototypes',
+      'UX Writing & Accessibility: Write effective interface text with a focus on inclusivity and accessibility',
+      'UI Design Principles: Design for multiple devices using UI components and modern design guidelines',
+      'Interaction Design: Add animations, micro-interactions, and motion graphics to elevate user experience',
+      'Advanced UX Practices: Improve designs with A/B testing, critiques, and iterative processes',
+      'Career Preparation: Build a strong portfolio, explore freelancing, and practice ethical design'
+    ],
+    outcomes: [
+      'Understand the principles and practices of UX and UI design',
+      'Apply user research methods and techniques to identify user needs and preferences',
+      'Create user personas, scenarios, user journeys and user flows to define user goals and behaviors',
+      'Design wireframes, prototypes and mockups to communicate design ideas and test usability',
+      'Use design tools Figma to create and present design solutions',
+      'Evaluate and iterate on design solutions based on user feedback and testing'
+    ],
+    img: IMGS.uxui, 
+    price: '$899', 
+    color: '#f59e0b' 
+  },
+  
+  { 
+    id: 8, 
+    category: 'pmp', 
+    title: 'Project Management Professional (PMP)', 
+    level: 'Professional', 
+    duration: '3 months', 
+    students: '2,400+', 
+    rating: 4.9, 
+    description: 'Master project management principles, process groups, knowledge areas, and prepare for PMP/CAPM certification.',
+    objectives: [
+      'Develop a solid foundation in project management principles and terminology',
+      'Understand the five project management process groups: initiation, planning, execution, monitoring and controlling, and closing',
+      'Gain knowledge of the ten project management knowledge areas, including scope, time, cost, quality, human resources, communication, risk, procurement, integration, and stakeholder management',
+      'Familiarize yourself with project management best practices and industry standards',
+      'Prepare for the CAPM certification exam by covering the key topics and concepts required for success'
+    ],
+    covers: [
+      'Introduction to Project Management: Process groups, project lifecycle, management relationships, and tailoring approaches',
+      'Project Environment: Impact factors, organizational systems, PMO roles, and project hierarchy',
+      'Role of the Project Manager: Functions, sphere of influence, PMI triangle, leadership vs management',
+      'Integration Management: Seven processes, change management, tailoring, and integration methods',
+      'Scope Management: Six processes, WBS, agile/adaptive scope handling, and prototypes',
+      'Schedule Management: Six processes, scheduling calculations, agile/adaptive considerations',
+      'Cost Management: Four processes, forecasting, earned value, agile/adaptive cost handling',
+      'Quality Management: Three processes, quality tools, continuous improvement, adaptive approaches',
+      'Resource Management: Six processes, team development, conflict resolution, resource planning',
+      'Communication Management: Three processes, communication planning, skills, and methods',
+      'Risk Management: Seven processes, risk documents, calculations, and environmental adjustments',
+      'Procurement Management: Three processes, contracts, agreements, and source selection',
+      'Stakeholder Management: Four processes, stakeholder roles, needs, and benefits',
+      'Principles of Agile: Agile vs Waterfall, scaling Agile, Scrum basics, real-world cases'
+    ],
+    outcomes: [
+      'Explain the importance of project management in achieving organizational goals',
+      'Understand the role and responsibilities of a project manager and project team members',
+      'Apply project management principles to initiate, plan, execute, monitor, control, and close projects effectively',
+      'Create project management deliverables such as project charters, work breakdown structures, schedules, budgets, and risk management plans',
+      'Identify and analyze project risks and develop appropriate risk response strategies',
+      'Effectively communicate and collaborate with project stakeholders',
+      'Recognize ethical considerations and professional conduct in project management',
+      'Demonstrate readiness to take the CAPM certification exam through a comprehensive understanding of the exam content and practice with sample questions'
+    ],
+    img: IMGS.corporate, 
+    price: '$999', 
+    color: '#f59e0b' 
+  },
+  
+  { 
+    id: 9, 
+    category: 'ai', 
+    title: 'AI Engineer', 
+    level: 'Advanced', 
+    duration: '6 months', 
+    students: '1,100+', 
+    rating: 4.9, 
+    description: 'Comprehensive AI engineering program covering machine learning, deep learning, and production-ready AI systems.',
+    objectives: [
+      'Master fundamental and advanced AI/ML concepts',
+      'Build and deploy production-ready AI models',
+      'Understand deep learning architectures and neural networks',
+      'Implement computer vision and NLP solutions',
+      'Optimize AI models for performance and scalability'
+    ],
+    covers: [
+      'Python for AI: Advanced Python, NumPy, Pandas, Scikit-learn',
+      'Machine Learning: Supervised/unsupervised learning, regression, classification, clustering',
+      'Deep Learning: Neural networks, TensorFlow, PyTorch, CNN, RNN, LSTM',
+      'Computer Vision: Image recognition, object detection, OpenCV',
+      'Natural Language Processing: Text processing, sentiment analysis, transformers, BERT',
+      'Model Deployment: Flask/FastAPI, Docker, cloud deployment (AWS/Azure/GCP)',
+      'MLOps: Model versioning, monitoring, CI/CD for ML',
+      'Capstone Project: End-to-end AI solution development'
+    ],
+    outcomes: [
+      'Build and deploy production-ready AI models',
+      'Master deep learning frameworks (TensorFlow/PyTorch)',
+      'Implement computer vision and NLP solutions',
+      'Optimize AI models for real-world applications',
+      'Deploy AI models to cloud platforms',
+      'Earn industry-recognized AI certification'
+    ],
+    img: IMGS.aiengineer, 
+    price: '$1,699', 
+    color: '#8b5cf6' 
+  },
+  
+  { 
+    id: 10, 
+    category: 'software', 
+    title: 'Full-Stack Development', 
+    level: 'Intermediate', 
+    duration: '4 months', 
+    students: '2,200+', 
+    rating: 4.8, 
+    description: 'Master front-end and back-end development with modern frameworks, databases, and deployment strategies.',
+    objectives: [
+      'Master modern front-end frameworks (React/Angular/Vue)',
+      'Build robust back-end APIs and services',
+      'Design and manage databases (SQL and NoSQL)',
+      'Deploy full-stack applications to production',
+      'Implement authentication and security best practices'
+    ],
+    covers: [
+      'Front-End: HTML5, CSS3, JavaScript, React.js, State management (Redux), Responsive design',
+      'Back-End: Node.js, Express.js, RESTful API design, Authentication (JWT, OAuth)',
+      'Databases: MongoDB, PostgreSQL, Mongoose, SQL queries, Database design',
+      'DevOps: Git, GitHub, Docker, CI/CD pipelines, Cloud deployment (Vercel/Heroku/AWS)',
+      'Testing: Unit testing, Integration testing, Jest, React Testing Library',
+      'Capstone Project: Build and deploy a complete full-stack application'
+    ],
+    outcomes: [
+      'Build complete full-stack applications from scratch',
+      'Implement secure authentication and authorization',
+      'Design and optimize database schemas',
+      'Deploy applications to production environments',
+      'Write clean, maintainable, and tested code',
+      'Collaborate effectively using Git workflows'
+    ],
+    img: IMGS.fullstack, 
+    price: '$1,299', 
+    color: '#3b82f6' 
+  }
 ];
 
 // Mock certificate database
@@ -243,51 +704,268 @@ const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: 12, bord
 
 function CourseModal({ course, onClose, onRegister }) {
   if (!course) return null;
+  
   return (
     <AnimatePresence>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
         onClick={onClose}>
-        <motion.div initial={{ scale: 0.9, y: 30, rotateX: 20 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 30, rotateX: 20 }}
+        <motion.div 
+          initial={{ scale: 0.9, y: 30, rotateX: 20 }} 
+          animate={{ scale: 1, y: 0, rotateX: 0 }} 
+          exit={{ scale: 0.9, y: 30, rotateX: 20 }}
           onClick={e => e.stopPropagation()}
-          className="w-full max-w-[740px] max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
-          <div className="relative h-72">
-            <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-            <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-              <X size={18} />
+          className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
+          
+          {/* Hero Image Section with Gradient Overlay */}
+          <div className="relative h-80 overflow-hidden">
+            <motion.img 
+              src={course.img} 
+              alt={course.title} 
+              className="w-full h-full object-cover"
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.6 }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+            
+            {/* Close Button */}
+            <button 
+              onClick={onClose} 
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-white/30 transition-all z-10">
+              <X size={18} className="text-white" />
             </button>
-            <div className="absolute bottom-4 left-6">
-              <span className="px-4 py-1.5 rounded-full text-white text-xs font-bold" style={{ background: course.color }}>{course.level}</span>
+            
+            {/* Course Level Badge */}
+            <div className="absolute bottom-6 left-6 z-10">
+              <div className="flex gap-3 items-center">
+                <span className="px-4 py-2 rounded-full text-white text-sm font-bold shadow-lg" style={{ background: course.color }}>
+                  {course.level}
+                </span>
+                {course.credits && (
+                  <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
+                    {course.credits} Credits
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            {/* Course Title Overlay */}
+            <div className="absolute bottom-6 right-6 left-auto z-10 max-w-md text-right">
+              <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">{course.title}</h2>
+              <div className="flex gap-4 justify-end text-white/90 text-sm">
+                <span className="flex items-center gap-1">
+                  <Clock size={14} /> {course.duration}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users size={14} /> {course.students} enrolled
+                </span>
+                {course.rating && (
+                  <span className="flex items-center gap-1">
+                    <Star size={14} fill="#fbbf24" stroke="none" /> {course.rating}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
+          
+          {/* Content Section */}
           <div className="p-8">
-            <div className="flex items-center gap-3 mb-3">
-              <Star size={16} fill="#f59e0b" stroke="none" />
-              <span className="font-bold text-gray-900">{course.rating}</span>
-              <span className="text-gray-400">· {course.students} enrolled · {course.duration}</span>
+            {/* Description */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <FileText size={20} className="text-red-600" />
+                Course Overview
+              </h3>
+              <p className="text-gray-600 leading-relaxed">{course.description || course.fullDesc}</p>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">{course.title}</h2>
-            <p className="text-gray-600 leading-relaxed mb-6">{course.description}</p>
-            <h3 className="font-bold text-gray-900 mb-3">What you'll learn</h3>
-            <div className="grid sm:grid-cols-2 gap-2 mb-6">
-              {course.outcomes.map(o => (
-                <div key={o} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
-                  <CheckCircle size={14} color={course.color} />
-                  <span className="text-sm text-gray-700">{o}</span>
+            
+            {/* Key Information Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {course.duration && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <Clock size={20} className="text-red-600 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 mb-1">Duration</p>
+                  <p className="font-semibold text-gray-900 text-sm">{course.duration}</p>
                 </div>
-              ))}
+              )}
+              {course.credits && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <Award size={20} className="text-red-600 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 mb-1">Credits</p>
+                  <p className="font-semibold text-gray-900 text-sm">{course.credits}</p>
+                </div>
+              )}
+              {course.students && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <Users size={20} className="text-red-600 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 mb-1">Students</p>
+                  <p className="font-semibold text-gray-900 text-sm">{course.students}</p>
+                </div>
+              )}
+              {course.level && (
+                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
+                  <TrendingUp size={20} className="text-red-600 mx-auto mb-2" />
+                  <p className="text-xs text-gray-500 mb-1">Level</p>
+                  <p className="font-semibold text-gray-900 text-sm">{course.level}</p>
+                </div>
+              )}
             </div>
-            <div className="flex items-center justify-between p-5 rounded-2xl bg-red-50 border-2 border-red-200">
-              <div>
-                {/* <div className="text-2xl font-bold text-red-600">{course.price}</div> */}
-                <div className="text-xs text-gray-500">One-time payment</div>
+            
+            {/* Prerequisites (if exists) */}
+            {course.prerequisites && (
+              <div className="mb-8 bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <Shield size={18} className="text-blue-600" />
+                  Prerequisites
+                </h3>
+                <p className="text-gray-700 text-sm">{course.prerequisites}</p>
               </div>
-              <motion.button onClick={onRegister} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                className="px-8 py-3 rounded-xl bg-red-600 text-white font-bold cursor-pointer shadow-lg">
-                Register Now →
-              </motion.button>
+            )}
+            
+            {/* Learning Objectives (if exists) */}
+            {course.objectives && course.objectives.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Target size={20} className="text-red-600" />
+                  Learning Objectives
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {course.objectives.map((obj, idx) => (
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md transition-all group"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-red-600 transition-colors">
+                        <CheckCircle size={14} className="text-red-600 group-hover:text-white transition-colors" />
+                      </div>
+                      <span className="text-sm text-gray-700 leading-relaxed">{obj}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Learning Outcomes */}
+            {course.outcomes && course.outcomes.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Award size={20} className="text-red-600" />
+                  What You'll Learn
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {course.outcomes.map((outcome, idx) => (
+                    <motion.div 
+                      key={idx}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition-all"
+                    >
+                      <CheckCircle size={16} color={course.color} className="flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700 leading-relaxed">{outcome}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Tools & Technologies */}
+            {course.tools && course.tools.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Cpu size={20} className="text-red-600" />
+                  Tools & Technologies Covered
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {course.tools.map((tool, idx) => (
+                    <motion.span
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.03 }}
+                      className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-100 hover:text-red-700 transition-all cursor-default"
+                    >
+                      {tool}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Suitable For / Target Audience */}
+            {course.suitableFor && (
+              <div className="mb-8 bg-gradient-to-r from-purple-50 to-white rounded-xl p-5 border border-purple-100">
+                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <Users size={18} className="text-purple-600" />
+                  Target Audience
+                </h3>
+                <p className="text-gray-700 text-sm leading-relaxed">{course.suitableFor}</p>
+              </div>
+            )}
+            
+            {/* Course Includes Section */}
+            <div className="mb-8 bg-gray-50 rounded-xl p-5">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <CheckSquare size={18} className="text-red-600" />
+                This Course Includes:
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Certificate of Completion</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Hands-on Projects</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Industry Expert Instructors</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Lifetime Access to Materials</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Career Support & Guidance</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle size={14} className="text-red-500" />
+                  <span>Community Access</span>
+                </div>
+              </div>
             </div>
+            
+            {/* CTA Section with 3D Hover Effect */}
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-700 p-8 shadow-xl"
+            >
+              <div className="absolute inset-0 bg-white/10 transform -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-2xl font-bold text-white mb-2">Ready to Start Your Journey?</h4>
+                  <p className="text-red-100">Enroll now and take the first step toward your career goals</p>
+                </div>
+                <motion.button 
+                  onClick={onRegister} 
+                  whileHover={{ scale: 1.05 }} 
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 group">
+                  Register Now 
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </motion.div>
@@ -866,6 +1544,7 @@ function CertificateCenter() {
               </div>
             </div>
           </Reveal>
+
 
           <Reveal delay={0.2}>
             <AnimatePresence mode="wait">
@@ -1777,49 +2456,149 @@ function CareerBoostSection({ onRegister }) {
 function IndustryProgramsSection() {
   const programs = [
     { 
+      id: 'ai-marketing',
       title: 'AI for Digital Marketing', 
       subtitle: '2 Days | Hands-on Workshop', 
       duration: '2 days',
       features: ['Google Gemini', 'Viral Content', 'CapCut Editing', 'Social Media AI'],
       description: 'Use AI as a "smart friend" to grow your business with Google Gemini and CapCut video editing.',
+      fullDesc: 'The goal of this 2-day, hands-on workshop is to show business owners and staff how AI can act as a "smart friend" to grow their business.',
+      objectives: [
+        'Learn to use AI as a Business Partner: Set up and use Google Gemini to help with business growth',
+        'Create Content Faster: Use AI to quickly come up with viral ideas and marketing concepts',
+        'Write Better Scripts: Learn how to write 30-second video scripts with a clear start, middle, and end',
+        'Master Easy Video Editing: Use CapCut to turn scripts into professional videos with music and voiceovers',
+        'Boost Social Media Results: Improve marketing on Facebook and TikTok using AI-generated captions and hashtags'
+      ],
+      outcomes: [
+        'Produce Professional Videos: Create high-quality marketing videos with captions',
+        'Adopt New Digital Tools: Successfully use at least three different AI tools',
+        'Think Like a Creator: Understand what makes people stop scrolling',
+        'Work Efficiently: Use the "learn-apply-produce" method',
+        'Launch Content: Be ready to post finished videos directly'
+      ],
+      suitableFor: 'Business owners, marketing professionals, content creators',
+      tools: ['Google Gemini', 'CapCut', 'ChatGPT', 'Canva'],
       img: IMGS.career, 
-      icon: TrendingUp 
+      icon: TrendingUp,
+      color: '#dc2626',
+      participants: '150+'
     },
     { 
+      id: 'ai-design',
       title: 'AI for Creative & Design', 
       subtitle: '2 Days | Hands-on Workshop', 
       duration: '2 days',
       features: ['Adobe Firefly', 'Branding Kit', 'Canva Magic', 'Generative Fill'],
       description: 'Design professional branding materials without expert design skills using Adobe Firefly.',
+      fullDesc: 'The goal of this 16-hour, hands-on training is to help business owners and creators use AI tools to design professional branding materials without needing expert design skills.',
+      objectives: [
+        'Master Generative Design: Learn how to use Adobe Firefly',
+        'Speed Up Creative Work: Use AI tools to automate repetitive tasks',
+        'Develop Professional Branding: Create consistent visual branding kit',
+        'Enhance Visual Storytelling: Use AI to create unique text effects'
+      ],
+      outcomes: [
+        'Create Custom Brand Assets: Generate unique Hero Images',
+        'Design Social Media Suites: Professional layouts for Instagram',
+        'Edit Images with AI: Use Generative Fill',
+        'Ensure Brand Consistency: Convert designs to multiple formats',
+        'Produce a Ready-to-Use Portfolio'
+      ],
+      suitableFor: 'Graphic designers, brand managers, small business owners',
+      tools: ['Adobe Firefly', 'Canva Magic Studio', 'Midjourney', 'Photoshop AI'],
       img: IMGS.internship, 
-      icon: Palette 
+      icon: Palette,
+      color: '#8b5cf6',
+      participants: '120+'
     },
     { 
+      id: 'ai-operations',
       title: 'AI for Operation & Admin', 
       subtitle: '2 Days | Hands-on Workshop', 
       duration: '2 days',
       features: ['ChatGPT', 'Otter.ai', 'Notion AI', 'SOP Creation'],
       description: 'Handle daily tasks faster and more accurately with ChatGPT and Otter.ai.',
+      fullDesc: 'The goal of this 16-hour, hands-on training is to show business owners and office staff how to use AI to handle daily tasks faster and more accurately.',
+      objectives: [
+        'Modernize Communication: Use ChatGPT for professional emails',
+        'Automate Meeting Management: Use Otter.ai to record meetings',
+        'Streamline Workflows: Organize projects with Notion AI',
+        'Standardize Processes: Create clear SOPs',
+        'Improve Efficiency: Reduce administrative workload'
+      ],
+      outcomes: [
+        'Use a Digital Assistant: Set up ChatGPT and Otter.ai',
+        'Create Structured Records: Turn transcripts into summaries',
+        'Build an Operational Dashboard: Central workspace in Notion',
+        'Produce Professional Documentation: Formal SOP manuals',
+        'Adopt New Tools: Integrate AI tools into daily work'
+      ],
+      suitableFor: 'Office administrators, operations managers, executive assistants',
+      tools: ['ChatGPT', 'Otter.ai', 'Notion AI', 'Zapier'],
       img: IMGS.global, 
-      icon: Database 
+      icon: Database,
+      color: '#06b6d4',
+      participants: '200+'
     },
     { 
+      id: 'cybersecurity',
       title: 'Digital Literacy & Cybersecurity', 
       subtitle: '2 Days | Awareness Course', 
       duration: '2 days',
       features: ['Fake News Detection', 'Phishing Prevention', 'Secure Collaboration', 'Incident Response'],
       description: 'Navigate the digital world safely and professionally with essential cybersecurity skills.',
+      fullDesc: 'The primary goal of this course is to equip non-technical professionals with fundamental skills needed to navigate the digital world safely.',
+      objectives: [
+        'Enhance Information Literacy: Evaluate website credibility',
+        'Promote Secure Collaboration: Safe use of cloud tools',
+        'Strengthen Cyber Defense: Recognize phishing and malware',
+        'Foster Incident Response: Respond to cybersecurity incidents'
+      ],
+      outcomes: [
+        'Evaluate credibility of online information',
+        'Identify misinformation and fake news',
+        'Use digital communication tools safely',
+        'Recognize common cybersecurity threats',
+        'Apply essential cybersecurity practices',
+        'Protect financial information during transactions',
+        'Practice safe browsing habits'
+      ],
+      suitableFor: 'All staff members, non-technical professionals',
+      tools: ['Google Drive', 'Microsoft Teams', 'Password Managers', '2FA Apps'],
       img: IMGS.security, 
-      icon: Shield 
+      icon: Shield,
+      color: '#ef4444',
+      participants: '300+'
     },
     { 
+      id: 'sales-kaizen',
       title: 'Sales & Kaizen (Soft Skill)', 
       subtitle: '2 Days | Professional Development', 
       duration: '2 days',
       features: ['Sales Process', 'Kaizen Philosophy', '5S Principles', 'PDCA Problem Solving'],
       description: 'Integrate high-performance sales techniques with Japanese continuous improvement philosophy.',
+      fullDesc: 'The primary objective is to integrate high-performance sales techniques with Japanese continuous improvement philosophy.',
+      objectives: [
+        'Standardize Sales Process: Structured workflow from prospecting',
+        'Instill Continuous Improvement: Kaizen philosophy mindset',
+        'Enhance Operational Efficiency: Identify inefficiencies with 5S',
+        'Develop Problem-Solving: Use PDCA and Fishbone Diagrams',
+        'Build Customer Loyalty: Persuasive communication'
+      ],
+      outcomes: [
+        'Execute Strategic Sales: Qualify prospects effectively',
+        'Improve Revenue Performance: Apply effective closing techniques',
+        'Optimize Workplace Organization: Apply 5S concepts',
+        'Utilize Analytical Tools: Use PDCA and root cause analysis',
+        'Strengthen Professionalism: Build trust-based relationships'
+      ],
+      suitableFor: 'Sales professionals, team leaders, business owners',
+      tools: ['PDCA Framework', '5S Methodology', 'Fishbone Diagram', '5 Why Analysis'],
       img: IMGS.training, 
-      icon: ShoppingCart 
+      icon: ShoppingCart,
+      color: '#f59e0b',
+      participants: '180+'
     },
   ];
   
@@ -1837,8 +2616,13 @@ function IndustryProgramsSection() {
     programTitle: ''
   });
 
-  const handleRegisterClick = (program) => {
+  // This opens the DETAILS modal first
+  const handleProgramClick = (program) => {
     setSelectedProgram(program);
+  };
+
+  // This opens the REGISTRATION modal (called from inside details modal)
+  const handleRegisterClick = (program) => {
     setFormData({
       name: '',
       email: '',
@@ -1906,7 +2690,8 @@ function IndustryProgramsSection() {
                 <motion.div
                   whileHover={{ y: -8 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  onClick={() => handleRegisterClick(prog)}
+                  // FIXED: This opens DETAILS modal, NOT registration directly
+                  onClick={() => handleProgramClick(prog)}
                   className="bg-white rounded-2xl overflow-hidden cursor-pointer group"
                   style={{
                     border: '1px solid #e5e7eb',
@@ -1971,7 +2756,7 @@ function IndustryProgramsSection() {
                       className="flex items-center justify-between pt-3 border-t border-gray-100"
                     >
                       <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
-                        View Details & Register
+                        View Details
                         <ArrowRight size={14} />
                       </span>
                       <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-600 transition-colors">
@@ -1986,85 +2771,221 @@ function IndustryProgramsSection() {
         </div>
       </div>
 
-      {/* Program Detail & Registration Modal */}
-      <AnimatePresence>
-        {selectedProgram && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-            onClick={() => setSelectedProgram(null)}
+      {/* PROGRAM DETAIL MODAL - Shows ALL course details first */}
+      {/* PROGRAM DETAIL MODAL - WITH IMAGE */}
+<AnimatePresence>
+  {selectedProgram && (
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
+      onClick={() => setSelectedProgram(null)}>
+      <motion.div 
+        initial={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }} 
+        animate={{ scale: 1, y: 0, rotateX: 0, opacity: 1 }} 
+        exit={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        onClick={e => e.stopPropagation()} 
+        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
+      >
+        {/* Hero Section WITH IMAGE */}
+        <div className="relative h-80 overflow-hidden rounded-t-3xl">
+          {/* Background Image */}
+          <motion.img
+            src={selectedProgram.img}
+            alt={selectedProgram.title}
+            className="w-full h-full object-cover"
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.6 }}
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+          
+          {/* Floating badges */}
+          <div className="absolute top-6 left-6 flex gap-3 z-10">
+            <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
+              {selectedProgram.duration}
+            </span>
+            <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
+              Hands-on Workshop
+            </span>
+          </div>
+          
+          {/* Close button */}
+          <button 
+            onClick={() => setSelectedProgram(null)} 
+            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all z-10"
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 30, rotateX: 20 }}
-              animate={{ scale: 1, y: 0, rotateX: 0 }}
-              exit={{ scale: 0.9, y: 30, rotateX: 20 }}
-              onClick={e => e.stopPropagation()}
-              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
-            >
-              <div className="sticky top-0 bg-white z-10 p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
-                    <selectedProgram.icon size={24} className="text-red-600" />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedProgram.title}</h2>
-                </div>
-                <button
-                  onClick={() => setSelectedProgram(null)}
-                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                >
-                  <X size={18} />
-                </button>
+            <X size={18} className="text-white" />
+          </button>
+          
+          {/* Title overlay at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                <selectedProgram.icon size={24} className="text-white" />
               </div>
-              
-              <div className="p-6">
-                <div className="mb-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="bg-red-100 text-red-600 text-sm font-semibold px-3 py-1 rounded-full">
-                      {selectedProgram.duration}
-                    </span>
-                    <span className="text-gray-400 text-sm">Hands-on Workshop</span>
+              <h2 className="text-3xl font-bold text-white">{selectedProgram.title}</h2>
+            </div>
+            <div className="flex items-center gap-4 text-white/90 text-sm">
+              <span className="flex items-center gap-1"><Clock size={14} /> {selectedProgram.duration}</span>
+              <span className="flex items-center gap-1"><Users size={14} /> {selectedProgram.participants || '100+'} participants trained</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-8">
+          {/* Description */}
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div className="w-1 h-6 bg-red-600 rounded-full" />
+              Program Overview
+            </h3>
+            <p className="text-gray-600 leading-relaxed bg-gray-50 p-5 rounded-2xl">
+              {selectedProgram.fullDesc || selectedProgram.description}
+            </p>
+          </div>
+          
+          {/* What You'll Learn - Features */}
+          {selectedProgram.features && selectedProgram.features.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                <Target size={20} className="text-red-600" />
+                What You'll Learn
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {selectedProgram.features.map((feature, idx) => (
+                  <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                    <CheckCircle size={16} className="text-red-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{feature}</span>
                   </div>
-                  <p className="text-gray-600 leading-relaxed">{selectedProgram.description}</p>
-                </div>
-                
-                <div className="bg-gray-50 rounded-xl p-5 mb-6">
-                  <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <Target size={18} className="text-red-600" /> 
-                    What You'll Learn
-                  </h3>
-                  <div className="grid gap-2">
-                    {selectedProgram.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                        <CheckCircle size={14} className="text-red-500 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="bg-red-50 rounded-xl p-5">
-                  <div className="flex flex-wrap gap-4 justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Ready to enroll?</p>
-                      <p className="text-xs text-gray-500">Limited spots available</p>
-                    </div>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setShowRegForm(true)}
-                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg cursor-pointer"
-                    >
-                      Register Now →
-                    </motion.button>
-                  </div>
-                </div>
+                ))}
               </div>
-            </motion.div>
+            </div>
+          )}
+          
+          {/* Learning Objectives */}
+          {selectedProgram.objectives && selectedProgram.objectives.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                <Target size={20} className="text-red-600" />
+                Learning Objectives
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {selectedProgram.objectives.map((obj, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                    <CheckCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{obj}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Key Outcomes */}
+          {selectedProgram.outcomes && selectedProgram.outcomes.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                <Award size={20} className="text-red-600" />
+                Key Outcomes
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {selectedProgram.outcomes.map((out, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100">
+                    <Sparkles size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">{out}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Tools & Technologies */}
+          {selectedProgram.tools && selectedProgram.tools.length > 0 && (
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                <Cpu size={20} className="text-red-600" />
+                Tools & Technologies Covered
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedProgram.tools.map((tool, idx) => (
+                  <span key={idx} className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-200">
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Target Audience */}
+          {selectedProgram.suitableFor && (
+            <div className="mb-8">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-lg">
+                <Users size={20} className="text-red-600" />
+                Target Audience
+              </h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
+                <p className="text-gray-700 leading-relaxed">{selectedProgram.suitableFor}</p>
+              </div>
+            </div>
+          )}
+          
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <Clock size={20} className="text-red-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500 mb-1">Duration</p>
+              <p className="font-semibold text-gray-900">{selectedProgram.duration}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <Users size={20} className="text-red-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500 mb-1">Participants</p>
+              <p className="font-semibold text-gray-900">{selectedProgram.participants || '100+'}</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <Award size={20} className="text-red-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500 mb-1">Certification</p>
+              <p className="font-semibold text-gray-900">Certificate</p>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <Calendar size={20} className="text-red-600 mx-auto mb-2" />
+              <p className="text-xs text-gray-500 mb-1">Format</p>
+              <p className="font-semibold text-gray-900">In-Person</p>
+            </div>
+          </div>
+          
+          {/* Registration CTA */}
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3, type: 'spring' }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-700 p-8 shadow-xl"
+          >
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-2xl font-bold text-white mb-2">Ready to Enroll?</h4>
+                <p className="text-red-100">Register now to secure your spot in this workshop</p>
+              </div>
+              <motion.button 
+                whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleRegisterClick(selectedProgram)}
+                className="px-8 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 group"
+              >
+                Register Now 
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
       {/* Registration Modal */}
       <AnimatePresence>
@@ -2089,7 +3010,7 @@ function IndustryProgramsSection() {
                     {regSubmitted ? 'Registration Submitted!' : `Register for Workshop`}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    {regSubmitted ? "We'll be in touch soon" : ` ${selectedProgram?.title}`}
+                    {regSubmitted ? "We'll be in touch soon" : selectedProgram?.title}
                   </p>
                 </div>
                 <button onClick={() => { setShowRegForm(false); setRegSubmitted(false); }} className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
@@ -2138,52 +3059,97 @@ function IndustryProgramsSection() {
 
 // ─── TECHNOLOGY SHOWCASE SECTION - NO MOVEMENT ────────────────────────────────
 
-function TechnologyShowcase() {
-  const techImages = [
-    { src: IMGS.aiTech, title: 'Artificial Intelligence', description: 'Cutting-edge AI and Machine Learning programs', icon: Brain },
-    { src: IMGS.security, title: 'Cybersecurity', description: 'Advanced security training and ethical hacking', icon: Shield },
-    { src: IMGS.cloudComputing, title: 'Cloud Computing', description: 'AWS, Azure, and cloud architecture', icon: Database },
-  ];
+// function TechnologyShowcase() {
+//   const techImages = [
+//     { 
+//       src: IMGS.aiTech, 
+//       title: 'Artificial Intelligence & Data Science', 
+//       description: 'AI Engineering, Data Science, and Machine Learning programs', 
+//       icon: Brain,
+//       courses: ['AI Engineer', 'Intensive Data Science', 'Data Analysis with Power BI']
+//     },
+//     { 
+//       src: IMGS.mobile, 
+//       title: 'Mobile & Web Development', 
+//       description: 'iOS development, Full-Stack, and Web application development', 
+//       icon: Cpu,
+//       courses: ['Advanced iOS App Development', 'Full-Stack Development', 'Web Application Development']
+//     },
+//     { 
+//       src: IMGS.springboot, 
+//       title: 'Enterprise & Database Solutions', 
+//       description: 'Java Spring Boot, Oracle Database, and backend systems', 
+//       icon: Database,
+//       courses: ['Java Spring Boot', 'Oracle Database 19c']
+//     },
+//     { 
+//       src: IMGS.security, 
+//       title: 'Cybersecurity & Digital Literacy', 
+//       description: 'Security awareness and digital literacy training', 
+//       icon: Shield,
+//       courses: ['Digital Literacy & Cybersecurity']
+//     },
+//     { 
+//       src: IMGS.uxui, 
+//       title: 'UX/UI Design & Project Management', 
+//       description: 'User-centered design and professional project management', 
+//       icon: Palette,
+//       courses: ['UX/UI Design', 'Project Management Professional (PMP)']
+//     },
+//   ];
 
-  return (
-    <section className="py-24 bg-gray-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <Reveal className="text-center mb-16">
-          <Eyebrow>Our Technology Focus</Eyebrow>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            Cutting-Edge <GradientText>Technologies</GradientText>
-          </h2>
-          <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
-            We train on the latest technologies to ensure our students are industry-ready.
-          </p>
-        </Reveal>
+//   return (
+//     <section className="py-24 bg-gray-50 overflow-hidden">
+//       <div className="max-w-7xl mx-auto px-6 lg:px-10">
+//         <Reveal className="text-center mb-16">
+//           <Eyebrow>Our Program Focus</Eyebrow>
+//           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
+//             Course <GradientText>Categories</GradientText>
+//           </h2>
+//           <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
+//             Comprehensive training programs covering modern technologies and professional skills
+//           </p>
+//         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {techImages.map((tech, index) => (
-            <Reveal key={tech.title} delay={index * 0.15}>
-              <TiltCard intensity={5}>
-                <HoverCard className="overflow-hidden">
-                  <div className="relative h-64 overflow-hidden">
-                    <img src={tech.src} alt={tech.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <tech.icon size={20} className="text-red-500" />
-                        <h3 className="text-xl font-bold text-white mb-1">{tech.title}</h3>
-                      </div>
-                      <p className="text-gray-200 text-sm">{tech.description}</p>
-                    </div>
-                  </div>
-                </HoverCard>
-              </TiltCard>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
+//         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+//           {techImages.map((tech, index) => (
+//             <Reveal key={tech.title} delay={index * 0.15}>
+//               <TiltCard intensity={5}>
+//                 <HoverCard className="overflow-hidden h-full">
+//                   <div className="relative h-48 overflow-hidden">
+//                     <img src={tech.src} alt={tech.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+//                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+//                     <div className="absolute bottom-0 left-0 right-0 p-5">
+//                       <div className="flex items-center gap-2 mb-1">
+//                         <tech.icon size={20} className="text-red-400" />
+//                         <h3 className="text-xl font-bold text-white">{tech.title}</h3>
+//                       </div>
+//                       <p className="text-gray-200 text-sm">{tech.description}</p>
+//                     </div>
+//                   </div>
+//                   <div className="p-4 bg-white">
+//                     <div className="flex flex-wrap gap-2">
+//                       {tech.courses.slice(0, 3).map((course, idx) => (
+//                         <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+//                           {course}
+//                         </span>
+//                       ))}
+//                       {tech.courses.length > 3 && (
+//                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+//                           +{tech.courses.length - 3} more
+//                         </span>
+//                       )}
+//                     </div>
+//                   </div>
+//                 </HoverCard>
+//               </TiltCard>
+//             </Reveal>
+//           ))}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 // ─── ENHANCED CORPORATE SECTION WITH 3D ──────────────────────────────────────
 function CorporateSection({ onQuote, onServiceSelect }) {
   const sectionRef = useRef(null);
@@ -2399,6 +3365,8 @@ function CorporateSection({ onQuote, onServiceSelect }) {
 // =============================================================================
 
 
+// Complete GovernmentSection component - FIXED VERSION
+
 function GovernmentSection({ onPartner }) {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -2418,7 +3386,7 @@ function GovernmentSection({ onPartner }) {
     { value: 100, suffix: '%', label: 'MoEYS Aligned', icon: Award },
   ];
 
-  // YOUR 5 COMPLETE PROGRAMS WITH ALL DETAILS
+  // YOUR GOVERNMENT PROGRAMS DATA
   const governmentPrograms = [
     { 
       id: 'ai-marketing',
@@ -2560,6 +3528,7 @@ function GovernmentSection({ onPartner }) {
     { title: 'Research Collaboration', desc: 'Partner on technology research and innovation projects', icon: Target },
   ];
 
+  // State declarations
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [showRegForm, setShowRegForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -2621,7 +3590,6 @@ function GovernmentSection({ onPartner }) {
       await new Promise(resolve => setTimeout(resolve, 1500));
       const newAppId = Math.random().toString(36).substring(2, 10).toUpperCase();
       setApplicationId(newAppId);
-      console.log('Registration submitted:', { ...formData, applicationId: newAppId });
       setSubmitted(true);
     } catch (error) {
       setRegError('There was an error submitting your registration. Please try again.');
@@ -2689,7 +3657,7 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
       
-      {/* YOUR 5 PROGRAMS - PROFESSIONAL 3D CLICKABLE CARDS */}
+      {/* GOVERNMENT COURSES GRID - FIXED: Click opens details modal, NOT registration */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <Reveal className="text-center mb-12">
@@ -2703,8 +3671,9 @@ function GovernmentSection({ onPartner }) {
               <Reveal key={program.id} delay={i * 0.1}>
                 <TiltCard intensity={5}>
                   <motion.div
-                    whileHover={{ y: -6 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    // FIXED: This opens the DETAILS modal, NOT registration
                     onClick={() => setSelectedProgram(program)}
                     className="bg-white rounded-2xl overflow-hidden cursor-pointer group h-full flex flex-col"
                     style={{
@@ -2715,9 +3684,14 @@ function GovernmentSection({ onPartner }) {
                     {/* Card Header with Gradient */}
                     <div className="relative p-5" style={{ background: `linear-gradient(135deg, ${program.color}10, white)` }}>
                       <div className="flex items-start justify-between">
-                        <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: `${program.color}15` }}>
+                        <motion.div 
+                          className="w-14 h-14 rounded-xl flex items-center justify-center"
+                          style={{ background: `${program.color}15` }}
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ type: 'spring', stiffness: 400 }}
+                        >
                           <program.icon size={28} style={{ color: program.color }} />
-                        </div>
+                        </motion.div>
                         <div className="text-right">
                           <span className="text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-600">{program.duration}</span>
                         </div>
@@ -2728,19 +3702,45 @@ function GovernmentSection({ onPartner }) {
                     
                     {/* Card Body */}
                     <div className="p-5 pt-0 flex-1">
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {program.tools?.slice(0, 3).map(tool => (
                           <span key={tool} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{tool}</span>
                         ))}
+                        {program.tools?.length > 3 && (
+                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                            +{program.tools.length - 3} more
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <Users size={12} /> {program.participants} enrolled
+                      
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
+                        <span className="flex items-center gap-1">
+                          <Users size={12} /> {program.participants}
                         </span>
-                        <motion.div whileHover={{ x: 5 }} className="flex items-center gap-1 text-sm font-semibold" style={{ color: program.color }}>
-                          View Details <ArrowRight size={14} />
-                        </motion.div>
+                        <span className="flex items-center gap-1">
+                          <Target size={12} /> {program.objectives?.length || 0} objectives
+                        </span>
                       </div>
+                      
+                      <p className="text-xs text-gray-400 line-clamp-1 mb-3">
+                        👥 {program.suitableFor?.substring(0, 50)}...
+                      </p>
+                      
+                      <motion.div 
+                        whileHover={{ x: 5 }} 
+                        className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100"
+                      >
+                        <span className="flex items-center gap-1 text-sm font-semibold" style={{ color: program.color }}>
+                          View Course Details <ArrowRight size={14} />
+                        </span>
+                        <motion.div 
+                          whileHover={{ scale: 1.1, x: 3 }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{ background: `${program.color}10` }}
+                        >
+                          <ExternalLink size={14} style={{ color: program.color }} />
+                        </motion.div>
+                      </motion.div>
                     </div>
                   </motion.div>
                 </TiltCard>
@@ -2769,9 +3769,9 @@ function GovernmentSection({ onPartner }) {
                 <p className="text-gray-600 mb-8">Collaborate with ADITI Academy to bring industry-recognized technology education to your students and faculty.</p>
                 <div className="grid gap-4">
                   {universityPrograms.map((program) => (
-                    <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:shadow-md transition-all">
-                      <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                        <program.icon size={18} className="text-red-600" />
+                    <div key={program.title} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:shadow-md transition-all cursor-pointer hover:bg-red-50 group">
+                      <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0 group-hover:bg-red-600 transition-colors">
+                        <program.icon size={18} className="text-red-600 group-hover:text-white transition-colors" />
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-900">{program.title}</h4>
@@ -2800,99 +3800,296 @@ function GovernmentSection({ onPartner }) {
         </div>
       </section>
 
-      {/* PROGRAM DETAIL MODAL */}
+      {/* PROGRAM DETAIL MODAL - Shows ALL course details with professional 3D design */}
       <AnimatePresence>
         {selectedProgram && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
             onClick={() => setSelectedProgram(null)}>
-            <motion.div initial={{ scale: 0.9, y: 30, rotateX: 20 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 30, rotateX: 20 }}
-              onClick={e => e.stopPropagation()} className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
-              <div className="sticky top-0 bg-white z-10 p-6 border-b border-gray-100 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${selectedProgram.color}15` }}>
-                    <selectedProgram.icon size={24} style={{ color: selectedProgram.color }} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedProgram.title}</h2>
+            <motion.div 
+              initial={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }} 
+              animate={{ scale: 1, y: 0, rotateX: 0, opacity: 1 }} 
+              exit={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              onClick={e => e.stopPropagation()} 
+              className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
+            >
+              {/* Hero Section with Gradient Background */}
+              <div 
+                className="relative h-72 overflow-hidden rounded-t-3xl"
+                style={{ background: `linear-gradient(135deg, ${selectedProgram.color}dd, ${selectedProgram.color}55)` }}
+              >
+                <div className="absolute inset-0 bg-black/30" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+                    className="w-32 h-32 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center"
+                  >
+                    <selectedProgram.icon size={64} className="text-white" />
+                  </motion.div>
                 </div>
-                <button onClick={() => setSelectedProgram(null)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-                  <X size={18} />
+                
+                {/* Floating badges */}
+                <div className="absolute top-6 left-6 flex gap-3">
+                  <motion.span 
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold"
+                  >
+                    {selectedProgram.duration}
+                  </motion.span>
+                  <motion.span 
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold"
+                  >
+                    Hands-on Workshop
+                  </motion.span>
+                </div>
+                
+                {/* Close button */}
+                <button 
+                  onClick={() => setSelectedProgram(null)} 
+                  className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all z-10"
+                >
+                  <X size={18} className="text-white" />
                 </button>
+                
+                {/* Title overlay at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+                  <motion.h2 
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-3xl font-bold text-white mb-2"
+                  >
+                    {selectedProgram.title}
+                  </motion.h2>
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-center gap-4 text-white/90 text-sm"
+                  >
+                    <span className="flex items-center gap-1"><Users size={14} /> {selectedProgram.participants} participants trained</span>
+                    <span className="flex items-center gap-1"><Target size={14} /> {selectedProgram.objectives?.length} learning objectives</span>
+                  </motion.div>
+                </div>
               </div>
               
-              <div className="p-6">
-                <div className="mb-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="bg-red-100 text-red-600 text-sm font-semibold px-3 py-1 rounded-full">{selectedProgram.duration}</span>
-                    <span className="text-gray-400 text-sm">Hands-on Workshop</span>
-                  </div>
-                  <p className="text-gray-600 leading-relaxed">{selectedProgram.fullDesc}</p>
-                </div>
+              {/* Content Section */}
+              <div className="p-8">
+                {/* Program Overview */}
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <div className="w-1 h-6 bg-red-600 rounded-full" />
+                    Program Overview
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                    {selectedProgram.fullDesc}
+                  </p>
+                </motion.div>
                 
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-gray-50 rounded-xl p-5">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <Target size={18} className="text-red-600" /> Program Objectives
+                {/* Objectives & Outcomes Grid with 3D cards */}
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  <motion.div 
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                      <Target size={20} className="text-red-600" />
+                      Program Objectives
                     </h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-3">
                       {selectedProgram.objectives?.map((obj, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                          <CheckCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                        <motion.li 
+                          key={idx} 
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.9 + idx * 0.05 }}
+                          className="flex items-start gap-3 text-sm text-gray-600"
+                        >
+                          <CheckCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
                           <span>{obj}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
-                  </div>
-                  <div className="bg-gray-50 rounded-xl p-5">
-                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <Award size={18} className="text-red-600" /> Learning Outcomes
+                  </motion.div>
+                  
+                  <motion.div 
+                    initial={{ x: 30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                      <Award size={20} className="text-red-600" />
+                      Learning Outcomes
                     </h3>
-                    <ul className="space-y-2">
+                    <ul className="space-y-3">
                       {selectedProgram.outcomes?.map((out, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                          <CheckCircle size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                        <motion.li 
+                          key={idx} 
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.9 + idx * 0.05 }}
+                          className="flex items-start gap-3 text-sm text-gray-600"
+                        >
+                          <Sparkles size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
                           <span>{out}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
-                  </div>
+                  </motion.div>
                 </div>
                 
-                <div className="bg-red-50 rounded-xl p-5">
-                  <div className="flex flex-wrap gap-4 justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Program Details</p>
-                      <div className="flex gap-4 text-sm">
-                        <span className="flex items-center gap-1"><Calendar size={14} /> {selectedProgram.duration}</span>
-                        <span className="flex items-center gap-1"><Users size={14} /> {selectedProgram.participants} trained</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">Suitable for: {selectedProgram.suitableFor}</p>
+                {/* Tools & Technologies */}
+                {selectedProgram.tools && selectedProgram.tools.length > 0 && (
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    className="mb-8"
+                  >
+                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                      <Cpu size={20} className="text-red-600" />
+                      Tools & Technologies Covered
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {selectedProgram.tools.map((tool, idx) => (
+                        <motion.span
+                          key={idx}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 1.1 + idx * 0.05, type: 'spring' }}
+                          className="px-4 py-2 bg-gradient-to-r from-red-50 to-red-100 text-red-700 rounded-xl text-sm font-medium border border-red-200 shadow-sm hover:shadow-md transition-all cursor-default"
+                          whileHover={{ scale: 1.05, y: -2 }}
+                        >
+                          {tool}
+                        </motion.span>
+                      ))}
                     </div>
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  </motion.div>
+                )}
+                
+                {/* Target Audience */}
+                {selectedProgram.suitableFor && (
+                  <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 1.2 }}
+                    className="mb-8"
+                  >
+                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-lg">
+                      <Users size={20} className="text-red-600" />
+                      Target Audience
+                    </h3>
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
+                      <p className="text-gray-700 leading-relaxed">
+                        {selectedProgram.suitableFor}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+                
+                {/* Key Information Grid */}
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 1.3 }}
+                  className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+                >
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
+                    <Clock size={20} className="text-red-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 mb-1">Duration</p>
+                    <p className="font-semibold text-gray-900">{selectedProgram.duration}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
+                    <Users size={20} className="text-red-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 mb-1">Participants</p>
+                    <p className="font-semibold text-gray-900">{selectedProgram.participants}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
+                    <Award size={20} className="text-red-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 mb-1">Certification</p>
+                    <p className="font-semibold text-gray-900">Certificate</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
+                    <Calendar size={20} className="text-red-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 mb-1">Format</p>
+                    <p className="font-semibold text-gray-900">In-Person</p>
+                  </div>
+                </motion.div>
+                
+                {/* Registration CTA - This opens the registration form */}
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 1.4, type: 'spring' }}
+                  className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-700 p-8 shadow-xl"
+                >
+                  <div className="absolute inset-0 bg-white/10 transform -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                  <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-2xl font-bold text-white mb-2">Ready to Enroll Your Team?</h4>
+                      <p className="text-red-100">Contact our government partnerships team for group registration</p>
+                    </div>
+                    <motion.button 
+                      whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }} 
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleRegisterClick(selectedProgram)}
-                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg cursor-pointer">
-                      Register for this Program →
+                      className="px-8 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 group"
+                    >
+                      Register Now 
+                      <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </motion.button>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* REGISTRATION MODAL */}
+      {/* REGISTRATION MODAL - Separate modal for registration form */}
       <AnimatePresence>
         {showRegForm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-[300] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-            onClick={() => { setShowRegForm(false); setSubmitted(false); }}>
-            <motion.div initial={{ scale: 0.9, y: 24, rotateX: 15 }} animate={{ scale: 1, y: 0, rotateX: 0 }} exit={{ scale: 0.9, y: 24, rotateX: 15 }}
-              onClick={e => e.stopPropagation()} className="w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl">
+            onClick={() => { setShowRegForm(false); setSubmitted(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 24, rotateX: 15 }}
+              animate={{ scale: 1, y: 0, rotateX: 0 }}
+              exit={{ scale: 0.9, y: 24, rotateX: 15 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl"
+            >
               <div className="p-6 bg-gradient-to-r from-red-50 to-white border-b border-gray-100 flex justify-between items-center">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">{submitted ? 'Registration Submitted!' : `Register for Workshop`}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{submitted ? "We'll be in touch soon" : selectedProgram?.title}</p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {submitted ? 'Registration Submitted!' : `Register for Workshop`}
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {submitted ? "We'll be in touch soon" : selectedProgram?.title}
+                  </p>
                 </div>
                 <button onClick={() => { setShowRegForm(false); setSubmitted(false); }} className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
                   <X size={16} className="text-gray-500" />
@@ -2907,7 +4104,7 @@ function GovernmentSection({ onPartner }) {
                     </motion.div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Registration Submitted!</h3>
                     <p className="text-gray-600 mb-2">Thank you, <strong>{formData.name}</strong>!</p>
-                    <p className="text-sm text-gray-500 mb-5">We've sent a confirmation to <strong>{formData.email}</strong>. Our team will contact you within 2-3 business days.</p>
+                    <p className="text-sm text-gray-500 mb-5">We've sent a confirmation to <strong>{formData.email}</strong>. Our team will contact you within 2 business days.</p>
                     <div className="bg-red-50 rounded-xl p-4 mb-5">
                       <p className="text-xs text-red-600 font-mono mb-1">Application ID: <strong>{applicationId}</strong></p>
                     </div>
@@ -2918,14 +4115,14 @@ function GovernmentSection({ onPartner }) {
                 ) : (
                   <>
                     <div className="flex flex-col gap-4">
-                      <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
-                      <input type="email" name="email" placeholder="Email Address *" value={formData.email} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
-                      <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
-                      <input type="text" name="organization" placeholder="Government Agency / Organization *" value={formData.organization} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none" />
+                      <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none transition-all" />
+                      <input type="email" name="email" placeholder="Email Address *" value={formData.email} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none transition-all" />
+                      <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none transition-all" />
+                      <input type="text" name="organization" placeholder="Government Agency / Organization *" value={formData.organization} onChange={handleRegChange} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-red-400 focus:outline-none transition-all" />
                     </div>
                     {regError && <p className="text-red-500 text-sm mt-3">{regError}</p>}
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} disabled={isSubmitting} onClick={handleRegSubmit} className={`w-full mt-6 py-3 rounded-xl bg-red-600 text-white font-semibold cursor-pointer shadow-lg transition-all ${isSubmitting ? 'opacity-70' : 'hover:bg-red-700'}`}>
-                      {isSubmitting ? <div className="flex items-center justify-center gap-2"><Loader2 size={18} className="animate-spin" /> Submitting...</div> : 'Submit Registration →'}
+                      {isSubmitting ? <div className="flex items-center justify-center gap-2"><Loader2 size={18} className="animate-spin" /> Submitting...</div> : 'Complete Registration →'}
                     </motion.button>
                   </>
                 )}
@@ -2937,6 +4134,7 @@ function GovernmentSection({ onPartner }) {
     </div>
   );
 }
+
 
 // ─── ROOT PAGE ────────────────────────────────────────────────────────────────
 
@@ -2990,10 +4188,10 @@ export function ProgramsPageEnhanced() {
     </section>
             
             {/* Technology Showcase added for individual tab */}
-            <TechnologyShowcase />
+            {/* <TechnologyShowcase /> */}
             
                 <CareerBoostSection audienceType="individual" onRegister={() => setShowRegForm(true)} />
-            <IndustryProgramsSection />
+            
           </motion.div>
         )}
 
@@ -3017,7 +4215,7 @@ export function ProgramsPageEnhanced() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
           >
-            <GovernmentSection onPartner={() => setShowPartner(true)} />
+            <IndustryProgramsSection />
           </motion.div>
         )}
       </AnimatePresence>

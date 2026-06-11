@@ -6,6 +6,12 @@ import { Footer } from '../components/Footer';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router';
 import CountUp from 'react-countup';
+import React from 'react';
+import * as THREE from 'three';
+
+import { Canvas } from '@react-three/fiber';
+import { Text3D, OrbitControls, Float, Line, Sphere, Cylinder } from '@react-three/drei';
+
 import {
   ArrowRight,
   Star,
@@ -234,7 +240,7 @@ export function LandingPage() {
         <StatsBannerInline />
         <TechShowcaseSectionInline />
         <MilestonesSectionInline />
-        <TechGallerySectionInline />
+        {/* <TechGallerySectionInline /> */}
         <ProgramsSectionInline />
         <CareerBoostSectionInline />
         <EnterpriseSectionInline />
@@ -710,89 +716,166 @@ function StatsBannerInline() {
 ═══════════════════════════════════════════════════════════════ */
 function TechShowcaseSectionInline() {
   const domains = [
-    { img: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80', label: 'Artificial Intelligence', icon: Cpu },
-    { img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&q=80',    label: 'Cybersecurity',          icon: Lock },
-    { img: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&q=80',    label: 'Cloud Architecture',     icon: Cloud },
-    { img: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80', label: 'Hardware & Systems',     icon: Zap },
-    { img: 'https://images.unsplash.com/photo-1516110833967-0b5716ca1387?w=600&q=80', label: 'Data Science',           icon: Target },
+    { img: '/assets/landing/techshowcase/AI.png', label: 'Artificial Intelligence', icon: Cpu },
+    { img: '/assets/landing/techshowcase/Cyber.png', label: 'Cybersecurity', icon: Lock },
+    { img: '/assets/landing/techshowcase/Software.png', label: 'Software Development', icon: Cloud },
+    { img: '/assets/landing/techshowcase/Data.png', label: 'Data Science', icon: Target },
   ];
 
   return (
-    <section className="relative py-24 bg-gray-950 overflow-hidden">
+    <section className="relative w-full py-16 sm:py-20 lg:py-24 bg-gray-950 overflow-hidden">
       
-      {/* Ambient glow orbs */}
+      {/* Ambient glow orbs - enhanced for depth */}
       <motion.div
-        className="absolute top-1/2 right-0 w-96 h-96 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }}
-        animate={{ scale: [1, 1.2, 1] }}
+        className="absolute top-1/2 right-0 w-[400px] sm:w-[500px] lg:w-[600px] h-[400px] sm:h-[500px] lg:h-[600px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.12) 0%, transparent 70%)', filter: 'blur(60px)' }}
+        animate={{ scale: [1, 1.3, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute top-0 left-0 w-80 h-80 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.06) 0%, transparent 70%)', filter: 'blur(40px)' }}
-        animate={{ scale: [1, 1.15, 1] }}
+        className="absolute top-0 left-0 w-[350px] sm:w-[450px] lg:w-[500px] h-[350px] sm:h-[450px] lg:h-[500px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(220,38,38,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }}
+        animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
       />
+      <motion.div
+        className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[300px] sm:w-[400px] lg:w-[500px] h-[300px] sm:h-[400px] lg:h-[500px] pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)', filter: 'blur(50px)' }}
+        animate={{ scale: [1, 1.4, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
+      <div className="relative w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-14"
+          className="text-center mb-10 sm:mb-12 lg:mb-14"
         >
           <SectionLabel>Technology Domains</SectionLabel>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight px-4">
             Master the <span className="text-red-500">Technologies</span> That Matter
           </h2>
-          <p className="mt-4 text-gray-400 max-w-xl mx-auto">
+          <p className="mt-3 sm:mt-4 text-gray-400 text-sm sm:text-base max-w-xl mx-auto px-4">
             In-demand skills across AI, cloud, security, and engineering disciplines.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {/* Responsive Grid - 4 columns on desktop, 2 on tablet, 1 on mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
           {domains.map((d, i) => {
             const Icon = d.icon;
             return (
               <motion.div
                 key={d.label}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -6 }}
+                className="group"
               >
                 <Card3D
-                  className="relative h-52 sm:h-64 rounded-2xl overflow-hidden border border-white/10 cursor-pointer group"
-                  strength={10}
+                  className="relative h-72 sm:h-80 md:h-84 lg:h-96 rounded-xl sm:rounded-2xl overflow-hidden border border-white/15 cursor-pointer bg-gray-900/30 shadow-2xl transition-all duration-300"
+                  strength={12}
                 >
-                  <ParallaxImg
-                    src={d.img}
-                    alt={d.label}
-                    className="absolute inset-0 w-full h-full"
-                    speed={0.12}
-                    style={{ filter: 'brightness(0.65) saturate(0.8)' }}
-                  />
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)' }} />
-                  {/* Red scan line on hover */}
-                  <motion.div
-                    className="absolute left-0 w-full h-0.5 bg-red-500 pointer-events-none opacity-0 group-hover:opacity-100"
-                    style={{ filter: 'blur(1px)', boxShadow: '0 0 12px rgba(220,38,38,0.9)' }}
-                    animate={{ y: ['-100%', '25000%'] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: 'linear', repeatDelay: 0.5 }}
-                  />
-                  {/* Corner brackets on hover */}
-                  <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute inset-0 flex flex-col justify-end p-4">
-                    <div className="w-8 h-8 rounded-lg bg-red-600/90 flex items-center justify-center mb-2 shadow-lg">
-                      <Icon className="w-4 h-4 text-white" />
-                    </div>
-                    <p className="text-white text-xs sm:text-sm font-semibold leading-tight">{d.label}</p>
+                  {/* Image Container - FIXED: full coverage with better visibility */}
+                  <div className="absolute inset-0 w-full h-full">
+                    <ParallaxImg
+                      src={d.img}
+                      alt={d.label}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      speed={0.08}
+                      style={{ 
+                        filter: 'brightness(0.8) contrast(1.15) saturate(1.1)',
+                        transform: 'scale(1.03)',
+                      }}
+                    />
+                    {/* Dynamic gradient overlay - lighter for better image visibility */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-red-500/10 via-transparent to-transparent" />
                   </div>
+                  
+                  {/* FULL HEIGHT SCAN LINE - FIXED: now covers entire card vertically */}
+                  <motion.div
+                    className="absolute left-0 w-full h-full pointer-events-none overflow-hidden"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                  >
+                    <motion.div
+                      className="absolute left-0 w-full bg-gradient-to-b from-transparent via-red-500 to-transparent"
+                      style={{ 
+                        height: '120%',
+                        filter: 'blur(3px)',
+                        boxShadow: '0 0 20px rgba(220,38,38,0.8)',
+                      }}
+                      animate={{
+                        top: ['-120%', '120%'],
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        repeatDelay: 0.3,
+                      }}
+                    />
+                  </motion.div>
+                  
+                  {/* Second slower scan line for dramatic effect */}
+                  <motion.div
+                    className="absolute left-0 w-full h-full pointer-events-none overflow-hidden"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 0.6 }}
+                  >
+                    <motion.div
+                      className="absolute left-0 w-full bg-gradient-to-b from-transparent via-red-400 to-transparent"
+                      style={{ 
+                        height: '80%',
+                        filter: 'blur(6px)',
+                      }}
+                      animate={{
+                        top: ['-80%', '180%'],
+                      }}
+                      transition={{
+                        duration: 3.8,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        repeatDelay: 0.5,
+                      }}
+                    />
+                  </motion.div>
+                  
+                  {/* Corner brackets - responsive sizing */}
+                  <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 border-t-2 border-l-2 border-red-500/0 group-hover:border-red-500/80 transition-all duration-300" />
+                  <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 border-t-2 border-r-2 border-red-500/0 group-hover:border-red-500/80 transition-all duration-300" />
+                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 border-b-2 border-l-2 border-red-500/0 group-hover:border-red-500/80 transition-all duration-300" />
+                  <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 border-b-2 border-r-2 border-red-500/0 group-hover:border-red-500/80 transition-all duration-300" />
+                  
+                  {/* Content - responsive padding and sizes */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 z-10">
+                    <motion.div 
+                      className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center mb-2 sm:mb-3 shadow-lg shadow-red-500/30 ring-1 ring-white/20"
+                      whileHover={{ scale: 1.1, rotate: 3 }}
+                      transition={{ type: 'spring', stiffness: 400 }}
+                    >
+                      <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 lg:w-5 lg:h-5 text-white" />
+                    </motion.div>
+                    <p className="text-white text-sm sm:text-base lg:text-lg font-bold leading-tight tracking-wide">
+                      {d.label}
+                    </p>
+                    {/* Animated underline on hover */}
+                    <motion.div 
+                      className="h-0.5 bg-red-500 mt-1.5 sm:mt-2 rounded-full"
+                      initial={{ width: 0 }}
+                      whileHover={{ width: '30%' }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  
+                  {/* 3D edge highlight on hover */}
+                  <div className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                       style={{ boxShadow: 'inset 0 0 20px rgba(220,38,38,0.3)' }} />
                 </Card3D>
               </motion.div>
             );
@@ -802,7 +885,6 @@ function TechShowcaseSectionInline() {
     </section>
   );
 }
-
 /* ═══════════════════════════════════════════════════════════════
    MILESTONES — original structure + 3D tilt + icon bubble
 ═══════════════════════════════════════════════════════════════ */
@@ -814,7 +896,7 @@ function MilestonesSectionInline() {
     { count: 1500, suffix: '+', label: 'IT Students', img: '/assets/landing/impact/ITStudent.jpg' },
     { count: 600,  suffix: '+', label: 'IT Professionals', img: '/assets/landing/impact/ITProfession.jpg' },
     { count: 500,  suffix: '+', label: 'Government Officers', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&q=80' },
-    { count: 600,  suffix: '+', label: 'SMEs', img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80' },
+    { count: 600,  suffix: '+', label: 'SMEs', img: '/assets/landing/impact/sme.jpg' },
     { count: 1000, suffix: '+', label: 'General Public', img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80' },
   ];
 
@@ -1293,34 +1375,52 @@ function ProgramsSectionInline() {
 
   const programs = [
     {
-      title: 'AI Engineer',
-      slug: 'ai-engineer',
-      description: 'Master machine learning pipelines, deep neural networks, and production AI systems through hands-on enterprise projects.',
-      details: ['ML fundamentals & advanced models', 'Deep learning with PyTorch / TensorFlow', 'Capstone AI product deployment'],
-      stats: { students: '1,000+', rating: '4.9' },
-      img: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=700&q=80',
-      accentImg: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=200&q=80',
-      tag: 'Most Popular', tagColor: 'bg-red-600',
-    },
-    {
-      title: 'Ethical Hacking',
-      slug: 'ethical-hacking',
-      description: 'Learn penetration testing, digital forensics, and threat modelling with CEH-aligned labs and live attack simulations.',
-      details: ['Penetration testing & vulnerability assessment', 'Network forensics & incident response', 'Professional security tooling'],
-      stats: { students: '800+', rating: '4.8' },
-      img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=700&q=80',
-      accentImg: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=200&q=80',
-      tag: 'CEH Aligned', tagColor: 'bg-gray-900',
-    },
-    {
-      title: 'AWS Solutions Architect',
-      slug: 'aws-solutions-architect',
-      description: 'Design, deploy, and scale enterprise cloud architectures on AWS with best-practice patterns and certification preparation.',
-      details: ['Cloud infrastructure fundamentals', 'High-availability architecture design', 'AWS SAA-C03 certification prep'],
+      title: 'Advanced iOS App Development',
+      slug: 'advanced-ios-app-development',
+      description: 'Master Swift programming, Core Data, API integration, memory management, and publish iOS apps to the App Store.',
+      details: [
+        'Swift programming language - Essential iOS Development Skill',
+        'Save and load data on your iOS device with Core Data',
+        'Fetch data from internal/external JSON files using Web APIs',
+        'Publish iOS apps to the App Store'
+      ],
       stats: { students: '1,200+', rating: '4.9' },
-      img: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=700&q=80',
-      accentImg: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&q=80',
-      tag: 'AWS Partner', tagColor: 'bg-amber-500',
+      img: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=700&q=80',
+      accentImg: 'https://images.unsplash.com/photo-1581276879432-15e50529f34b?w=200&q=80',
+      tag: '6 Months',
+      tagColor: 'bg-emerald-600',
+    },
+    {
+      title: 'Full-Stack Development',
+      slug: 'full-stack-development',
+      description: 'Master front-end and back-end development with modern frameworks, databases, and deployment strategies.',
+      details: [
+        'Front-end with React.js & state management',
+        'Back-end APIs with Node.js & Express',
+        'MongoDB, PostgreSQL & database design',
+        'Docker, CI/CD & cloud deployment'
+      ],
+      stats: { students: '2,200+', rating: '4.8' },
+      img: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=700&q=80',
+      accentImg: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200&q=80',
+      tag: '4 Months',
+      tagColor: 'bg-blue-600',
+    },
+    {
+      title: 'Web Application Development',
+      slug: 'web-application-development',
+      description: 'Build dynamic websites with HTML, CSS, JavaScript, PHP, and MySQL integration from fundamentals to deployment.',
+      details: [
+        'Front-end with HTML, CSS, JavaScript/jQuery',
+        'Server-side scripting with PHP',
+        'MySQL database integration',
+        'Professional-grade dynamic website capstone'
+      ],
+      stats: { students: '2,800+', rating: '4.8' },
+      img: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=700&q=80',
+      accentImg: 'https://images.unsplash.com/photo-1627398242454-81a6e318fa7d?w=200&q=80',
+      tag: '3 Months',
+      tagColor: 'bg-amber-600',
     },
   ];
 
@@ -1430,96 +1530,492 @@ function ProgramsSectionInline() {
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   CAREER ROADMAP — original structure + 3D tilt + top image strip
-═══════════════════════════════════════════════════════════════ */
 function CareerBoostSectionInline() {
   const roadmapSteps = [
-    { title: 'Explore Career Pathways',   description: 'Choose the right technology track from software, AI, cybersecurity, cloud, and digital transformation.', img: 'https://images.unsplash.com/photo-1557426272-fc759fdf7a8d?w=300&q=80' },
-    { title: 'Structured Learning',       description: 'Follow a clear curriculum with expert-led courses, hands-on labs, and real-world projects.',              img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300&q=80' },
-    { title: 'Apply with Real Projects',  description: 'Develop practical portfolio work that demonstrates your capabilities to employers.',                       img: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=300&q=80' },
-    { title: 'Mentor & Peer Support',     description: 'Stay supported through mentor coaching, study groups, and career guidance.',                              img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80' },
-    { title: 'Certification Preparation', description: 'Prepare for recognized certifications and industry exams with structured training.',                       img: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=300&q=80' },
-    { title: 'Launch Your Career',        description: 'Get ready for interviews, placement support, and career pathways into tech roles.',                       img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=300&q=80' },
+    {
+      title: 'Explore Career Pathways',
+      description: 'Choose the right technology track from software, AI, cybersecurity, cloud, and digital transformation.',
+    },
+    {
+      title: 'Structured Learning',
+      description: 'Follow a clear curriculum with expert-led courses, hands-on labs, and real-world projects.',
+    },
+    {
+      title: 'Apply with Real Projects',
+      description: 'Develop practical portfolio work that demonstrates your capabilities to employers.',
+    },
+    {
+      title: 'Mentor & Peer Support',
+      description: 'Stay supported through mentor coaching, study groups, and career guidance.',
+    },
+    {
+      title: 'Certification Preparation',
+      description: 'Prepare for recognized certifications and industry exams with structured training.',
+    },
+    {
+      title: 'Launch Your Career',
+      description: 'Get ready for interviews, placement support, and career pathways into tech roles.',
+    },
   ];
 
+  const SectionLabel = ({ children }) => (
+    <div className="inline-flex items-center gap-2.5 mb-5">
+      <span className="block w-7 h-px bg-red-600" />
+      <span className="text-xs font-bold tracking-[0.2em] text-red-600 uppercase">{children}</span>
+      <span className="block w-7 h-px bg-red-600" />
+    </div>
+  );
+
+  const Roadmap3D = () => {
+    const containerRef = React.useRef(null);
+    const rendererRef = React.useRef(null);
+    const sceneRef = React.useRef(null);
+    const cameraRef = React.useRef(null);
+    const mouseRef = React.useRef({ x: 0, y: 0 });
+    const targetMouseRef = React.useRef({ x: 0, y: 0 });
+    const rafRef = React.useRef(null);
+    const nodesRef = React.useRef([]);
+    const particleSystemRef = React.useRef(null);
+    const activeTooltipRef = React.useRef(null);
+    const tooltipDomRef = React.useRef(null);
+    const clockRef = React.useRef(0);
+
+    // Responsive height based on viewport
+    const getResponsiveHeight = () => {
+      if (typeof window === 'undefined') return 500;
+      if (window.innerWidth < 640) return 400;
+      if (window.innerWidth < 1024) return 500;
+      return 600;
+    };
+
+    React.useEffect(() => {
+      if (!containerRef.current || typeof THREE === 'undefined') return;
+
+      const width = containerRef.current.clientWidth;
+      const height = getResponsiveHeight();
+
+      // ── Scene ──────────────────────────────────────────────
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x06090f);
+      scene.fog = new THREE.FogExp2(0x06090f, 0.012);
+      sceneRef.current = scene;
+
+      // ── Camera ─────────────────────────────────────────────
+      // Responsive FOV: slightly wider on mobile for better visibility
+      const fov = window.innerWidth < 768 ? 45 : 42;
+      const camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 300);
+      // Responsive Z distance: closer on mobile for better readability
+      const cameraZ = window.innerWidth < 768 ? 9.5 : 8.5;
+      camera.position.set(0, 1.2, cameraZ);
+      camera.lookAt(0, 0, 0);
+      cameraRef.current = camera;
+
+      // ── Renderer ───────────────────────────────────────────
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      containerRef.current.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
+
+      // ── Lighting ───────────────────────────────────────────
+      scene.add(new THREE.AmbientLight(0x0d1a2e, 3));
+
+      const keyLight = new THREE.DirectionalLight(0xd0e4ff, 2.5);
+      keyLight.position.set(4, 8, 6);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.set(1024, 1024);
+      keyLight.shadow.camera.near = 0.1;
+      keyLight.shadow.camera.far = 40;
+      scene.add(keyLight);
+
+      const fillLight = new THREE.DirectionalLight(0x2244aa, 0.6);
+      fillLight.position.set(-6, 2, 4);
+      scene.add(fillLight);
+
+      const rimLight = new THREE.DirectionalLight(0x334466, 0.4);
+      rimLight.position.set(0, -3, -6);
+      scene.add(rimLight);
+
+      // ── Grid floor ─────────────────────────────────────────
+      const gridHelper = new THREE.GridHelper(30, 30, 0x1a2540, 0x0e1828);
+      gridHelper.position.y = -2.8;
+      scene.add(gridHelper);
+
+      // ── Particles (responsive count) ──────────────────────────
+      const pCount = window.innerWidth < 768 ? 500 : 900;
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount; i++) {
+        pPos[i * 3]     = (Math.random() - 0.5) * 28;
+        pPos[i * 3 + 1] = (Math.random() - 0.5) * 14;
+        pPos[i * 3 + 2] = (Math.random() - 0.5) * 16 - 4;
+      }
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      const pMat = new THREE.PointsMaterial({
+        color: 0x4a6fa5,
+        size: window.innerWidth < 768 ? 0.05 : 0.06,
+        transparent: true,
+        opacity: 0.55,
+        sizeAttenuation: true,
+      });
+      const particles = new THREE.Points(pGeo, pMat);
+      scene.add(particles);
+      particleSystemRef.current = particles;
+
+      // ── Node positions ─────────────────────────────────────
+      const nodePositions = [
+        { x: -5.0, y: 0.4,  z: -0.8 },
+        { x: -3.0, y: 0.15, z: -0.2 },
+        { x: -1.0, y: -0.1, z:  0.3 },
+        { x:  1.0, y: -0.3, z:  0.7 },
+        { x:  3.0, y: -0.5, z:  1.1 },
+        { x:  5.0, y: -0.7, z:  1.5 },
+      ];
+
+      const NODE_W = 1.6;
+      const NODE_H = 0.72;
+      const NODE_D = 0.22;
+
+      const faceColor  = new THREE.Color(0x0d1624);
+      const edgeColor  = new THREE.Color(0x2a4070);
+      const topColor   = new THREE.Color(0x162236);
+
+      nodesRef.current = roadmapSteps.map((step, idx) => {
+        const pos = nodePositions[idx];
+        const group = new THREE.Group();
+        group.position.set(pos.x, pos.y, pos.z);
+
+        // Front face
+        const frontGeo = new THREE.BoxGeometry(NODE_W, NODE_H, NODE_D, 1, 1, 1);
+        const frontMat = new THREE.MeshStandardMaterial({
+          color: faceColor,
+          metalness: 0.35,
+          roughness: 0.55,
+        });
+        const front = new THREE.Mesh(frontGeo, frontMat);
+        front.castShadow = true;
+        front.receiveShadow = true;
+        group.add(front);
+
+        // Top face highlight
+        const topGeo = new THREE.BoxGeometry(NODE_W, 0.06, NODE_D + 0.08);
+        const topMat = new THREE.MeshStandardMaterial({
+          color: topColor,
+          metalness: 0.6,
+          roughness: 0.3,
+        });
+        const top = new THREE.Mesh(topGeo, topMat);
+        top.position.y = NODE_H / 2 + 0.03;
+        group.add(top);
+
+        // Accent border
+        const accentGeo = new THREE.BoxGeometry(NODE_W + 0.01, 0.015, 0.015);
+        const accentMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(0x3a6ea8),
+          emissive: new THREE.Color(0x1a3a60),
+          emissiveIntensity: 0.8,
+          metalness: 0.9,
+          roughness: 0.1,
+        });
+        const accent = new THREE.Mesh(accentGeo, accentMat);
+        accent.position.y = NODE_H / 2;
+        accent.position.z = NODE_D / 2 + 0.008;
+        group.add(accent);
+
+        // Wireframe edges
+        const edgesGeo = new THREE.EdgesGeometry(frontGeo);
+        const edgesMat = new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.5 });
+        const edges = new THREE.LineSegments(edgesGeo, edgesMat);
+        group.add(edges);
+
+        // Step number dot
+        const dotGeo = new THREE.CircleGeometry(0.055, 16);
+        const dotMat = new THREE.MeshBasicMaterial({ color: 0x2d5a8e });
+        const dot = new THREE.Mesh(dotGeo, dotMat);
+        dot.position.set(-NODE_W / 2 + 0.18, NODE_H / 2 - 0.18, NODE_D / 2 + 0.001);
+        group.add(dot);
+
+        // Canvas label texture - responsive text sizing
+        const canvas = document.createElement('canvas');
+        const isMobile = window.innerWidth < 768;
+        canvas.width = isMobile ? 512 : 512;
+        canvas.height = isMobile ? 200 : 192;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Step number
+        ctx.font = `600 ${isMobile ? '24px' : '28px'} "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(100,160,220,0.95)';
+        ctx.fillText(`0${idx + 1}`, 28, isMobile ? 48 : 52);
+
+        // Title
+        ctx.font = `700 ${isMobile ? '38px' : '46px'} "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(235,245,255,1)';
+        // Handle long titles on mobile
+        let titleText = step.title;
+        if (isMobile && step.title.length > 20) {
+          titleText = step.title.substring(0, 18) + '...';
+        }
+        ctx.fillText(titleText, 28, isMobile ? 90 : 98);
+
+        // Divider
+        ctx.fillStyle = 'rgba(70,110,160,0.6)';
+        ctx.fillRect(28, isMobile ? 102 : 110, 456, 2);
+
+        // Description - responsive wrapping
+        ctx.font = `500 ${isMobile ? '22px' : '28px'} "Inter", system-ui, sans-serif`;
+        ctx.fillStyle = 'rgba(180,205,235,0.92)';
+        const words = step.description.split(' ');
+        let line = '';
+        let lineY = isMobile ? 140 : 150;
+        const maxWidth = isMobile ? 400 : 456;
+        words.forEach(word => {
+          const test = line + word + ' ';
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line.trim(), 28, lineY);
+            line = word + ' ';
+            lineY += isMobile ? 28 : 34;
+          } else {
+            line = test;
+          }
+        });
+        ctx.fillText(line.trim(), 28, lineY);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        const labelMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+        const labelGeo = new THREE.PlaneGeometry(NODE_W - 0.08, NODE_H - 0.08);
+        const label = new THREE.Mesh(labelGeo, labelMat);
+        label.position.z = NODE_D / 2 + 0.002;
+        group.add(label);
+
+        scene.add(group);
+
+        return {
+          group,
+          front,
+          accent,
+          edges,
+          baseY: pos.y,
+          baseZ: pos.z,
+          phase: idx * (Math.PI / 3),
+        };
+      });
+
+      // ── Connecting path ─────────────────────────────────────
+      const curvePoints = nodePositions.map(
+        p => new THREE.Vector3(p.x, p.y - NODE_H / 2 - 0.05, p.z)
+      );
+      const curve = new THREE.CatmullRomCurve3(curvePoints);
+      const tubeGeo = new THREE.TubeGeometry(curve, 80, 0.012, 6, false);
+      const tubeMat = new THREE.MeshBasicMaterial({ color: 0x2a4a7a, transparent: true, opacity: 0.6 });
+      scene.add(new THREE.Mesh(tubeGeo, tubeMat));
+
+      // Connector dots
+      nodePositions.forEach(p => {
+        const dotGeo = new THREE.SphereGeometry(0.045, 12, 12);
+        const dotMat = new THREE.MeshStandardMaterial({
+          color: 0x3a6ea8,
+          emissive: 0x1a3050,
+          emissiveIntensity: 1.0,
+          metalness: 0.8,
+          roughness: 0.2,
+        });
+        const dot = new THREE.Mesh(dotGeo, dotMat);
+        dot.position.set(p.x, p.y - NODE_H / 2 - 0.05, p.z);
+        scene.add(dot);
+      });
+
+      // ── Tooltip DOM element ────────────────────────────────
+      const tooltip = document.createElement('div');
+      tooltip.style.cssText = `
+        position: absolute;
+        background: rgba(8,14,24,0.98);
+        border-left: 3px solid #e63946;
+        border-radius: 10px;
+        padding: ${window.innerWidth < 768 ? '12px 16px' : '16px 20px'};
+        font-family: "Inter", system-ui, sans-serif;
+        font-size: ${window.innerWidth < 768 ? '13px' : '15px'};
+        color: rgba(220,235,255,0.96);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        max-width: ${window.innerWidth < 768 ? '240px' : '280px'};
+        line-height: 1.5;
+        z-index: 20;
+        white-space: normal;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      `;
+      containerRef.current.appendChild(tooltip);
+      tooltipDomRef.current = tooltip;
+
+      // ── Raycaster ──────────────────────────────────────────
+      const raycaster = new THREE.Raycaster();
+      const pointerVec = new THREE.Vector2();
+      const frontMeshes = nodesRef.current.map(n => n.front);
+
+      const onPointerMove = e => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointerVec.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+        pointerVec.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+
+        targetMouseRef.current.x = (e.clientX - rect.left) / rect.width  - 0.5;
+        targetMouseRef.current.y = (e.clientY - rect.top)  / rect.height - 0.5;
+
+        raycaster.setFromCamera(pointerVec, camera);
+        const hits = raycaster.intersectObjects(frontMeshes);
+
+        if (hits.length > 0) {
+          const idx = frontMeshes.indexOf(hits[0].object);
+          if (idx !== activeTooltipRef.current) {
+            activeTooltipRef.current = idx;
+            const step = roadmapSteps[idx];
+            const isMobile = window.innerWidth < 768;
+            tooltip.innerHTML = `
+              <div style="color:#7eb4ff; font-size:${isMobile ? '10px' : '12px'}; letter-spacing:.1em; margin-bottom:${isMobile ? '6px' : '8px'};">STEP 0${idx + 1}</div>
+              <strong style="color:white; font-size:${isMobile ? '15px' : '18px'}; display:block; margin-bottom:${isMobile ? '6px' : '8px'};">${step.title}</strong>
+              <div style="color:#c0d8ff; font-size:${isMobile ? '12px' : '14px'}; line-height:1.45;">${step.description}</div>
+            `;
+            tooltip.style.opacity = '1';
+          }
+          tooltip.style.left = `${e.clientX - rect.left + 16}px`;
+          tooltip.style.top  = `${e.clientY - rect.top - 12}px`;
+          renderer.domElement.style.cursor = 'pointer';
+        } else {
+          activeTooltipRef.current = null;
+          tooltip.style.opacity = '0';
+          renderer.domElement.style.cursor = 'default';
+        }
+      };
+
+      renderer.domElement.addEventListener('pointermove', onPointerMove);
+
+      // ── Animate ────────────────────────────────────────────
+      const animate = () => {
+        rafRef.current = requestAnimationFrame(animate);
+        clockRef.current += 0.012;
+        const t = clockRef.current;
+
+        mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.04;
+        mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.04;
+
+        camera.position.x = mouseRef.current.x * 1.2;
+        camera.position.y = 1.2 - mouseRef.current.y * 0.6;
+        camera.lookAt(mouseRef.current.x * 0.3, mouseRef.current.y * -0.2, 0);
+
+        nodesRef.current.forEach((node, i) => {
+          const hovered = activeTooltipRef.current === i;
+          node.group.position.y = node.baseY + Math.sin(t + node.phase) * 0.07;
+          node.group.rotation.y = Math.sin(t * 0.4 + node.phase) * 0.025;
+          const targetScale = hovered ? 1.04 : 1.0;
+          node.group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+          node.accent.material.emissiveIntensity = hovered
+            ? 1.2 + Math.sin(t * 4) * 0.3
+            : 0.5 + Math.sin(t * 1.5 + node.phase) * 0.2;
+        });
+
+        if (particles) {
+          particles.rotation.y = t * 0.018;
+          particles.rotation.x = Math.sin(t * 0.07) * 0.04;
+        }
+
+        renderer.render(scene, camera);
+      };
+
+      animate();
+
+      // ── Resize handler with responsive updates ─────────────
+      const onResize = () => {
+        if (!containerRef.current || !camera || !renderer) return;
+        const w = containerRef.current.clientWidth;
+        const h = getResponsiveHeight();
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      };
+      
+      window.addEventListener('resize', onResize);
+
+      return () => {
+        window.removeEventListener('resize', onResize);
+        renderer.domElement.removeEventListener('pointermove', onPointerMove);
+        cancelAnimationFrame(rafRef.current);
+        renderer.dispose();
+        if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
+          containerRef.current.removeChild(renderer.domElement);
+        }
+        if (tooltipDomRef.current && tooltipDomRef.current.parentNode === containerRef.current) {
+          containerRef.current.removeChild(tooltipDomRef.current);
+        }
+      };
+    }, []);
+
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '400px',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      />
+    );
+  };
+
   return (
-    <section className="relative py-28 bg-white overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(#B51D39 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20"
-        >
+    <section className="w-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-12 md:py-20 overflow-x-hidden">
+      {/* FULL WIDTH - removed max-w constraints */}
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        
+        {/* Header - responsive text */}
+        <div className="text-center mb-8 md:mb-10">
           <SectionLabel>Career Roadmap</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
-            Career Roadmap <span className="text-red-600">Preview</span>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+            Your{' '}
+            <span className="bg-gradient-to-r from-red-500 to-orange-400 bg-clip-text text-transparent">
+              3D Journey
+            </span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-            Explore the learning pathways from foundations to career launch, guided by mentors, projects, and certifications.
+          <p className="mt-3 md:mt-4 text-slate-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed px-4">
+            Move your cursor across the scene to explore each milestone in three dimensions.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {roadmapSteps.map((step, index) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 36 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.08 }}
+        {/* Three.js canvas - FULL WIDTH with responsive height */}
+        <div className="w-full">
+          <Roadmap3D />
+        </div>
+
+        {/* Legend strip - responsive wrapping */}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 md:mt-7 px-2">
+          {roadmapSteps.map((step, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/8 bg-white/3 backdrop-blur-sm"
             >
-              <Card3D
-                className="group relative h-full bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-red-200 hover:shadow-xl hover:shadow-red-50/80 transition-all duration-400"
-                strength={10}
-              >
-                {/* Top image strip with parallax */}
-                <div className="relative h-20 overflow-hidden">
-                  <ParallaxImg
-                    src={step.img}
-                    alt={step.title}
-                    className="absolute inset-0 w-full h-full"
-                    speed={0.08}
-                    style={{ filter: 'brightness(0.6) saturate(0.8)' }}
-                  />
-                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(255,255,255,0.95))' }} />
-                  {/* Step badge */}
-                  <div className="absolute top-3 left-4 w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-black shadow-lg">
-                    {index + 1}
-                  </div>
-                </div>
-
-                <div className="p-8 relative">
-                  {/* Watermark number */}
-                  <span className="absolute top-3 right-5 text-7xl font-black text-gray-50 select-none leading-none group-hover:text-red-50 transition-colors duration-300">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <h3 className="relative z-10 text-lg font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors duration-300">
-                    {step.title}
-                  </h3>
-                  <p className="relative z-10 text-sm text-gray-500 leading-relaxed">{step.description}</p>
-                </div>
-
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: index * 0.08 + 0.4 }}
-                  className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-red-600 to-red-400 origin-left rounded-b-2xl"
-                />
-              </Card3D>
-            </motion.div>
+              <span className="text-[9px] sm:text-[10px] md:text-[11px] font-mono text-slate-400">0{idx + 1}</span>
+              <span className="text-[10px] sm:text-xs md:text-sm text-slate-300 whitespace-nowrap">{step.title}</span>
+            </div>
           ))}
         </div>
+
+        <p className="text-center text-[10px] sm:text-[11px] text-slate-600 mt-4 md:mt-5 tracking-wide">
+          Move cursor to pan · Hover nodes for detail
+        </p>
       </div>
     </section>
   );
 }
+
 
 /* ═══════════════════════════════════════════════════════════════
    TESTIMONIALS — original structure + 3D tilt cards
