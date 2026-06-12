@@ -538,52 +538,7 @@ function WhyGetCertifiedSection() {
 
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
 
-function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  return (
-    <section className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Reveal className="text-center mb-14">
-          <SectionBadge>FAQ</SectionBadge>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900">
-            Frequently Asked <GradientText>Questions</GradientText>
-          </h2>
-        </Reveal>
-        <div className="space-y-3">
-          {certificationFaqs.map((faq, i) => (
-            <Reveal key={faq.q} delay={i * 0.04}>
-              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                <button
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-gray-900 hover:bg-gray-50 transition-colors text-sm"
-                >
-                  <span>{faq.q}</span>
-                  <motion.div animate={{ rotate: openIndex === i ? 90 : 0 }} transition={{ duration: 0.25 }}>
-                    <ChevronRight size={18} className="text-gray-400 flex-shrink-0 ml-4" />
-                  </motion.div>
-                </button>
-                <AnimatePresence>
-                  {openIndex === i && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28 }}
-                      className="border-t border-gray-100"
-                    >
-                      <p className="px-6 py-5 text-gray-500 text-sm leading-relaxed">{faq.a}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ─── CTA Banner ───────────────────────────────────────────────────────────────
 
@@ -793,7 +748,7 @@ export default function CertificationsPage() {
       </section>
 
       <WhyGetCertifiedSection />
-      <FAQSection />
+     
 
       <CTASection />
       <Footer />

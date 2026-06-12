@@ -12,11 +12,12 @@ import {
   Heart, Zap as ZapIcon, ExternalLink,
   ShoppingCart,
   Palette,
-  Smartphone,
+  Smartphone, ChevronRight,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
+import { certificationFaqs } from '../data/certifications-data';
 
 const certificateImageUrl = new URL("../../assets/certificate.jpg", import.meta.url).href;
 
@@ -548,7 +549,54 @@ function Reveal({ children, delay = 0, direction = 'up', className = '', style =
     </motion.div>
   );
 }
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
 
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <section className="py-24 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Reveal className="text-center mb-14">
+          <SectionBadge>FAQ</SectionBadge>
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900">
+            Frequently Asked <GradientText>Questions</GradientText>
+          </h2>
+        </Reveal>
+        <div className="space-y-3">
+          {certificationFaqs.map((faq, i) => (
+            <Reveal key={faq.q} delay={i * 0.04}>
+              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                <button
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  className="w-full flex justify-between items-center px-6 py-5 text-left font-semibold text-gray-900 hover:bg-gray-50 transition-colors text-sm"
+                >
+                  <span>{faq.q}</span>
+                  <motion.div animate={{ rotate: openIndex === i ? 90 : 0 }} transition={{ duration: 0.25 }}>
+                    <ChevronRight size={18} className="text-gray-400 flex-shrink-0 ml-4" />
+                  </motion.div>
+                </button>
+                <AnimatePresence>
+                  {openIndex === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28 }}
+                      className="border-t border-gray-100"
+                    >
+                      <p className="px-6 py-5 text-gray-500 text-sm leading-relaxed">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 // 3D Tilt Card on hover
 function TiltCard({ children, intensity = 8, className = '', style = {} }) {
   const ref = useRef(null);
@@ -676,7 +724,17 @@ function Eyebrow({ children, dark = false }) {
   );
 }
 
-function GradientText({ children }) {
+function SectionBadge({ children, className = '' }: any) {
+  return (
+    <div className={`inline-flex items-center gap-2.5 mb-5 ${className}`}>
+      <span className="block w-7 h-px bg-red-500" />
+      <span className="text-xs font-bold tracking-[0.2em] uppercase text-red-400">{children}</span>
+      <span className="block w-7 h-px bg-red-500" />
+    </div>
+  );
+}
+
+function GradientText({ children }: any) {
   return <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">{children}</span>;
 }
 
@@ -4226,6 +4284,7 @@ export function ProgramsPageEnhanced() {
       <RegModal show={showRegForm} onClose={() => setShowRegForm(false)} course={selectedCourse} />
       <QuoteModal show={showQuote} onClose={() => { setShowQuote(false); setPreselectedService(null); }} preselectedService={preselectedService} />
       <PartnerModal show={showPartner} onClose={() => setShowPartner(false)} />
+        <FAQSection/>
       <CTASection />
       <Footer />
     </div>
