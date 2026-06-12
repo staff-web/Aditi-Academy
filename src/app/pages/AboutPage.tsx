@@ -505,50 +505,50 @@ function AchievementsSection() {
 // TECHNOLOGY SHOWCASE SECTION (NEW - adds relevant tech imagery)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TechnologyShowcase() {
-  const techImages = [
-    { src: IMGS.aiTech, title: 'Artificial Intelligence', description: 'Cutting-edge AI and Machine Learning programs' },
-    { src: IMGS.cybersecurity, title: 'Cybersecurity', description: 'Advanced security training and ethical hacking' },
-    { src: IMGS.cloudComputing, title: 'Cloud Computing', description: 'AWS, Azure, and cloud architecture' },
-  ];
+// function TechnologyShowcase() {
+//   const techImages = [
+//     { src: IMGS.aiTech, title: 'Artificial Intelligence', description: 'Cutting-edge AI and Machine Learning programs' },
+//     { src: IMGS.cybersecurity, title: 'Cybersecurity', description: 'Advanced security training and ethical hacking' },
+//     { src: IMGS.cloudComputing, title: 'Cloud Computing', description: 'AWS, Azure, and cloud architecture' },
+//   ];
 
-  return (
-    <section className="py-28 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <Reveal className="text-center mb-16">
-          <SectionLabel>Our Technology Focus</SectionLabel>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
-            Cutting-Edge <GradientText>Technologies</GradientText>
-          </h2>
-          <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
-            We train on the latest technologies to ensure our students are industry-ready.
-          </p>
-        </Reveal>
+//   return (
+//     <section className="py-28 bg-white">
+//       <div className="max-w-7xl mx-auto px-6 lg:px-10">
+//         <Reveal className="text-center mb-16">
+//           <SectionLabel>Our Technology Focus</SectionLabel>
+//           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900">
+//             Cutting-Edge <GradientText>Technologies</GradientText>
+//           </h2>
+//           <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
+//             We train on the latest technologies to ensure our students are industry-ready.
+//           </p>
+//         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {techImages.map((tech, index) => (
-            <ParallaxScroll key={tech.title} direction={index % 2 === 0 ? 'up' : 'down'}>
-              <Reveal delay={index * 0.15}>
-                <TiltCard intensity={5}>
-                  <HoverCard className="overflow-hidden">
-                    <div className="relative h-64 overflow-hidden">
-                      <img src={tech.src} alt={tech.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <h3 className="text-xl font-bold text-white mb-1">{tech.title}</h3>
-                        <p className="text-gray-200 text-sm">{tech.description}</p>
-                      </div>
-                    </div>
-                  </HoverCard>
-                </TiltCard>
-              </Reveal>
-            </ParallaxScroll>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+//         <div className="grid md:grid-cols-3 gap-8">
+//           {techImages.map((tech, index) => (
+//             <ParallaxScroll key={tech.title} direction={index % 2 === 0 ? 'up' : 'down'}>
+//               <Reveal delay={index * 0.15}>
+//                 <TiltCard intensity={5}>
+//                   <HoverCard className="overflow-hidden">
+//                     <div className="relative h-64 overflow-hidden">
+//                       <img src={tech.src} alt={tech.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+//                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+//                       <div className="absolute bottom-0 left-0 right-0 p-6">
+//                         <h3 className="text-xl font-bold text-white mb-1">{tech.title}</h3>
+//                         <p className="text-gray-200 text-sm">{tech.description}</p>
+//                       </div>
+//                     </div>
+//                   </HoverCard>
+//                 </TiltCard>
+//               </Reveal>
+//             </ParallaxScroll>
+//           ))}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE EXPORT
@@ -561,7 +561,7 @@ export function AboutPage() {
       <HeroSection />
       <VisionMissionSection />
       <CoreValuesSection />
-      <TechnologyShowcase />
+      {/* <TechnologyShowcase /> */}
       <MilestonesSection />
       <AchievementsSection />
       <CTASection imageUrl={IMGS.cta} />
