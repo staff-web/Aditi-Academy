@@ -257,76 +257,173 @@ export function LandingPage() {
 ═══════════════════════════════════════════════════════════════ */
 function PremiumTechBackgroundInline() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [screenSize, setScreenSize] = useState('desktop');
+  
+  useEffect(() => { 
+    setMounted(true);
+    
+    // Handle screen size detection
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) setScreenSize('mobile');
+      else if (width < 1024) setScreenSize('tablet');
+      else setScreenSize('desktop');
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive sizing utilities
+  const getResponsiveSize = (desktop, tablet, mobile) => {
+    if (screenSize === 'mobile') return mobile;
+    if (screenSize === 'tablet') return tablet;
+    return desktop;
+  };
+
+  const getResponsivePosition = (desktopPos, tabletPos, mobilePos) => {
+    if (screenSize === 'mobile') return mobilePos;
+    if (screenSize === 'tablet') return tabletPos;
+    return desktopPos;
+  };
 
   return (
     <>
+      {/* Horizontal scanning lines - responsive widths */}
       <motion.div
         initial={{ x: '-5%', opacity: 0 }}
         animate={{ x: mounted ? '105%' : '-5%', opacity: mounted ? [0, 1, 1, 0.5, 0] : 0 }}
         transition={{ duration: 4.5, delay: 1.5, repeat: Infinity, repeatDelay: 3, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 w-2 h-full pointer-events-none z-50"
-        style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(220, 38, 38, 0.2) 20%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.2) 80%, transparent 100%)', filter: 'blur(3px)', boxShadow: '0 0 60px 25px rgba(220, 38, 38, 0.7), 0 0 100px 50px rgba(220, 38, 38, 0.3)' }}
+        className="absolute top-0 left-0 pointer-events-none z-50"
+        style={{ 
+          width: getResponsiveSize('2px', '1.5px', '1px'),
+          height: '100%',
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(220, 38, 38, 0.2) 20%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.2) 80%, transparent 100%)', 
+          filter: 'blur(3px)', 
+          boxShadow: getResponsiveSize('0 0 60px 25px rgba(220, 38, 38, 0.7)', '0 0 40px 15px rgba(220, 38, 38, 0.7)', '0 0 20px 8px rgba(220, 38, 38, 0.7)')
+        }}
       />
       <motion.div
         initial={{ x: '105%', opacity: 0 }}
         animate={{ x: mounted ? '-5%' : '105%', opacity: mounted ? [0, 0.8, 0.8, 0.4, 0] : 0 }}
         transition={{ duration: 5, delay: 4, repeat: Infinity, repeatDelay: 4, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 right-0 w-1.5 h-full pointer-events-none z-48"
-        style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(220, 38, 38, 0.15) 20%, rgba(220, 38, 38, 0.8) 50%, rgba(220, 38, 38, 0.15) 80%, transparent 100%)', filter: 'blur(4px)', boxShadow: '0 0 50px 20px rgba(220, 38, 38, 0.5)' }}
+        className="absolute top-0 right-0 pointer-events-none z-48"
+        style={{ 
+          width: getResponsiveSize('1.5px', '1px', '0.75px'),
+          height: '100%',
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(220, 38, 38, 0.15) 20%, rgba(220, 38, 38, 0.8) 50%, rgba(220, 38, 38, 0.15) 80%, transparent 100%)', 
+          filter: 'blur(4px)', 
+          boxShadow: getResponsiveSize('0 0 50px 20px rgba(220, 38, 38, 0.5)', '0 0 30px 12px rgba(220, 38, 38, 0.5)', '0 0 15px 6px rgba(220, 38, 38, 0.5)')
+        }}
       />
       <motion.div
         initial={{ y: '-5%', opacity: 0 }}
         animate={{ y: mounted ? '105%' : '-5%', opacity: mounted ? [0, 0.9, 0.9, 0.5, 0] : 0 }}
         transition={{ duration: 5, delay: 2.5, repeat: Infinity, repeatDelay: 4.5, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 w-full h-1 pointer-events-none z-49"
-        style={{ background: 'linear-gradient(to right, transparent 0%, rgba(220, 38, 38, 0.2) 20%, rgba(220, 38, 38, 0.9) 50%, rgba(220, 38, 38, 0.2) 80%, transparent 100%)', filter: 'blur(3px)', boxShadow: '0 0 50px 20px rgba(220, 38, 38, 0.6)' }}
+        className="absolute top-0 left-0 w-full pointer-events-none z-49"
+        style={{ 
+          height: getResponsiveSize('1px', '0.75px', '0.5px'),
+          background: 'linear-gradient(to right, transparent 0%, rgba(220, 38, 38, 0.2) 20%, rgba(220, 38, 38, 0.9) 50%, rgba(220, 38, 38, 0.2) 80%, transparent 100%)', 
+          filter: 'blur(3px)', 
+          boxShadow: getResponsiveSize('0 0 50px 20px rgba(220, 38, 38, 0.6)', '0 0 30px 12px rgba(220, 38, 38, 0.6)', '0 0 15px 6px rgba(220, 38, 38, 0.6)')
+        }}
       />
       <motion.div
         initial={{ y: '-5%', opacity: 0 }}
         animate={{ y: mounted ? '105%' : '-5%', opacity: mounted ? [0, 1, 1, 0.6, 0] : 0 }}
         transition={{ duration: 3.5, delay: 1, repeat: Infinity, repeatDelay: 5, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute top-0 left-0 w-full h-2 pointer-events-none z-50"
-        style={{ background: 'linear-gradient(to right, transparent 0%, rgba(220, 38, 38, 0.3) 25%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.3) 75%, transparent 100%)', filter: 'blur(2px)', boxShadow: '0 0 80px 30px rgba(220, 38, 38, 0.8), 0 0 120px 60px rgba(220, 38, 38, 0.4)' }}
+        className="absolute top-0 left-0 w-full pointer-events-none z-50"
+        style={{ 
+          height: getResponsiveSize('2px', '1.5px', '1px'),
+          background: 'linear-gradient(to right, transparent 0%, rgba(220, 38, 38, 0.3) 25%, rgba(220, 38, 38, 1) 50%, rgba(220, 38, 38, 0.3) 75%, transparent 100%)', 
+          filter: 'blur(2px)', 
+          boxShadow: getResponsiveSize('0 0 80px 30px rgba(220, 38, 38, 0.8)', '0 0 50px 20px rgba(220, 38, 38, 0.8)', '0 0 25px 10px rgba(220, 38, 38, 0.8)')
+        }}
       />
 
-      {/* Corner brackets */}
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 1.5 }} className="absolute top-8 left-8 pointer-events-none z-40">
-        <svg width="160" height="160" viewBox="0 0 160 160">
-          <motion.path d="M 55,0 L 0,0 L 0,55" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="3" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2 }} />
-          <motion.path d="M 35,5 L 5,5 L 5,35" stroke="rgba(220, 38, 38, 0.5)" strokeWidth="1.5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.5 }} />
-          <motion.line x1="0" y1="18" x2="22" y2="18" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="2.5" initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 3.5, repeat: Infinity, repeatDelay: 3 }} />
+      {/* Corner brackets - responsive sizes and positions */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 1.2, delay: 1.5 }} 
+        className="absolute pointer-events-none z-40"
+        style={{ 
+          top: getResponsiveSize('8px', '6px', '4px'),
+          left: getResponsiveSize('8px', '6px', '4px')
+        }}
+      >
+        <svg width={getResponsiveSize(160, 120, 80)} height={getResponsiveSize(160, 120, 80)} viewBox="0 0 160 160">
+          <motion.path d="M 55,0 L 0,0 L 0,55" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(3, 2.5, 2)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2 }} />
+          <motion.path d="M 35,5 L 5,5 L 5,35" stroke="rgba(220, 38, 38, 0.5)" strokeWidth={getResponsiveSize(1.5, 1.5, 1)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.5 }} />
+          <motion.line x1="0" y1="18" x2="22" y2="18" stroke="rgba(220, 38, 38, 0.7)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 3.5, repeat: Infinity, repeatDelay: 3 }} />
         </svg>
       </motion.div>
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 1.7 }} className="absolute top-8 right-8 pointer-events-none z-40">
-        <svg width="160" height="160" viewBox="0 0 160 160">
-          <motion.path d="M 105,0 L 160,0 L 160,55" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="3" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.2 }} />
-          <motion.path d="M 125,5 L 155,5 L 155,35" stroke="rgba(220, 38, 38, 0.5)" strokeWidth="1.5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.7 }} />
-          <motion.line x1="160" y1="18" x2="138" y2="18" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="2.5" initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 4, repeat: Infinity, repeatDelay: 3 }} />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 1.2, delay: 1.7 }} 
+        className="absolute pointer-events-none z-40"
+        style={{ 
+          top: getResponsiveSize('8px', '6px', '4px'),
+          right: getResponsiveSize('8px', '6px', '4px')
+        }}
+      >
+        <svg width={getResponsiveSize(160, 120, 80)} height={getResponsiveSize(160, 120, 80)} viewBox="0 0 160 160">
+          <motion.path d="M 105,0 L 160,0 L 160,55" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(3, 2.5, 2)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.2 }} />
+          <motion.path d="M 125,5 L 155,5 L 155,35" stroke="rgba(220, 38, 38, 0.5)" strokeWidth={getResponsiveSize(1.5, 1.5, 1)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.7 }} />
+          <motion.line x1="160" y1="18" x2="138" y2="18" stroke="rgba(220, 38, 38, 0.7)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 4, repeat: Infinity, repeatDelay: 3 }} />
         </svg>
       </motion.div>
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 1.9 }} className="absolute bottom-8 left-8 pointer-events-none z-40">
-        <svg width="160" height="160" viewBox="0 0 160 160">
-          <motion.path d="M 55,160 L 0,160 L 0,105" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="3" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.4 }} />
-          <motion.path d="M 35,155 L 5,155 L 5,125" stroke="rgba(220, 38, 38, 0.5)" strokeWidth="1.5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.9 }} />
-          <motion.line x1="0" y1="142" x2="22" y2="142" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="2.5" initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 4.5, repeat: Infinity, repeatDelay: 3 }} />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 1.2, delay: 1.9 }} 
+        className="absolute pointer-events-none z-40"
+        style={{ 
+          bottom: getResponsiveSize('8px', '6px', '4px'),
+          left: getResponsiveSize('8px', '6px', '4px')
+        }}
+      >
+        <svg width={getResponsiveSize(160, 120, 80)} height={getResponsiveSize(160, 120, 80)} viewBox="0 0 160 160">
+          <motion.path d="M 55,160 L 0,160 L 0,105" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(3, 2.5, 2)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.4 }} />
+          <motion.path d="M 35,155 L 5,155 L 5,125" stroke="rgba(220, 38, 38, 0.5)" strokeWidth={getResponsiveSize(1.5, 1.5, 1)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 2.9 }} />
+          <motion.line x1="0" y1="142" x2="22" y2="142" stroke="rgba(220, 38, 38, 0.7)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 4.5, repeat: Infinity, repeatDelay: 3 }} />
         </svg>
       </motion.div>
-      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 2.1 }} className="absolute bottom-8 right-8 pointer-events-none z-40">
-        <svg width="160" height="160" viewBox="0 0 160 160">
-          <motion.path d="M 105,160 L 160,160 L 160,105" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="3" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.6 }} />
-          <motion.path d="M 125,155 L 155,155 L 155,125" stroke="rgba(220, 38, 38, 0.5)" strokeWidth="1.5" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 3.1 }} />
-          <motion.line x1="160" y1="142" x2="138" y2="142" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="2.5" initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 5, repeat: Infinity, repeatDelay: 3 }} />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        transition={{ duration: 1.2, delay: 2.1 }} 
+        className="absolute pointer-events-none z-40"
+        style={{ 
+          bottom: getResponsiveSize('8px', '6px', '4px'),
+          right: getResponsiveSize('8px', '6px', '4px')
+        }}
+      >
+        <svg width={getResponsiveSize(160, 120, 80)} height={getResponsiveSize(160, 120, 80)} viewBox="0 0 160 160">
+          <motion.path d="M 105,160 L 160,160 L 160,105" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(3, 2.5, 2)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, delay: 2.6 }} />
+          <motion.path d="M 125,155 L 155,155 L 155,125" stroke="rgba(220, 38, 38, 0.5)" strokeWidth={getResponsiveSize(1.5, 1.5, 1)} fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 3.1 }} />
+          <motion.line x1="160" y1="142" x2="138" y2="142" stroke="rgba(220, 38, 38, 0.7)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} initial={{ pathLength: 0 }} animate={{ pathLength: [0, 1, 0] }} transition={{ duration: 1.5, delay: 5, repeat: Infinity, repeatDelay: 3 }} />
         </svg>
       </motion.div>
 
-      {/* Large hologram scanning rectangle (left) */}
+      {/* Large hologram scanning rectangle - responsive sizes and positions */}
       <motion.div
         initial={{ opacity: 0, scale: 0.85, x: -80, y: -20 }}
         animate={{ opacity: [0, 0.7, 0.7, 0.6, 0.4], scale: [0.85, 1.05, 1, 1.02, 1], x: [0, 5, 0, -3, 0], y: [0, -5, 0, 3, 0] }}
         transition={{ duration: 2.5, delay: 3, times: [0, 0.2, 0.5, 0.8, 1] }}
-        className="absolute left-[12%] top-[35%] w-[420px] h-72 border-2 border-red-600/70 pointer-events-none z-35"
-        style={{ boxShadow: 'inset 0 0 60px rgba(220, 38, 38, 0.2), 0 0 60px rgba(220, 38, 38, 0.35)' }}
+        className="absolute border-2 border-red-600/70 pointer-events-none z-35"
+        style={{ 
+          left: getResponsivePosition('12%', '8%', '5%'),
+          top: getResponsivePosition('35%', '40%', '45%'),
+          width: getResponsiveSize('420px', '320px', '260px'),
+          height: getResponsiveSize('288px', '220px', '180px'),
+          boxShadow: 'inset 0 0 60px rgba(220, 38, 38, 0.2), 0 0 60px rgba(220, 38, 38, 0.35)'
+        }}
       >
         <motion.div className="absolute -top-2 -left-2 w-10 h-10 border-t-[5px] border-l-[5px] border-red-500" animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 4 }} />
         <motion.div className="absolute -top-2 -right-2 w-10 h-10 border-t-[5px] border-r-[5px] border-red-500" animate={{ borderColor: ['rgba(220,38,38,1)', 'rgba(220,38,38,0.5)', 'rgba(220,38,38,1)'], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 4.2 }} />
@@ -336,13 +433,19 @@ function PremiumTechBackgroundInline() {
         <motion.div animate={{ x: ['0%', '100%', '0%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: [0.16, 1, 0.3, 1], delay: 5 }} className="absolute top-0 h-full w-2" style={{ background: 'linear-gradient(to right, transparent, rgba(220, 38, 38, 0.7) 50%, transparent)', filter: 'blur(3px)', boxShadow: '0 0 25px 5px rgba(220, 38, 38, 0.8)' }} />
       </motion.div>
 
-      {/* Small hologram scanning rectangle (right) */}
+      {/* Small hologram scanning rectangle - responsive sizes and positions */}
       <motion.div
         initial={{ opacity: 0, scale: 0.85, x: 80, y: 20 }}
         animate={{ opacity: [0, 0.65, 0.65, 0.55, 0.35], scale: [0.85, 1.05, 1, 1.03, 1], x: [0, -5, 0, 3, 0], y: [0, 5, 0, -3, 0] }}
         transition={{ duration: 2.5, delay: 4, times: [0, 0.2, 0.5, 0.8, 1] }}
-        className="absolute right-[10%] top-[58%] w-96 h-56 border-2 border-red-600/60 pointer-events-none z-35"
-        style={{ boxShadow: 'inset 0 0 60px rgba(220, 38, 38, 0.18), 0 0 60px rgba(220, 38, 38, 0.3)' }}
+        className="absolute border-2 border-red-600/60 pointer-events-none z-35"
+        style={{ 
+          right: getResponsivePosition('10%', '6%', '3%'),
+          top: getResponsivePosition('58%', '55%', '50%'),
+          width: getResponsiveSize('384px', '280px', '220px'),
+          height: getResponsiveSize('224px', '180px', '150px'),
+          boxShadow: 'inset 0 0 60px rgba(220, 38, 38, 0.18), 0 0 60px rgba(220, 38, 38, 0.3)'
+        }}
       >
         <motion.div className="absolute -top-2 -left-2 w-10 h-10 border-t-[5px] border-l-[5px] border-red-500/90" animate={{ borderColor: ['rgba(220,38,38,0.9)', 'rgba(220,38,38,0.4)', 'rgba(220,38,38,0.9)'], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 5 }} />
         <motion.div className="absolute -top-2 -right-2 w-10 h-10 border-t-[5px] border-r-[5px] border-red-500/90" animate={{ borderColor: ['rgba(220,38,38,0.9)', 'rgba(220,38,38,0.4)', 'rgba(220,38,38,0.9)'], scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity, delay: 5.2 }} />
@@ -352,37 +455,56 @@ function PremiumTechBackgroundInline() {
         <motion.div animate={{ y: ['0%', '100%', '0%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: [0.16, 1, 0.3, 1], delay: 6 }} className="absolute left-0 w-full h-2" style={{ background: 'linear-gradient(to bottom, transparent, rgba(220, 38, 38, 0.65) 50%, transparent)', filter: 'blur(3px)', boxShadow: '0 0 25px 5px rgba(220, 38, 38, 0.7)' }} />
       </motion.div>
 
-      {/* Ripple circles */}
-      <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 2.5, 0], opacity: [0, 0.4, 0] }} transition={{ duration: 3, delay: 5, repeat: Infinity, repeatDelay: 5, ease: 'easeOut' }} className="absolute left-[30%] top-[45%] w-64 h-64 border-2 border-red-600/60 rounded-full pointer-events-none z-30" />
-      <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 2.2, 0], opacity: [0, 0.35, 0] }} transition={{ duration: 3.5, delay: 8, repeat: Infinity, repeatDelay: 6, ease: 'easeOut' }} className="absolute right-[25%] top-[60%] w-56 h-56 border-2 border-red-600/50 rounded-full pointer-events-none z-30" />
-
-      {/* Diagonal sweep line */}
-      <motion.div
-        initial={{ x: '-100%', y: '-100%', opacity: 0 }}
-        animate={{ x: '100%', y: '100%', opacity: [0, 0.3, 0.3, 0] }}
-        transition={{ duration: 4, delay: 6, repeat: Infinity, repeatDelay: 6, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 w-1 h-[200%] pointer-events-none z-25"
-        style={{ transform: 'rotate(45deg)', transformOrigin: 'center', filter: 'blur(2px)', boxShadow: '0 0 30px rgba(220, 38, 38, 0.6)' }}
+      {/* Ripple circles - responsive sizes and positions */}
+      <motion.div 
+        initial={{ scale: 0, opacity: 0 }} 
+        animate={{ scale: [0, 2.5, 0], opacity: [0, 0.4, 0] }} 
+        transition={{ duration: 3, delay: 5, repeat: Infinity, repeatDelay: 5, ease: 'easeOut' }} 
+        className="absolute border-2 border-red-600/60 rounded-full pointer-events-none z-30"
+        style={{ 
+          left: getResponsivePosition('30%', '25%', '20%'),
+          top: getResponsivePosition('45%', '48%', '52%'),
+          width: getResponsiveSize('256px', '200px', '150px'),
+          height: getResponsiveSize('256px', '200px', '150px')
+        }} 
+      />
+      <motion.div 
+        initial={{ scale: 0, opacity: 0 }} 
+        animate={{ scale: [0, 2.2, 0], opacity: [0, 0.35, 0] }} 
+        transition={{ duration: 3.5, delay: 8, repeat: Infinity, repeatDelay: 6, ease: 'easeOut' }} 
+        className="absolute border-2 border-red-600/50 rounded-full pointer-events-none z-30"
+        style={{ 
+          right: getResponsivePosition('25%', '20%', '15%'),
+          top: getResponsivePosition('60%', '55%', '50%'),
+          width: getResponsiveSize('224px', '180px', '140px'),
+          height: getResponsiveSize('224px', '180px', '140px')
+        }} 
       />
 
-      {/* Rotating reticle */}
+      {/* Rotating reticle - responsive sizes and positions */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: [0, 0.6, 0.6, 0], scale: [0.5, 1.2, 1.2, 0.8], rotate: 360 }}
         transition={{ duration: 6, delay: 7, repeat: Infinity, repeatDelay: 8, ease: 'linear' }}
-        className="absolute left-[35%] top-[48%] w-48 h-48 pointer-events-none z-38"
+        className="absolute pointer-events-none z-38"
+        style={{ 
+          left: getResponsivePosition('35%', '30%', '25%'),
+          top: getResponsivePosition('48%', '50%', '52%'),
+          width: getResponsiveSize('192px', '140px', '100px'),
+          height: getResponsiveSize('192px', '140px', '100px')
+        }}
       >
         <svg width="100%" height="100%" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" stroke="rgba(220, 38, 38, 0.7)" strokeWidth="2" fill="none" strokeDasharray="12 6" />
-          <circle cx="50" cy="50" r="32" stroke="rgba(220, 38, 38, 0.5)" strokeWidth="1.5" fill="none" />
-          <line x1="50" y1="8"  x2="50" y2="28" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="2.5" />
-          <line x1="50" y1="72" x2="50" y2="92" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="2.5" />
-          <line x1="8"  y1="50" x2="28" y2="50" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="2.5" />
-          <line x1="72" y1="50" x2="92" y2="50" stroke="rgba(220, 38, 38, 0.8)" strokeWidth="2.5" />
+          <circle cx="50" cy="50" r="45" stroke="rgba(220, 38, 38, 0.7)" strokeWidth={getResponsiveSize(2, 1.5, 1)} fill="none" strokeDasharray="12 6" />
+          <circle cx="50" cy="50" r="32" stroke="rgba(220, 38, 38, 0.5)" strokeWidth={getResponsiveSize(1.5, 1, 0.75)} fill="none" />
+          <line x1="50" y1="8"  x2="50" y2="28" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} />
+          <line x1="50" y1="72" x2="50" y2="92" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} />
+          <line x1="8"  y1="50" x2="28" y2="50" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} />
+          <line x1="72" y1="50" x2="92" y2="50" stroke="rgba(220, 38, 38, 0.8)" strokeWidth={getResponsiveSize(2.5, 2, 1.5)} />
         </svg>
       </motion.div>
 
-      {/* Vertical grid lines */}
+      {/* Vertical grid lines - responsive positions */}
       {[...Array(4)].map((_, i) => (
         <motion.div
           key={`grid-v-${i}`}
@@ -390,22 +512,31 @@ function PremiumTechBackgroundInline() {
           animate={{ opacity: 0.04 }}
           transition={{ duration: 2, delay: 2 + i * 0.2 }}
           className="absolute top-0 h-full w-px pointer-events-none z-10"
-          style={{ left: `${20 + i * 20}%`, background: 'linear-gradient(to bottom, transparent, rgba(220, 38, 38, 0.4) 50%, transparent)' }}
+          style={{ 
+            left: getResponsivePosition(`${20 + i * 20}%`, `${15 + i * 22}%`, `${10 + i * 25}%`),
+            background: 'linear-gradient(to bottom, transparent, rgba(220, 38, 38, 0.4) 50%, transparent)'
+          }}
         />
       ))}
 
-      {/* Central red glow orb */}
+      {/* Central red glow orb - responsive size */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 0.1, scale: 1 }}
         transition={{ duration: 2.5, delay: 1.5 }}
-        className="absolute top-1/3 left-1/3 w-[600px] h-[600px] pointer-events-none z-5"
-        style={{ background: 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)', filter: 'blur(80px)' }}
+        className="absolute pointer-events-none z-5"
+        style={{ 
+          top: getResponsivePosition('33%', '35%', '38%'),
+          left: getResponsivePosition('33%', '30%', '25%'),
+          width: getResponsiveSize('600px', '400px', '250px'),
+          height: getResponsiveSize('600px', '400px', '250px'),
+          background: 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)', 
+          filter: 'blur(80px)'
+        }}
       />
     </>
   );
 }
-
 /* ═══════════════════════════════════════════════════════════════
    HERO — 100 % ORIGINAL
 ═══════════════════════════════════════════════════════════════ */
