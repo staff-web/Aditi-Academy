@@ -2,6 +2,7 @@ import { RouterProvider } from 'react-router';
 import { router } from './routes';
 import { LiquidCursor } from './components/LiquidCursor';
 import { ChatbotWidget } from './components/ChatbotWidget';
+import CookieConsent from './components/CookieConsent';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <LiquidCursor />
       <RouterProvider router={router} />
       <ChatbotWidget />
+      <CookieConsent />
     </>
   );
 }
