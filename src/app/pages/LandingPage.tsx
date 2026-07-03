@@ -1661,493 +1661,1212 @@ function ProgramsSectionInline() {
     </section>
   );
 }
-function CareerBoostSectionInline() {
+export default function CareerBoostSectionInline() {
   const roadmapSteps = [
     {
-      title: 'Explore Career Pathways',
-      description: 'Choose the right technology track from software, AI, cybersecurity, cloud, and digital transformation.',
+      title: "Explore Career Pathways",
+      description:
+        "Choose the right technology track from software, AI, cybersecurity, cloud, and digital transformation.",
     },
     {
-      title: 'Structured Learning',
-      description: 'Follow a clear curriculum with expert-led courses, hands-on labs, and real-world projects.',
+      title: "Structured Learning",
+      description:
+        "Follow a clear curriculum with expert-led courses, hands-on labs, and real-world projects.",
     },
     {
-      title: 'Apply with Real Projects',
-      description: 'Develop practical portfolio work that demonstrates your capabilities to employers.',
+      title: "Apply with Real Projects",
+      description:
+        "Develop practical portfolio work that demonstrates your capabilities to employers.",
     },
     {
-      title: 'Mentor & Peer Support',
-      description: 'Stay supported through mentor coaching, study groups, and career guidance.',
+      title: "Mentor & Peer Support",
+      description:
+        "Stay supported through mentor coaching, study groups, and career guidance.",
     },
     {
-      title: 'Certification Preparation',
-      description: 'Prepare for recognized certifications and industry exams with structured training.',
+      title: "Certification Preparation",
+      description:
+        "Prepare for recognized certifications and industry exams with structured training.",
     },
     {
-      title: 'Launch Your Career',
-      description: 'Get ready for interviews, placement support, and career pathways into tech roles.',
+      title: "Launch Your Career",
+      description:
+        "Get ready for interviews, placement support, and career pathways into tech roles.",
     },
   ];
 
-  const SectionLabel = ({ children }) => (
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [openChip, setOpenChip] = React.useState<number | null>(null);
+  const chipsRef = React.useRef<HTMLDivElement>(null);
+
+  // Close tooltip when tapping/clicking outside the chip row (mobile-friendly)
+  React.useEffect(() => {
+    const handleOutside = (e: MouseEvent | TouchEvent) => {
+      if (chipsRef.current && !chipsRef.current.contains(e.target as Node)) {
+        setOpenChip(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, []);
+
+  const SectionLabel = ({ children }: { children: React.ReactNode }) => (
     <div className="inline-flex items-center gap-2.5 mb-5">
-      <span className="block w-7 h-px bg-red-600" />
-      <span className="text-xs font-bold tracking-[0.2em] text-red-600 uppercase">{children}</span>
-      <span className="block w-7 h-px bg-red-600" />
+      <span className="block w-7 h-px bg-red-500" />
+      <span className="text-xs font-bold tracking-[0.2em] text-red-500 uppercase">
+        {children}
+      </span>
+      <span className="block w-7 h-px bg-red-500" />
     </div>
   );
 
-  const Roadmap3D = () => {
-    const containerRef = React.useRef(null);
-    const rendererRef = React.useRef(null);
-    const sceneRef = React.useRef(null);
-    const cameraRef = React.useRef(null);
-    const mouseRef = React.useRef({ x: 0, y: 0 });
-    const targetMouseRef = React.useRef({ x: 0, y: 0 });
-    const rafRef = React.useRef(null);
-    const nodesRef = React.useRef([]);
-    const particleSystemRef = React.useRef(null);
-    const activeTooltipRef = React.useRef(null);
-    const tooltipDomRef = React.useRef(null);
-    const clockRef = React.useRef(0);
-
-    // Responsive height based on viewport
-    const getResponsiveHeight = () => {
-      if (typeof window === 'undefined') return 500;
-      if (window.innerWidth < 640) return 400;
-      if (window.innerWidth < 1024) return 500;
-      return 600;
-    };
-
-    React.useEffect(() => {
-      if (!containerRef.current || typeof THREE === 'undefined') return;
-
-      const width = containerRef.current.clientWidth;
-      const height = getResponsiveHeight();
-
-      // ── Scene ──────────────────────────────────────────────
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x06090f);
-      scene.fog = new THREE.FogExp2(0x06090f, 0.012);
-      sceneRef.current = scene;
-
-      // ── Camera ─────────────────────────────────────────────
-      // Responsive FOV: slightly wider on mobile for better visibility
-      const fov = window.innerWidth < 768 ? 45 : 42;
-      const camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 300);
-      // Responsive Z distance: closer on mobile for better readability
-      const cameraZ = window.innerWidth < 768 ? 9.5 : 8.5;
-      camera.position.set(0, 1.2, cameraZ);
-      camera.lookAt(0, 0, 0);
-      cameraRef.current = camera;
-
-      // ── Renderer ───────────────────────────────────────────
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
-      containerRef.current.appendChild(renderer.domElement);
-      rendererRef.current = renderer;
-
-      // ── Lighting ───────────────────────────────────────────
-      scene.add(new THREE.AmbientLight(0x0d1a2e, 3));
-
-      const keyLight = new THREE.DirectionalLight(0xd0e4ff, 2.5);
-      keyLight.position.set(4, 8, 6);
-      keyLight.castShadow = true;
-      keyLight.shadow.mapSize.set(1024, 1024);
-      keyLight.shadow.camera.near = 0.1;
-      keyLight.shadow.camera.far = 40;
-      scene.add(keyLight);
-
-      const fillLight = new THREE.DirectionalLight(0x2244aa, 0.6);
-      fillLight.position.set(-6, 2, 4);
-      scene.add(fillLight);
-
-      const rimLight = new THREE.DirectionalLight(0x334466, 0.4);
-      rimLight.position.set(0, -3, -6);
-      scene.add(rimLight);
-
-      // ── Grid floor ─────────────────────────────────────────
-      const gridHelper = new THREE.GridHelper(30, 30, 0x1a2540, 0x0e1828);
-      gridHelper.position.y = -2.8;
-      scene.add(gridHelper);
-
-      // ── Particles (responsive count) ──────────────────────────
-      const pCount = window.innerWidth < 768 ? 500 : 900;
-      const pGeo = new THREE.BufferGeometry();
-      const pPos = new Float32Array(pCount * 3);
-      for (let i = 0; i < pCount; i++) {
-        pPos[i * 3]     = (Math.random() - 0.5) * 28;
-        pPos[i * 3 + 1] = (Math.random() - 0.5) * 14;
-        pPos[i * 3 + 2] = (Math.random() - 0.5) * 16 - 4;
-      }
-      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-      const pMat = new THREE.PointsMaterial({
-        color: 0x4a6fa5,
-        size: window.innerWidth < 768 ? 0.05 : 0.06,
-        transparent: true,
-        opacity: 0.55,
-        sizeAttenuation: true,
-      });
-      const particles = new THREE.Points(pGeo, pMat);
-      scene.add(particles);
-      particleSystemRef.current = particles;
-
-      // ── Node positions ─────────────────────────────────────
-      const nodePositions = [
-        { x: -5.0, y: 0.4,  z: -0.8 },
-        { x: -3.0, y: 0.15, z: -0.2 },
-        { x: -1.0, y: -0.1, z:  0.3 },
-        { x:  1.0, y: -0.3, z:  0.7 },
-        { x:  3.0, y: -0.5, z:  1.1 },
-        { x:  5.0, y: -0.7, z:  1.5 },
-      ];
-
-      const NODE_W = 1.6;
-      const NODE_H = 0.72;
-      const NODE_D = 0.22;
-
-      const faceColor  = new THREE.Color(0x0d1624);
-      const edgeColor  = new THREE.Color(0x2a4070);
-      const topColor   = new THREE.Color(0x162236);
-
-      nodesRef.current = roadmapSteps.map((step, idx) => {
-        const pos = nodePositions[idx];
-        const group = new THREE.Group();
-        group.position.set(pos.x, pos.y, pos.z);
-
-        // Front face
-        const frontGeo = new THREE.BoxGeometry(NODE_W, NODE_H, NODE_D, 1, 1, 1);
-        const frontMat = new THREE.MeshStandardMaterial({
-          color: faceColor,
-          metalness: 0.35,
-          roughness: 0.55,
-        });
-        const front = new THREE.Mesh(frontGeo, frontMat);
-        front.castShadow = true;
-        front.receiveShadow = true;
-        group.add(front);
-
-        // Top face highlight
-        const topGeo = new THREE.BoxGeometry(NODE_W, 0.06, NODE_D + 0.08);
-        const topMat = new THREE.MeshStandardMaterial({
-          color: topColor,
-          metalness: 0.6,
-          roughness: 0.3,
-        });
-        const top = new THREE.Mesh(topGeo, topMat);
-        top.position.y = NODE_H / 2 + 0.03;
-        group.add(top);
-
-        // Accent border
-        const accentGeo = new THREE.BoxGeometry(NODE_W + 0.01, 0.015, 0.015);
-        const accentMat = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(0x3a6ea8),
-          emissive: new THREE.Color(0x1a3a60),
-          emissiveIntensity: 0.8,
-          metalness: 0.9,
-          roughness: 0.1,
-        });
-        const accent = new THREE.Mesh(accentGeo, accentMat);
-        accent.position.y = NODE_H / 2;
-        accent.position.z = NODE_D / 2 + 0.008;
-        group.add(accent);
-
-        // Wireframe edges
-        const edgesGeo = new THREE.EdgesGeometry(frontGeo);
-        const edgesMat = new THREE.LineBasicMaterial({ color: edgeColor, transparent: true, opacity: 0.5 });
-        const edges = new THREE.LineSegments(edgesGeo, edgesMat);
-        group.add(edges);
-
-        // Step number dot
-        const dotGeo = new THREE.CircleGeometry(0.055, 16);
-        const dotMat = new THREE.MeshBasicMaterial({ color: 0x2d5a8e });
-        const dot = new THREE.Mesh(dotGeo, dotMat);
-        dot.position.set(-NODE_W / 2 + 0.18, NODE_H / 2 - 0.18, NODE_D / 2 + 0.001);
-        group.add(dot);
-
-        // Canvas label texture - responsive text sizing
-        const canvas = document.createElement('canvas');
-        const isMobile = window.innerWidth < 768;
-        canvas.width = isMobile ? 512 : 512;
-        canvas.height = isMobile ? 200 : 192;
-        const ctx = canvas.getContext('2d');
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Step number
-        ctx.font = `600 ${isMobile ? '24px' : '28px'} "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(100,160,220,0.95)';
-        ctx.fillText(`0${idx + 1}`, 28, isMobile ? 48 : 52);
-
-        // Title
-        ctx.font = `700 ${isMobile ? '38px' : '46px'} "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(235,245,255,1)';
-        // Handle long titles on mobile
-        let titleText = step.title;
-        if (isMobile && step.title.length > 20) {
-          titleText = step.title.substring(0, 18) + '...';
-        }
-        ctx.fillText(titleText, 28, isMobile ? 90 : 98);
-
-        // Divider
-        ctx.fillStyle = 'rgba(70,110,160,0.6)';
-        ctx.fillRect(28, isMobile ? 102 : 110, 456, 2);
-
-        // Description - responsive wrapping
-        ctx.font = `500 ${isMobile ? '22px' : '28px'} "Inter", system-ui, sans-serif`;
-        ctx.fillStyle = 'rgba(180,205,235,0.92)';
-        const words = step.description.split(' ');
-        let line = '';
-        let lineY = isMobile ? 140 : 150;
-        const maxWidth = isMobile ? 400 : 456;
-        words.forEach(word => {
-          const test = line + word + ' ';
-          if (ctx.measureText(test).width > maxWidth && line) {
-            ctx.fillText(line.trim(), 28, lineY);
-            line = word + ' ';
-            lineY += isMobile ? 28 : 34;
-          } else {
-            line = test;
-          }
-        });
-        ctx.fillText(line.trim(), 28, lineY);
-
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        const labelMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-        const labelGeo = new THREE.PlaneGeometry(NODE_W - 0.08, NODE_H - 0.08);
-        const label = new THREE.Mesh(labelGeo, labelMat);
-        label.position.z = NODE_D / 2 + 0.002;
-        group.add(label);
-
-        scene.add(group);
-
-        return {
-          group,
-          front,
-          accent,
-          edges,
-          baseY: pos.y,
-          baseZ: pos.z,
-          phase: idx * (Math.PI / 3),
-        };
-      });
-
-      // ── Connecting path ─────────────────────────────────────
-      const curvePoints = nodePositions.map(
-        p => new THREE.Vector3(p.x, p.y - NODE_H / 2 - 0.05, p.z)
-      );
-      const curve = new THREE.CatmullRomCurve3(curvePoints);
-      const tubeGeo = new THREE.TubeGeometry(curve, 80, 0.012, 6, false);
-      const tubeMat = new THREE.MeshBasicMaterial({ color: 0x2a4a7a, transparent: true, opacity: 0.6 });
-      scene.add(new THREE.Mesh(tubeGeo, tubeMat));
-
-      // Connector dots
-      nodePositions.forEach(p => {
-        const dotGeo = new THREE.SphereGeometry(0.045, 12, 12);
-        const dotMat = new THREE.MeshStandardMaterial({
-          color: 0x3a6ea8,
-          emissive: 0x1a3050,
-          emissiveIntensity: 1.0,
-          metalness: 0.8,
-          roughness: 0.2,
-        });
-        const dot = new THREE.Mesh(dotGeo, dotMat);
-        dot.position.set(p.x, p.y - NODE_H / 2 - 0.05, p.z);
-        scene.add(dot);
-      });
-
-      // ── Tooltip DOM element ────────────────────────────────
-      const tooltip = document.createElement('div');
-      tooltip.style.cssText = `
-        position: absolute;
-        background: rgba(8,14,24,0.98);
-        border-left: 3px solid #e63946;
-        border-radius: 10px;
-        padding: ${window.innerWidth < 768 ? '12px 16px' : '16px 20px'};
-        font-family: "Inter", system-ui, sans-serif;
-        font-size: ${window.innerWidth < 768 ? '13px' : '15px'};
-        color: rgba(220,235,255,0.96);
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s;
-        max-width: ${window.innerWidth < 768 ? '240px' : '280px'};
-        line-height: 1.5;
-        z-index: 20;
-        white-space: normal;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      `;
-      containerRef.current.appendChild(tooltip);
-      tooltipDomRef.current = tooltip;
-
-      // ── Raycaster ──────────────────────────────────────────
-      const raycaster = new THREE.Raycaster();
-      const pointerVec = new THREE.Vector2();
-      const frontMeshes = nodesRef.current.map(n => n.front);
-
-      const onPointerMove = e => {
-        const rect = renderer.domElement.getBoundingClientRect();
-        pointerVec.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
-        pointerVec.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
-
-        targetMouseRef.current.x = (e.clientX - rect.left) / rect.width  - 0.5;
-        targetMouseRef.current.y = (e.clientY - rect.top)  / rect.height - 0.5;
-
-        raycaster.setFromCamera(pointerVec, camera);
-        const hits = raycaster.intersectObjects(frontMeshes);
-
-        if (hits.length > 0) {
-          const idx = frontMeshes.indexOf(hits[0].object);
-          if (idx !== activeTooltipRef.current) {
-            activeTooltipRef.current = idx;
-            const step = roadmapSteps[idx];
-            const isMobile = window.innerWidth < 768;
-            tooltip.innerHTML = `
-              <div style="color:#7eb4ff; font-size:${isMobile ? '10px' : '12px'}; letter-spacing:.1em; margin-bottom:${isMobile ? '6px' : '8px'};">STEP 0${idx + 1}</div>
-              <strong style="color:white; font-size:${isMobile ? '15px' : '18px'}; display:block; margin-bottom:${isMobile ? '6px' : '8px'};">${step.title}</strong>
-              <div style="color:#c0d8ff; font-size:${isMobile ? '12px' : '14px'}; line-height:1.45;">${step.description}</div>
-            `;
-            tooltip.style.opacity = '1';
-          }
-          tooltip.style.left = `${e.clientX - rect.left + 16}px`;
-          tooltip.style.top  = `${e.clientY - rect.top - 12}px`;
-          renderer.domElement.style.cursor = 'pointer';
-        } else {
-          activeTooltipRef.current = null;
-          tooltip.style.opacity = '0';
-          renderer.domElement.style.cursor = 'default';
-        }
-      };
-
-      renderer.domElement.addEventListener('pointermove', onPointerMove);
-
-      // ── Animate ────────────────────────────────────────────
-      const animate = () => {
-        rafRef.current = requestAnimationFrame(animate);
-        clockRef.current += 0.012;
-        const t = clockRef.current;
-
-        mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.04;
-        mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.04;
-
-        camera.position.x = mouseRef.current.x * 1.2;
-        camera.position.y = 1.2 - mouseRef.current.y * 0.6;
-        camera.lookAt(mouseRef.current.x * 0.3, mouseRef.current.y * -0.2, 0);
-
-        nodesRef.current.forEach((node, i) => {
-          const hovered = activeTooltipRef.current === i;
-          node.group.position.y = node.baseY + Math.sin(t + node.phase) * 0.07;
-          node.group.rotation.y = Math.sin(t * 0.4 + node.phase) * 0.025;
-          const targetScale = hovered ? 1.04 : 1.0;
-          node.group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
-          node.accent.material.emissiveIntensity = hovered
-            ? 1.2 + Math.sin(t * 4) * 0.3
-            : 0.5 + Math.sin(t * 1.5 + node.phase) * 0.2;
-        });
-
-        if (particles) {
-          particles.rotation.y = t * 0.018;
-          particles.rotation.x = Math.sin(t * 0.07) * 0.04;
-        }
-
-        renderer.render(scene, camera);
-      };
-
-      animate();
-
-      // ── Resize handler with responsive updates ─────────────
-      const onResize = () => {
-        if (!containerRef.current || !camera || !renderer) return;
-        const w = containerRef.current.clientWidth;
-        const h = getResponsiveHeight();
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-      };
-      
-      window.addEventListener('resize', onResize);
-
-      return () => {
-        window.removeEventListener('resize', onResize);
-        renderer.domElement.removeEventListener('pointermove', onPointerMove);
-        cancelAnimationFrame(rafRef.current);
-        renderer.dispose();
-        if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
-          containerRef.current.removeChild(renderer.domElement);
-        }
-        if (tooltipDomRef.current && tooltipDomRef.current.parentNode === containerRef.current) {
-          containerRef.current.removeChild(tooltipDomRef.current);
-        }
-      };
-    }, []);
-
-    return (
-      <div
-        ref={containerRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          minHeight: '400px',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          position: 'relative',
-        }}
-      />
-    );
-  };
-
   return (
-    <section className="w-full bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 py-12 md:py-20 overflow-x-hidden">
-      {/* FULL WIDTH - removed max-w constraints */}
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        
-        {/* Header - responsive text */}
-        <div className="text-center mb-8 md:mb-10">
+    <section
+      className="relative w-full bg-gradient-to-b from-slate-950 via-[#060d18] to-slate-950 py-14 md:py-24"
+      style={{ overflowX: "clip" }}
+    >
+      {/* ambient blobs */}
+      <div className="pointer-events-none absolute -top-16 -left-16 w-80 h-80 bg-sky-500/10 blur-[100px] rounded-full" />
+      <div className="pointer-events-none absolute bottom-0 right-0 w-[500px] h-[500px] bg-amber-400/8 blur-[120px] rounded-full" />
+
+      <div className="relative w-full px-4 sm:px-6 lg:px-10 xl:px-16">
+        {/* header */}
+        <div className="text-center mb-8 md:mb-12">
           <SectionLabel>Career Roadmap</SectionLabel>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white">
-            Your{' '}
-            <span className="bg-gradient-to-r from-red-500 to-orange-400 bg-clip-text text-transparent">
-              3D Journey
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.75rem] font-extrabold tracking-tight text-white leading-[1.1]">
+            From Zero to{" "}
+            <span className="bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
+              Success
             </span>
           </h2>
-          <p className="mt-3 md:mt-4 text-slate-400 max-w-xl mx-auto text-sm sm:text-base leading-relaxed px-4">
-            Move your cursor across the scene to explore each milestone in three dimensions.
+          <p className="mt-4 md:mt-5 text-slate-400 max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed">
+            Scroll to build the journey — every milestone grows into place as
+            you go.
           </p>
         </div>
 
-        {/* Three.js canvas - FULL WIDTH with responsive height */}
+        {/* 3D scene with its own step indicator */}
         <div className="w-full">
-          <Roadmap3D />
+          <Roadmap3D steps={roadmapSteps} onStepChange={setActiveIndex} />
         </div>
 
-        {/* Legend strip - responsive wrapping */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6 md:mt-7 px-2">
-          {roadmapSteps.map((step, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/8 bg-white/3 backdrop-blur-sm"
-            >
-              <span className="text-[9px] sm:text-[10px] md:text-[11px] font-mono text-slate-400">0{idx + 1}</span>
-              <span className="text-[10px] sm:text-xs md:text-sm text-slate-300 whitespace-nowrap">{step.title}</span>
-            </div>
-          ))}
+        {/* START/SUCCESS label row — sits below the 3D graph, outside the canvas,
+            so it stays crisp and legible regardless of the in-canvas SUCCESS sprite */}
+        <div className="flex items-center justify-center gap-3 max-w-lg mx-auto mt-6 mb-8 md:mt-8 md:mb-10">
+          <span className="text-sm font-bold tracking-widest text-sky-400 whitespace-nowrap uppercase bg-slate-900/50 px-4 py-1.5 rounded-full border border-sky-400/20">
+            ⚡ Start
+          </span>
+          <div className="flex-1 h-px bg-gradient-to-r from-sky-400/50 via-teal-300/50 to-amber-300/50" />
+          <span className="text-sm font-bold tracking-widest text-amber-300 whitespace-nowrap uppercase bg-slate-900/50 px-4 py-1.5 rounded-full border border-amber-300/20">
+            Success 🎯
+          </span>
         </div>
 
-        <p className="text-center text-[10px] sm:text-[11px] text-slate-600 mt-4 md:mt-5 tracking-wide">
-          Move cursor to pan · Hover nodes for detail
+        {/* milestone chips — title only; tap (mobile) or hover (desktop) reveals description */}
+        <div
+          ref={chipsRef}
+          className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-4 md:mt-6 px-2"
+        >
+          {roadmapSteps.map((step, idx) => {
+            const reached = idx <= activeIndex;
+            const isOpen = openChip === idx;
+            return (
+              <div key={idx} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setOpenChip(isOpen ? null : idx)}
+                  onMouseEnter={() => setOpenChip(idx)}
+                  onMouseLeave={() =>
+                    setOpenChip((prev) => (prev === idx ? null : prev))
+                  }
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border backdrop-blur-sm transition-all duration-500 cursor-pointer ${
+                    reached
+                      ? "border-teal-400/50 bg-teal-400/12 shadow-[0_0_12px_rgba(94,234,212,0.12)]"
+                      : "border-white/10 bg-white/4"
+                  } ${isOpen ? "ring-1 ring-teal-300/70" : ""}`}
+                >
+                  <span
+                    className={`text-[10px] sm:text-xs font-mono font-bold ${
+                      reached ? "text-amber-300" : "text-teal-300/50"
+                    }`}
+                  >
+                    {idx === roadmapSteps.length - 1 ? "★" : `0${idx + 1}`}
+                  </span>
+                  <span
+                    className={`text-xs sm:text-sm font-medium whitespace-nowrap ${
+                      reached ? "text-white" : "text-slate-500"
+                    }`}
+                  >
+                    {step.title}
+                  </span>
+                </button>
+
+                {/* Description tooltip */}
+                {isOpen && (
+                  <div className="absolute z-20 top-full left-1/2 -translate-x-1/2 mt-2 w-56 sm:w-64 rounded-xl border border-teal-400/30 bg-slate-900/95 backdrop-blur-md px-4 py-3 shadow-xl shadow-black/40 pointer-events-none">
+                    <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed text-left">
+                      {step.description}
+                    </p>
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-t border-l border-teal-400/30 rotate-45" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="text-center text-xs text-slate-600 mt-5 tracking-wide">
+          Tap a step to see details — keep scrolling to build the journey.
         </p>
       </div>
     </section>
   );
 }
 
+// Separate Roadmap3D component with fixed HUD
 
+function Roadmap3D({
+  steps = defaultRoadmapSteps,
+  onStepChange,
+}: {
+  steps?: typeof defaultRoadmapSteps;
+  onStepChange?: (idx: number) => void;
+}) {
+  // Set this to match your actual <Navigation /> bar height in px
+  const NAV_HEIGHT = 80;
+
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const rendererRef = React.useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = React.useRef<THREE.Scene | null>(null);
+  const cameraRef = React.useRef<THREE.PerspectiveCamera | null>(null);
+  const mouseRef = React.useRef({ x: 0, y: 0 });
+  const targetMouseRef = React.useRef({ x: 0, y: 0 });
+  const rafRef = React.useRef<number | null>(null);
+  const nodesRef = React.useRef<any[]>([]);
+  const activeTooltipRef = React.useRef<number | null>(null);
+  const tooltipDomRef = React.useRef<HTMLDivElement | null>(null);
+  const hudTitleRef = React.useRef<HTMLDivElement | null>(null);
+  const hudDescRef = React.useRef<HTMLDivElement | null>(null);
+  const hudCounterRef = React.useRef<HTMLDivElement | null>(null);
+  const hudFillRef = React.useRef<HTMLDivElement | null>(null);
+  const clockRef = React.useRef(0);
+  const worldGroupRef = React.useRef<THREE.Group | null>(null);
+  const cameraBaseZRef = React.useRef(9.6);
+  const cameraLookYRef = React.useRef(0.4);
+  const targetPRef = React.useRef(0);
+  const scrollPRef = React.useRef(0);
+  const lastStepIndexRef = React.useRef(-1);
+
+  const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+  const easeOutBack = (x: number) => {
+    const c1 = 1.70158,
+      c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  };
+  const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  const roundRectPath = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    r: number
+  ) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  };
+
+  const makeGlowTexture = (inner: string, outer: string) => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    g.addColorStop(0, inner);
+    g.addColorStop(1, outer);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  };
+
+  const makeVerticalGradientTexture = (bottomHex: string, topHex: string) => {
+    const c = document.createElement("canvas");
+    c.width = 8;
+    c.height = 256;
+    const ctx = c.getContext("2d")!;
+    const g = ctx.createLinearGradient(0, 256, 0, 0);
+    g.addColorStop(0, bottomHex);
+    g.addColorStop(1, topHex);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 8, 256);
+    return new THREE.CanvasTexture(c);
+  };
+
+  const getLayout = (width: number, height: number) => {
+    const aspect = width / Math.max(height, 1);
+    let base: {
+      spread: number;
+      scale: number;
+      cameraZ: number;
+      fov: number;
+    };
+    if (width < 400)
+      base = { spread: 0.46, scale: 0.78, cameraZ: 9.8, fov: 56 };
+    else if (width < 480)
+      base = { spread: 0.52, scale: 0.82, cameraZ: 10.0, fov: 54 };
+    else if (width < 640)
+      base = { spread: 0.6, scale: 0.88, cameraZ: 10.4, fov: 51 };
+    else if (width < 900)
+      base = { spread: 0.76, scale: 0.94, cameraZ: 11.2, fov: 47 };
+    else if (width < 1280)
+      base = { spread: 0.9, scale: 1.0, cameraZ: 12.2, fov: 43 };
+    else base = { spread: 1.0, scale: 1.02, cameraZ: 13.4, fov: 41 };
+
+    if (aspect < 0.62) {
+      base = {
+        ...base,
+        cameraZ: base.cameraZ * 1.18,
+        spread: base.spread * 0.8,
+        fov: Math.min(base.fov + 4, 58),
+      };
+    }
+
+    const SHORT_VIEWPORT_PX = 760;
+    const MIN_VIEWPORT_PX = 520;
+    if (height > 0 && height < SHORT_VIEWPORT_PX) {
+      const shortFactor = clamp01(
+        (SHORT_VIEWPORT_PX - height) / (SHORT_VIEWPORT_PX - MIN_VIEWPORT_PX)
+      );
+      base = {
+        ...base,
+        cameraZ: base.cameraZ * (1 + shortFactor * 0.4),
+        fov: Math.min(base.fov + shortFactor * 12, 62),
+        scale: base.scale * (1 - shortFactor * 0.14),
+      };
+    }
+
+    return base;
+  };
+
+  React.useEffect(() => {
+    if (!containerRef.current || !wrapperRef.current) return;
+
+    const reducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const N = steps.length;
+    const getSize = () => ({
+      w: containerRef.current!.clientWidth,
+      h: containerRef.current!.clientHeight || window.innerHeight,
+    });
+    let { w: width, h: height } = getSize();
+    let layout = getLayout(width, height);
+    cameraBaseZRef.current = layout.cameraZ;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060d1a);
+    scene.fog = new THREE.FogExp2(0x060d1a, 0.013);
+    sceneRef.current = scene;
+
+    const camIntroZ = layout.cameraZ + 2.4;
+    const camera = new THREE.PerspectiveCamera(
+      layout.fov,
+      width / height,
+      0.1,
+      300
+    );
+    camera.position.set(0, 1.6, camIntroZ);
+    camera.lookAt(0, cameraLookYRef.current, 0);
+    cameraRef.current = camera;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    containerRef.current.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+
+    const ambientLight = new THREE.AmbientLight(0x2a3f5f, 0.35);
+    scene.add(ambientLight);
+    const keyLight = new THREE.DirectionalLight(0xe8f0ff, 0.3);
+    keyLight.position.set(4, 8, 6);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
+    keyLight.shadow.camera.near = 0.1;
+    keyLight.shadow.camera.far = 40;
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0x4f83d1, 0.7);
+    fillLight.position.set(-6, 2, 4);
+    scene.add(fillLight);
+    const goldLightBase = 1.4;
+    const goldLight = new THREE.PointLight(0xf5c76e, 0, 14);
+    goldLight.position.set(5.5, 3.5, 2);
+    scene.add(goldLight);
+
+    const worldGroup = new THREE.Group();
+    scene.add(worldGroup);
+    worldGroupRef.current = worldGroup;
+    worldGroup.scale.setScalar(layout.scale);
+
+    const BASELINE_Y = -2.6;
+    const gridHelper = new THREE.GridHelper(30, 30, 0x223452, 0x101d30);
+    gridHelper.position.y = BASELINE_Y;
+    (gridHelper.material as THREE.Material).transparent = true;
+    (gridHelper.material as THREE.Material).opacity = 0.5;
+    worldGroup.add(gridHelper);
+
+    const pCount = 700;
+    const pGeo = new THREE.BufferGeometry();
+    const pPos = new Float32Array(pCount * 3);
+    const pCol = new Float32Array(pCount * 3);
+    const startColor = new THREE.Color(0x60a5fa);
+    const endColor = new THREE.Color(0xf5c76e);
+    for (let i = 0; i < pCount; i++) {
+      const x = (Math.random() - 0.5) * 28;
+      pPos[i * 3] = x;
+      pPos[i * 3 + 1] = (Math.random() - 0.5) * 14;
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 16 - 4;
+      const norm = clamp01((x + 14) / 28 + (Math.random() * 0.3 - 0.15));
+      const c = startColor.clone().lerp(endColor, norm);
+      pCol[i * 3] = c.r;
+      pCol[i * 3 + 1] = c.g;
+      pCol[i * 3 + 2] = c.b;
+    }
+    pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+    pGeo.setAttribute("color", new THREE.BufferAttribute(pCol, 3));
+    const pMat = new THREE.PointsMaterial({
+      size: 0.055,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const particles = new THREE.Points(pGeo, pMat);
+    worldGroup.add(particles);
+
+    const spread = layout.spread;
+    const nodePositions = steps.map((_, idx) => {
+      const t = N > 1 ? idx / (N - 1) : 0;
+      return {
+        x: lerp(-5, 5, t) * spread,
+        y: lerp(-1.6, 2.6, t),
+        z: lerp(-0.6, 1.2, t),
+      };
+    });
+    cameraLookYRef.current = 0.4;
+
+    const NODE_W = 1.6,
+      NODE_H = 0.72,
+      NODE_D = 0.22;
+    const CANVAS_W = 640,
+      CANVAS_H = 288;
+    const CARD_SS = Math.min(window.devicePixelRatio || 1, 2) >= 2 ? 3 : 2.5;
+    const lastIdx = N - 1;
+
+    const revealSpan = 0.82;
+    const perStep = revealSpan / N;
+    const overlap = 1.6;
+    const successStart = revealSpan;
+
+    nodesRef.current = steps.map((step, idx) => {
+      const t = N > 1 ? idx / (N - 1) : 0;
+      const accent = startColor.clone().lerp(endColor, t);
+      const isLast = idx === lastIdx;
+      const pos = nodePositions[idx];
+      const baseScale = 0.85 + t * 0.33;
+
+      const group = new THREE.Group();
+      group.position.set(pos.x, pos.y, pos.z);
+      group.scale.setScalar(0.001);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = CANVAS_W * CARD_SS;
+      canvas.height = CANVAS_H * CARD_SS;
+      const ctx = canvas.getContext("2d")!;
+      ctx.scale(CARD_SS, CARD_SS);
+      const r = 34;
+
+      roundRectPath(ctx, 2, 2, CANVAS_W - 4, CANVAS_H - 4, r);
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, CANVAS_H);
+      bgGrad.addColorStop(0, "rgba(20,32,56,0.99)");
+      bgGrad.addColorStop(1, "rgba(6,12,22,0.99)");
+      ctx.fillStyle = bgGrad;
+      ctx.fill();
+
+      ctx.save();
+      roundRectPath(ctx, 2, 2, CANVAS_W - 4, CANVAS_H - 4, r);
+      ctx.clip();
+      const accHex = `#${accent.getHexString()}`;
+      const stripGrad = ctx.createLinearGradient(0, 0, CANVAS_W, 0);
+      stripGrad.addColorStop(0, "#60a5fa");
+      stripGrad.addColorStop(1, accHex);
+      ctx.fillStyle = stripGrad;
+      ctx.fillRect(0, 0, CANVAS_W, 8);
+      const innerGlow = ctx.createRadialGradient(
+        CANVAS_W - 60,
+        40,
+        0,
+        CANVAS_W - 60,
+        40,
+        240
+      );
+      innerGlow.addColorStop(
+        0,
+        `rgba(${Math.round(accent.r * 255)},${Math.round(
+          accent.g * 255
+        )},${Math.round(accent.b * 255)},0.22)`
+      );
+      innerGlow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = innerGlow;
+      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+      ctx.restore();
+
+      roundRectPath(ctx, 2, 2, CANVAS_W - 4, CANVAS_H - 4, r);
+      ctx.strokeStyle = `rgba(${Math.round(accent.r * 255)},${Math.round(
+        accent.g * 255
+      )},${Math.round(accent.b * 255)},0.65)`;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      ctx.font = `800 32px "Inter", system-ui, sans-serif`;
+      ctx.fillStyle = accHex;
+      ctx.shadowColor = "rgba(0,0,0,0.55)";
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetY = 1;
+      ctx.fillText(isLast ? "★" : `0${idx + 1}`, 34, 58);
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      let titleSize = 52;
+      const titleMax = CANVAS_W - 68;
+      ctx.font = `800 ${titleSize}px "Inter", system-ui, sans-serif`;
+      while (ctx.measureText(step.title).width > titleMax && titleSize > 30) {
+        titleSize -= 2;
+        ctx.font = `800 ${titleSize}px "Inter", system-ui, sans-serif`;
+      }
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 1;
+      ctx.fillText(step.title, 34, 114);
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      ctx.fillStyle = `rgba(${Math.round(accent.r * 255)},${Math.round(
+        accent.g * 255
+      )},${Math.round(accent.b * 255)},0.6)`;
+      ctx.fillRect(34, 130, CANVAS_W - 68, 2);
+
+      ctx.font = `600 28px "Inter", system-ui, sans-serif`;
+      ctx.fillStyle = "rgba(234,241,255,1)";
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 3;
+      ctx.shadowOffsetY = 1;
+      const words = step.description.split(" ");
+      let line = "",
+        lineY = 174;
+      const maxWidth = CANVAS_W - 68;
+      words.forEach((word) => {
+        const test = line + word + " ";
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line.trim(), 34, lineY);
+          line = word + " ";
+          lineY += 36;
+        } else {
+          line = test;
+        }
+      });
+      ctx.fillText(line.trim(), 34, lineY);
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = true;
+      texture.needsUpdate = true;
+
+      const sideMat = new THREE.MeshStandardMaterial({
+        color: 0x0a1220,
+        metalness: 0.4,
+        roughness: 0.6,
+        transparent: true,
+        opacity: 0,
+      });
+      const frontMat = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0,
+      });
+      const materials = [
+        sideMat,
+        sideMat,
+        sideMat,
+        sideMat,
+        frontMat,
+        sideMat,
+      ];
+
+      const cardGeo = new THREE.BoxGeometry(NODE_W, NODE_H, NODE_D);
+      const card = new THREE.Mesh(cardGeo, materials);
+      card.castShadow = true;
+      card.receiveShadow = true;
+      group.add(card);
+
+      const edgesGeo = new THREE.EdgesGeometry(cardGeo);
+      const edgesMat = new THREE.LineBasicMaterial({
+        color: accent,
+        transparent: true,
+        opacity: 0,
+      });
+      const edges = new THREE.LineSegments(edgesGeo, edgesMat);
+      group.add(edges);
+
+      worldGroup.add(group);
+
+      const cardBottom = pos.y - (NODE_H * baseScale) / 2 - 0.05;
+      const barHeight = Math.max(cardBottom - BASELINE_Y, 0.05);
+      const barTex = makeVerticalGradientTexture("#14243d", accHex);
+      const barMat = new THREE.MeshStandardMaterial({
+        map: barTex,
+        emissive: accent,
+        emissiveIntensity: 0.28,
+        metalness: 0.3,
+        roughness: 0.5,
+        transparent: true,
+        opacity: 0.94,
+      });
+      const barGeo = new THREE.BoxGeometry(0.46, barHeight, 0.46);
+      const bar = new THREE.Mesh(barGeo, barMat);
+      bar.position.y = barHeight / 2;
+      bar.castShadow = true;
+      bar.receiveShadow = true;
+      const barGroup = new THREE.Group();
+      barGroup.position.set(pos.x, BASELINE_Y, pos.z);
+      barGroup.scale.y = 0.0001;
+      barGroup.add(bar);
+      worldGroup.add(barGroup);
+
+      const dotY = pos.y - (NODE_H * baseScale) / 2 - 0.06;
+      const dotGeo = new THREE.SphereGeometry(0.045, 16, 16);
+      const dotMat = new THREE.MeshStandardMaterial({
+        color: accent,
+        emissive: accent,
+        emissiveIntensity: 0.9,
+        metalness: 0.6,
+        roughness: 0.25,
+      });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.position.set(pos.x, dotY, pos.z);
+      dot.scale.setScalar(0.0001);
+      worldGroup.add(dot);
+
+      const glowTex = makeGlowTexture(
+        `rgba(${Math.round(accent.r * 255)},${Math.round(
+          accent.g * 255
+        )},${Math.round(accent.b * 255)},0.9)`,
+        "rgba(0,0,0,0)"
+      );
+      const glowMat = new THREE.SpriteMaterial({
+        map: glowTex,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const glow = new THREE.Sprite(glowMat);
+      const glowTargetScale = isLast ? 0.75 : 0.38;
+      glow.scale.setScalar(0.0001);
+      glow.position.copy(dot.position);
+      worldGroup.add(glow);
+
+      const pStart = idx * perStep;
+      const pEnd = Math.min(revealSpan + 0.06, pStart + perStep * overlap);
+
+      return {
+        group,
+        front: card,
+        sideMat,
+        frontMat,
+        edgesMat,
+        baseY: pos.y,
+        baseScale,
+        accent,
+        isLast,
+        phase: idx * (Math.PI / 3),
+        barGroup,
+        dot,
+        glow,
+        glowTargetScale,
+        pStart,
+        pEnd,
+      };
+    });
+
+    const firstX = nodePositions[0].x,
+      lastX = nodePositions[lastIdx].x;
+    const baselineTex = makeVerticalGradientTexture("#60a5fa", "#f5c76e");
+    baselineTex.rotation = Math.PI / 2;
+    const baselineMat = new THREE.MeshBasicMaterial({
+      map: baselineTex,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const baselinePlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(lastX - firstX + 2.4, 0.05),
+      baselineMat
+    );
+    baselinePlane.rotation.x = -Math.PI / 2;
+    baselinePlane.position.set(
+      (firstX + lastX) / 2,
+      BASELINE_Y + 0.005,
+      (nodePositions[0].z + nodePositions[lastIdx].z) / 2
+    );
+    worldGroup.add(baselinePlane);
+
+    const curvePoints = nodePositions.map((p, idx) => {
+      const t = nodePositions.length > 1 ? idx / (nodePositions.length - 1) : 0;
+      const bScale = 0.85 + t * 0.33;
+      return new THREE.Vector3(
+        p.x,
+        p.y - (NODE_H * bScale) / 2 - 0.06,
+        p.z
+      );
+    });
+    const curve = new THREE.CatmullRomCurve3(curvePoints);
+
+    const gradCanvas = document.createElement("canvas");
+    gradCanvas.width = 256;
+    gradCanvas.height = 8;
+    const gctx = gradCanvas.getContext("2d")!;
+    const gGrad = gctx.createLinearGradient(0, 0, 256, 0);
+    gGrad.addColorStop(0, "#60a5fa");
+    gGrad.addColorStop(0.55, "#5eead4");
+    gGrad.addColorStop(1, "#f5c76e");
+    gctx.fillStyle = gGrad;
+    gctx.fillRect(0, 0, 256, 8);
+    const gradTex = new THREE.CanvasTexture(gradCanvas);
+
+    const tubeGeo = new THREE.TubeGeometry(curve, 120, 0.013, 8, false);
+    const tubeMat = new THREE.MeshBasicMaterial({
+      map: gradTex,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+    worldGroup.add(tubeMesh);
+    const tubeFullCount = tubeGeo.index ? tubeGeo.index.count : 0;
+    if (tubeGeo.index) tubeGeo.setDrawRange(0, 0);
+
+    const glowTubeGeo = new THREE.TubeGeometry(curve, 120, 0.04, 8, false);
+    const glowTubeMat = new THREE.MeshBasicMaterial({
+      map: gradTex,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    worldGroup.add(new THREE.Mesh(glowTubeGeo, glowTubeMat));
+
+    const lastPos = nodePositions[lastIdx];
+    const beamTex = makeGlowTexture(
+      "rgba(245,199,110,0.55)",
+      "rgba(245,199,110,0)"
+    );
+    const beamMat = new THREE.SpriteMaterial({
+      map: beamTex,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const beam = new THREE.Sprite(beamMat);
+    beam.scale.setScalar(0.0001);
+    beam.position.set(lastPos.x, lastPos.y + 1.2, lastPos.z);
+    worldGroup.add(beam);
+
+    const successLabel = makeLabelSprite("SUCCESS", "#fbd888");
+    successLabel.scale.setScalar(0.0001);
+    successLabel.position.set(lastPos.x, lastPos.y + 1.85, lastPos.z);
+    worldGroup.add(successLabel);
+
+    const tooltip = document.createElement("div");
+    tooltip.style.cssText = `
+        position: absolute;
+        background: rgba(7,12,20,0.97);
+        border-left: 3px solid #5eead4;
+        border-radius: 10px;
+        padding: clamp(10px,3vw,18px) clamp(12px,3.5vw,22px);
+        font-family: "Inter", system-ui, sans-serif;
+        font-size: clamp(13px,3vw,15px);
+        color: rgba(224,238,255,0.97);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        max-width: min(260px,60vw);
+        line-height: 1.55;
+        z-index: 20;
+        white-space: normal;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 10px 26px rgba(0,0,0,0.6);
+      `;
+    containerRef.current!.appendChild(tooltip);
+    tooltipDomRef.current = tooltip;
+
+    const raycaster = new THREE.Raycaster();
+    const pointerVec = new THREE.Vector2();
+    const frontMeshes = nodesRef.current.map((n) => n.front);
+
+    const showTooltipFor = (
+      idx: number,
+      clientX: number,
+      clientY: number,
+      rect: DOMRect
+    ) => {
+      if (idx !== activeTooltipRef.current) {
+        activeTooltipRef.current = idx;
+        const step = steps[idx];
+        tooltip.innerHTML = `
+            <div style="color:#7eecd8;font-size:0.75em;letter-spacing:.1em;margin-bottom:6px;">STEP 0${idx + 1}</div>
+            <strong style="color:white;font-size:1.2em;display:block;margin-bottom:6px;">${step.title}</strong>
+            <div style="color:#c0d8ff;font-size:0.95em;line-height:1.5;">${step.description}</div>
+          `;
+        tooltip.style.opacity = "1";
+      }
+      let left = clientX - rect.left + 16;
+      let top = clientY - rect.top - 12;
+      const tw = tooltip.offsetWidth || 220;
+      const th = tooltip.offsetHeight || 100;
+      if (left + tw > rect.width - 8) left = clientX - rect.left - tw - 16;
+      if (left < 8) left = 8;
+      if (top + th > rect.height - 8) top = rect.height - th - 8;
+      if (top < 8) top = 8;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    };
+    const hideTooltip = () => {
+      activeTooltipRef.current = null;
+      tooltip.style.opacity = "0";
+    };
+
+    const raycastAt = (clientX: number, clientY: number) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointerVec.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      pointerVec.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      targetMouseRef.current.x = (clientX - rect.left) / rect.width - 0.5;
+      targetMouseRef.current.y = (clientY - rect.top) / rect.height - 0.5;
+      raycaster.setFromCamera(pointerVec, camera);
+      return { hits: raycaster.intersectObjects(frontMeshes), rect };
+    };
+
+    const isFinePointer = (e: PointerEvent) => e.pointerType === "mouse";
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isFinePointer(e)) return;
+      const { hits, rect } = raycastAt(e.clientX, e.clientY);
+      if (hits.length > 0) {
+        const idx = frontMeshes.indexOf(hits[0].object as THREE.Mesh);
+        showTooltipFor(idx, e.clientX, e.clientY, rect);
+        renderer.domElement.style.cursor = "pointer";
+      } else {
+        hideTooltip();
+        renderer.domElement.style.cursor = "default";
+      }
+    };
+    const onPointerLeave = (e: PointerEvent) => {
+      if (isFinePointer(e)) hideTooltip();
+    };
+
+    renderer.domElement.addEventListener("pointermove", onPointerMove);
+    renderer.domElement.addEventListener("pointerleave", onPointerLeave);
+
+    const setWrapperHeight = () => {
+      const vh = window.innerHeight;
+      const stickyH = vh - NAV_HEIGHT;
+      const stepVh = width < 640 ? 0.62 : 0.58;
+      wrapperRef.current!.style.height = `${stickyH + N * vh * stepVh}px`;
+    };
+    setWrapperHeight();
+
+   const updateScroll = () => {
+      if (!wrapperRef.current) return;
+      const rect = wrapperRef.current.getBoundingClientRect();
+      const stickyH = window.innerHeight - NAV_HEIGHT;
+      const total = wrapperRef.current.offsetHeight - stickyH;
+      const scrolled = NAV_HEIGHT - rect.top;
+      targetPRef.current = total > 0 ? clamp01(scrolled / total) : 0;
+    };
+    let scrollTicking = false;
+    const onScroll = () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        updateScroll();
+        scrollTicking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateScroll();
+    scrollPRef.current = targetPRef.current;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateScroll();
+    scrollPRef.current = targetPRef.current;
+
+    const animate = () => {
+      rafRef.current = requestAnimationFrame(animate);
+      clockRef.current += 0.012;
+      const t = clockRef.current;
+
+      mouseRef.current.x +=
+        (targetMouseRef.current.x - mouseRef.current.x) * 0.05;
+      mouseRef.current.y +=
+        (targetMouseRef.current.y - mouseRef.current.y) * 0.05;
+
+      scrollPRef.current +=
+        (targetPRef.current - scrollPRef.current) *
+        (reducedMotion ? 1 : 0.085);
+      const p = scrollPRef.current;
+
+      const swayX = reducedMotion ? 0 : Math.sin(t * 0.15) * 0.14;
+      const swayY = reducedMotion ? 0 : Math.cos(t * 0.11) * 0.06;
+
+      const camZP = easeOutCubic(clamp01(p / 0.35));
+      let camZ = lerp(camIntroZ, cameraBaseZRef.current, camZP);
+      camZ = lerp(
+        camZ,
+        cameraBaseZRef.current - 0.5,
+        easeOutCubic(clamp01((p - 0.82) / 0.18))
+      );
+      const journeyX = lerp(
+        nodePositions[0].x * 0.25,
+        nodePositions[lastIdx].x * 0.18,
+        easeOutCubic(p)
+      );
+
+      camera.position.x = journeyX + mouseRef.current.x * 1.0 + swayX;
+      camera.position.y =
+        lerp(1.6, 2.7, easeOutCubic(p)) - mouseRef.current.y * 0.6 + swayY;
+      camera.position.z = camZ;
+      camera.lookAt(
+        journeyX * 0.4 + mouseRef.current.x * 0.25,
+        cameraLookYRef.current + p * 0.3 - mouseRef.current.y * -0.12,
+        0
+      );
+
+      const lightP = easeOutCubic(clamp01(p / 0.3));
+      ambientLight.intensity = lerp(0.35, 3.1, lightP);
+      keyLight.intensity =
+        lerp(0.3, 2.7, lightP) +
+        (reducedMotion ? 0 : Math.sin(t * 0.25) * 0.12 * lightP);
+      scene.fog!.density = lerp(0.013, 0.007, p);
+
+      const successP = clamp01((p - successStart) / (1 - successStart));
+      if (successP < 1) {
+        goldLight.intensity = Math.sin(successP * Math.PI) * goldLightBase * 2.2;
+      } else {
+        goldLight.intensity =
+          goldLightBase + (reducedMotion ? 0 : Math.sin(t * 0.6) * 0.25);
+      }
+
+      if (tubeGeo.index) {
+        const pathP = easeOutCubic(clamp01(p / revealSpan));
+        const count = Math.floor((tubeFullCount * pathP) / 3) * 3;
+        tubeGeo.setDrawRange(0, count);
+        glowTubeMat.opacity = 0.18 * pathP;
+      }
+
+      const pIntro = easeOutCubic(clamp01(p / 0.25));
+      pMat.opacity =
+        lerp(0, 0.5, pIntro) +
+        (reducedMotion ? 0 : Math.sin(t * 0.4) * 0.08 * pIntro);
+      if (!reducedMotion) {
+        particles.rotation.y = t * 0.015;
+        particles.rotation.x = Math.sin(t * 0.07) * 0.03;
+      }
+
+      const introP = easeOutCubic(clamp01(p / 0.05));
+      baselineMat.opacity = 0.6 * clamp01(introP + 0.3);
+
+      let currentIdx = 0;
+      nodesRef.current.forEach((node, i) => {
+        const hovered = activeTooltipRef.current === i;
+        const localT = clamp01(
+          (p - node.pStart) / Math.max(node.pEnd - node.pStart, 0.0001)
+        );
+
+        const barP = easeOutCubic(clamp01(localT / 0.42));
+        node.barGroup.scale.y = Math.max(barP, 0.0001);
+
+        const cardP = clamp01((localT - 0.28) / 0.72);
+        const cardEase = easeOutBack(cardP);
+        const cardOpacity = easeOutCubic(cardP);
+        node.frontMat.opacity = cardOpacity;
+        node.sideMat.opacity = cardOpacity;
+        node.edgesMat.opacity = 0.45 * cardOpacity;
+        const revealScale = Math.max(node.baseScale * cardEase, 0.0001);
+
+        const dotP = easeOutBack(clamp01((localT - 0.6) / 0.4));
+        node.dot.scale.setScalar(Math.max(dotP, 0.0001));
+        node.glow.scale.setScalar(
+          Math.max(node.glowTargetScale * dotP, 0.0001)
+        );
+
+        const idleScale = hovered ? 1.07 : 1.0;
+        node.group.scale.setScalar(revealScale * idleScale);
+
+        const bob = reducedMotion
+          ? 0
+          : Math.sin(t + node.phase) * 0.045 * barP;
+        node.group.position.y = node.baseY + bob;
+        node.group.rotation.y = reducedMotion
+          ? 0
+          : Math.sin(t * 0.4 + node.phase) * 0.02 * barP;
+
+        if (localT > 0.05) currentIdx = i;
+      });
+
+      const sp = easeOutBack(successP);
+      const beamP = easeOutCubic(successP);
+      beam.scale.set(
+        1.7 * Math.max(beamP, 0.0001),
+        3.4 * Math.max(beamP, 0.0001),
+        1
+      );
+      beam.material.opacity = 1;
+      successLabel.scale.set(
+        1.5 * Math.max(sp, 0.0001),
+        0.38 * Math.max(sp, 0.0001),
+        1
+      );
+
+      if (hudFillRef.current) hudFillRef.current.style.width = `${p * 100}%`;
+      const stepIdx = Math.min(N - 1, currentIdx);
+      if (stepIdx !== lastStepIndexRef.current) {
+        lastStepIndexRef.current = stepIdx;
+        if (hudCounterRef.current)
+          hudCounterRef.current.textContent = `STEP ${stepIdx + 1} / ${N}`;
+        if (hudTitleRef.current)
+          hudTitleRef.current.textContent = steps[stepIdx].title;
+        if (hudDescRef.current)
+          hudDescRef.current.textContent = steps[stepIdx].description;
+        if (onStepChange) onStepChange(stepIdx);
+      }
+
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    const applyLayout = () => {
+      if (!containerRef.current || !camera || !renderer) return;
+      const size = getSize();
+      width = size.w;
+      height = size.h;
+      const l = getLayout(width, height);
+      camera.aspect = width / height;
+      camera.fov = l.fov;
+      camera.updateProjectionMatrix();
+      cameraBaseZRef.current = l.cameraZ;
+      renderer.setSize(width, height);
+      if (worldGroupRef.current)
+        worldGroupRef.current.scale.setScalar(l.scale);
+      setWrapperHeight();
+    };
+
+    const resizeObserver = new ResizeObserver(() => applyLayout());
+    resizeObserver.observe(containerRef.current!);
+    window.addEventListener("orientationchange", applyLayout);
+    window.addEventListener("resize", applyLayout);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("orientationchange", applyLayout);
+      window.removeEventListener("resize", applyLayout);
+      window.removeEventListener("scroll", onScroll);
+      renderer.domElement.removeEventListener("pointermove", onPointerMove);
+      renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      renderer.dispose();
+      if (
+        containerRef.current &&
+        renderer.domElement.parentNode === containerRef.current
+      ) {
+        containerRef.current.removeChild(renderer.domElement);
+      }
+      if (
+        tooltipDomRef.current &&
+        tooltipDomRef.current.parentNode === containerRef.current
+      ) {
+        containerRef.current.removeChild(tooltipDomRef.current);
+      }
+    };
+  }, [steps, onStepChange]);
+
+return (
+    <div
+      ref={wrapperRef}
+      style={{ position: "relative", width: "100%", overflowX: "clip" }}
+    >
+      <div
+        style={{
+          position: "sticky",
+          top: NAV_HEIGHT,
+          width: "100%",
+          height: `calc(100vh - ${NAV_HEIGHT}px)`,
+          maxHeight: `calc(100vh - ${NAV_HEIGHT}px)`,
+          minHeight: "480px",
+        }}
+      >
+        <div
+          ref={containerRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "20px",
+            overflow: "hidden",
+            touchAction: "pan-y",
+            boxShadow:
+              "0 0 0 1px rgba(96,165,250,0.12), 0 32px 64px -16px rgba(0,0,0,0.7)",
+          }}
+        />
+
+        {/* HUD - Always visible step indicator */}
+        <div
+          style={{
+            position: "absolute",
+            top: "clamp(16px, 3.5vw, 32px)",
+            left: "clamp(16px, 3.5vw, 32px)",
+            right: "clamp(16px, 3.5vw, 32px)",
+            maxWidth: "min(480px, calc(100vw - 32px))",
+            zIndex: 10,
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            style={{
+              background: "rgba(5,10,20,0.88)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              borderRadius: "14px",
+              border: "1px solid rgba(96,165,250,0.22)",
+              padding: "clamp(14px,3vw,22px) clamp(16px,3.5vw,26px)",
+              boxShadow:
+                "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+            }}
+          >
+            <div
+              ref={hudCounterRef}
+              style={{
+                fontFamily: '"Inter", system-ui, sans-serif',
+                fontSize: "clamp(11px, 2.6vw, 13px)",
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+                color: "#7bf5de",
+                marginBottom: "8px",
+                textTransform: "uppercase" as const,
+              }}
+            >
+              STEP 1 / {steps.length}
+            </div>
+            <div
+              ref={hudTitleRef}
+              style={{
+                fontFamily: '"Inter", system-ui, sans-serif',
+                fontSize: "clamp(16px, 4vw, 26px)",
+                fontWeight: 800,
+                color: "#ffffff",
+                marginBottom: "8px",
+                lineHeight: 1.25,
+                textShadow: "0 2px 12px rgba(0,0,0,0.9)",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {steps[0].title}
+            </div>
+            <div
+              ref={hudDescRef}
+              style={{
+                fontFamily: '"Inter", system-ui, sans-serif',
+                fontSize: "clamp(12px, 2.6vw, 15px)",
+                lineHeight: 1.6,
+                color: "rgba(224,235,252,0.98)",
+                textShadow: "0 1px 6px rgba(0,0,0,0.7)",
+                fontWeight: 500,
+              }}
+            >
+              {steps[0].description}
+            </div>
+            <div
+              style={{
+                marginTop: "14px",
+                height: "3px",
+                width: "100%",
+                background: "rgba(255,255,255,0.12)",
+                borderRadius: "2px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                ref={hudFillRef}
+                style={{
+                  height: "100%",
+                  width: "0%",
+                  background:
+                    "linear-gradient(90deg, #60a5fa, #5eead4, #f5c76e)",
+                  borderRadius: "2px",
+                  transition: "width 0.1s linear",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Helper function for label sprites
+function makeLabelSprite(text: string, color: string) {
+  const c = document.createElement("canvas");
+  c.width = 280;
+  c.height = 72;
+  const ctx = c.getContext("2d")!;
+  ctx.font = `800 34px "Inter", system-ui, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 20;
+  ctx.fillStyle = color;
+  ctx.fillText(text, 140, 36);
+  ctx.fillText(text, 140, 36);
+  const tex = new THREE.CanvasTexture(c);
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(1.5, 0.38, 1);
+  return sprite;
+}
 /* ═══════════════════════════════════════════════════════════════
    TESTIMONIALS — original structure + 3D tilt cards
 ═══════════════════════════════════════════════════════════════ */
