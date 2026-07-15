@@ -15,6 +15,7 @@ import {
   Smartphone, ChevronRight,
 } from 'lucide-react';
 import { Navigation } from '../components/Navigation';
+
 import { Footer } from '../components/Footer';
 import { CTASection } from '../components/CTASection';
 import { certificationFaqs } from '../data/certifications-data';
@@ -761,269 +762,971 @@ function AnimatedCounter({ value, suffix = '' }) {
 const inputStyle = { width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 14, outline: 'none', background: '#fafafa', boxSizing: 'border-box' };
 
 function CourseModal({ course, onClose, onRegister }) {
+  const scrollRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // --- Sticky "Ready to start?" CTA (mobile/tablet only) ---------------
+  // Single source of truth: the SAME card element is always rendered.
+  // We never mount a second card — we only change how this one card is
+  // positioned/sized, and reserve its original space with a plain
+  // (contentless) spacer so nothing jumps when it leaves the flow.
+  const ctaRef = useRef(null);
+  const ctaSentinelRef = useRef(null);
+  const [isCtaStuck, setIsCtaStuck] = useState(false);
+  const [ctaFlowHeight, setCtaFlowHeight] = useState(0);
+  const STICKY_TOP_OFFSET = 12; // px, clears the 3px progress bar with room to spare
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const maxScroll = scrollHeight - clientHeight;
+    setScrollProgress(maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0);
+
+    // Only mobile/tablet gets the morphing sticky behavior. Desktop keeps
+    // the existing `lg:sticky lg:top-4` sidebar behavior untouched.
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (isDesktop) {
+      setIsCtaStuck(false);
+      return;
+    }
+
+    const sentinel = ctaSentinelRef.current;
+    const container = scrollRef.current;
+    if (!sentinel || !container) return;
+
+    const sentinelTop = sentinel.getBoundingClientRect().top;
+    const containerTop = container.getBoundingClientRect().top;
+    setIsCtaStuck(sentinelTop - containerTop <= STICKY_TOP_OFFSET);
+  }, []);
+
+  useEffect(() => {
+    if (!course) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    el.scrollTop = 0;
+    handleScroll();
+
+    const nudgeTimer = setTimeout(() => {
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      const prefersReduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (maxScroll > 40 && !prefersReduced) {
+        el.scrollTo({ top: 60, behavior: "smooth" });
+        setTimeout(() => el.scrollTo({ top: 0, behavior: "smooth" }), 600);
+      }
+    }, 550);
+
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      clearTimeout(nudgeTimer);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [course, handleScroll]);
+
+  // Track the card's natural (in-flow, expanded) height so the spacer that
+  // replaces it while it's pinned reserves the exact right amount of space.
+  useEffect(() => {
+    const node = ctaRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      if (!isCtaStuck) {
+        const h = entries[0]?.contentRect?.height;
+        if (h) setCtaFlowHeight(h);
+      }
+    });
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [isCtaStuck]);
+
   if (!course) return null;
-  
+
   return (
     <AnimatePresence>
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-        onClick={onClose}>
-        <motion.div 
-          initial={{ scale: 0.9, y: 30, rotateX: 20 }} 
-          animate={{ scale: 1, y: 0, rotateX: 0 }} 
+        className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, y: 30, rotateX: 20 }}
+          animate={{ scale: 1, y: 0, rotateX: 0 }}
           exit={{ scale: 0.9, y: 30, rotateX: 20 }}
+          transition={{ type: "spring", damping: 22, stiffness: 260 }}
           onClick={e => e.stopPropagation()}
-          className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl">
-          
-          {/* Hero Image Section with Gradient Overlay */}
-          <div className="relative h-80 overflow-hidden">
-            <motion.img 
-              src={course.img} 
-              alt={course.title} 
-              className="w-full h-full object-cover"
-              initial={{ scale: 1.1 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.6 }}
+          className="w-full max-w-6xl max-h-[92vh] bg-white rounded-2xl sm:rounded-3xl relative shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col"
+        >
+          <style>{`
+            .course-modal-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(220,38,38,0.35) transparent;
+            }
+            .course-modal-scroll::-webkit-scrollbar {
+              width: 8px;
+            }
+            .course-modal-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .course-modal-scroll::-webkit-scrollbar-thumb {
+              background-color: rgba(220,38,38,0.25);
+              border-radius: 999px;
+              border: 2px solid transparent;
+              background-clip: padding-box;
+            }
+            .course-modal-scroll::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(220,38,38,0.45);
+              background-clip: padding-box;
+            }
+          `}</style>
+
+          {/* Scroll progress bar */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gray-100/60 z-30 overflow-hidden">
+            <motion.div
+              className="h-full"
+              style={{ background: course.color || "#dc2626" }}
+              animate={{ width: `${scrollProgress}%` }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-            
-            {/* Close Button */}
-            <button 
-              onClick={onClose} 
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-white/30 transition-all z-10">
-              <X size={18} className="text-white" />
-            </button>
-            
-            {/* Course Level Badge */}
-            <div className="absolute bottom-6 left-6 z-10">
-              <div className="flex gap-3 items-center">
-                <span className="px-4 py-2 rounded-full text-white text-sm font-bold shadow-lg" style={{ background: course.color }}>
-                  {course.level}
-                </span>
-                {course.credits && (
-                  <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
-                    {course.credits} Credits
-                  </span>
-                )}
+          </div>
+
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="course-modal-scroll overflow-y-auto flex-1"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 p-5 sm:p-8">
+              {/* IMAGE — left column, top of the layout, order-1 always */}
+              <div className="lg:col-span-2 order-1">
+                <div
+                  className="relative w-full rounded-2xl overflow-hidden shadow-lg"
+                  style={{ aspectRatio: '3 / 2' }}
+                >
+                  <motion.img
+                    src={course.img}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+
+                  <motion.button
+                    onClick={onClose}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg hover:bg-white/25 transition-colors z-10"
+                  >
+                    <X size={16} className="text-white" />
+                  </motion.button>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex flex-wrap gap-2 items-center"
+                  >
+                    <span
+                      className="px-3 py-1 sm:py-1.5 rounded-full text-white text-xs font-bold shadow-lg"
+                      style={{ background: course.color }}
+                    >
+                      {course.level}
+                    </span>
+                    {course.credits && (
+                      <span className="px-3 py-1 sm:py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold">
+                        {course.credits} Credits
+                      </span>
+                    )}
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 z-10"
+                  >
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1.5 sm:mb-2 drop-shadow-lg leading-tight">
+                      {course.title}
+                    </h2>
+                    <div className="flex flex-wrap gap-2 text-white/90 text-xs">
+                      <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <Clock size={12} /> {course.duration}
+                      </span>
+                      <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <Users size={12} /> {course.students} enrolled
+                      </span>
+                      {course.rating && (
+                        <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                          <Star size={12} fill="#fbbf24" stroke="none" /> {course.rating}
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
               </div>
-            </div>
-            
-            {/* Course Title Overlay */}
-            <div className="absolute bottom-6 right-6 left-auto z-10 max-w-md text-right">
-              <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">{course.title}</h2>
-              <div className="flex gap-4 justify-end text-white/90 text-sm">
-                <span className="flex items-center gap-1">
-                  <Clock size={14} /> {course.duration}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users size={14} /> {course.students} enrolled
-                </span>
-                {course.rating && (
-                  <span className="flex items-center gap-1">
-                    <Star size={14} fill="#fbbf24" stroke="none" /> {course.rating}
-                  </span>
+
+              {/* SIDEBAR — right column, spans both rows, sticky, order-2 on mobile so it
+                  appears right after the image before the long text sections */}
+              <div className="lg:col-span-1 lg:row-span-2 order-2">
+                <div className="lg:sticky lg:top-4 flex flex-col gap-5">
+                  {/* Key info stat grid — Level called out full-width and first on
+                      mobile/tablet (order-1); desktop keeps the original 2x2 grid
+                      order (Duration, Credits, Students, Level) via lg:order-*. */}
+                  <div className="order-2 lg:order-1 grid grid-cols-2 gap-3">
+                    {course.level && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-1 lg:order-4 col-span-2 lg:col-span-1 relative overflow-hidden rounded-xl p-4 lg:text-center text-white shadow-lg flex lg:block items-center gap-3 lg:gap-0"
+                        style={{
+                          background: `linear-gradient(135deg, ${course.color || "#dc2626"}, ${course.color || "#dc2626"}99)`,
+                        }}
+                      >
+                        <motion.div
+                          animate={{ scale: [1, 1.15, 1] }}
+                          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                          className="flex-shrink-0 lg:mx-auto lg:mb-2"
+                        >
+                          <TrendingUp size={22} className="drop-shadow" />
+                        </motion.div>
+                        <div>
+                          <p className="text-[11px] text-white/85 mb-0.5 lg:mb-1 uppercase tracking-wide font-semibold">Level</p>
+                          <p className="font-extrabold text-base drop-shadow-sm">{course.level}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                    {course.duration && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-2 lg:order-1 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Clock size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Duration</p>
+                        <p className="font-semibold text-gray-900 text-sm">{course.duration}</p>
+                      </motion.div>
+                    )}
+                    {course.students && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-3 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Users size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Students</p>
+                        <p className="font-semibold text-gray-900 text-sm">{course.students}</p>
+                      </motion.div>
+                    )}
+                    {course.credits && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-4 lg:order-2 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Award size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Credits</p>
+                        <p className="font-semibold text-gray-900 text-sm">{course.credits}</p>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {course.prerequisites && (
+                    <div className="order-3 bg-blue-50 rounded-xl p-4 border border-blue-200">
+                      <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                        <Shield size={16} className="text-blue-600" />
+                        Prerequisites
+                      </h3>
+                      <p className="text-gray-700 text-sm">{course.prerequisites}</p>
+                    </div>
+                  )}
+
+                  {/* Course includes */}
+                  <div className="order-4 bg-gray-50 rounded-xl p-5 border border-gray-100">
+                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+                      <CheckSquare size={16} className="text-red-600" />
+                      This Course Includes:
+                    </h3>
+                    <div className="space-y-2.5">
+                      {[
+                        "Certificate of Completion",
+                        "Hands-on Projects",
+                        "Industry Expert Instructors",
+                        "Lifetime Access to Materials",
+                        "Career Support & Guidance",
+                        "Community Access",
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                          <CheckCircle size={14} className="text-red-500 flex-shrink-0" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Marks the CTA's natural position — now right under the image
+                      banner, above the stat cards, on mobile/tablet (order-1).
+                      Desktop keeps it last, exactly as before (lg:order-4). Once
+                      this scrolls past the top of the scroll container (below the
+                      progress bar), the card morphs into its pinned, compact
+                      state. */}
+                  <div ref={ctaSentinelRef} className="order-1 lg:order-4 h-0 lg:hidden" aria-hidden="true" />
+
+                  {/* Spacer: reserves the CTA's original space while it's pinned so
+                      the rest of the layout never jumps. It carries no content and
+                      is never visible as a card — it's just empty space. */}
+                  <motion.div
+                    aria-hidden="true"
+                    className="order-1 lg:order-4 lg:hidden"
+                    animate={{ height: isCtaStuck ? ctaFlowHeight : 0 }}
+                    transition={{ type: "spring", stiffness: 320, damping: 34 }}
+                    style={{ pointerEvents: "none" }}
+                  />
+
+                  {/* CTA card — the ONE registration card. On mobile/tablet it
+                      morphs from its in-flow position into a compact pinned bar
+                      anchored to the modal (not the browser viewport) once the
+                      spot above scrolls out of view, then morphs back. When
+                      pinned, it's a little taller/bolder than a typical sticky
+                      bar so it still reads as the hero CTA. Desktop is
+                      untouched: it simply stays in flow inside the sticky
+                      sidebar, exactly as before. */}
+                  <motion.div
+                    ref={ctaRef}
+                    layout
+                    transition={{ layout: { type: "spring", stiffness: 320, damping: 34 } }}
+                    whileHover={!isCtaStuck ? { scale: 1.01 } : {}}
+                    className={`order-1 lg:order-4 overflow-hidden bg-gradient-to-br from-red-600 to-red-700 shadow-xl group z-20 ${
+                      isCtaStuck
+                        ? "absolute top-3 left-5 right-5 sm:left-8 sm:right-8 rounded-2xl py-4 px-5 lg:static lg:top-auto lg:left-auto lg:right-auto lg:rounded-2xl lg:p-6"
+                        : "relative rounded-2xl p-6"
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-white/10 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    <div className="relative z-10">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {isCtaStuck ? (
+                          <motion.div
+                            key="compact"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center justify-between gap-4"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-[11px] text-red-100 font-semibold uppercase tracking-wide leading-none mb-1">
+                                Ready to start?
+                              </p>
+                              <h4 className="text-base font-bold text-white truncate leading-tight">
+                                {course.title}
+                              </h4>
+                            </div>
+                            <motion.button
+                              onClick={onRegister}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="px-5 py-2.5 rounded-xl bg-white text-red-600 font-bold text-sm cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center justify-center gap-1.5 flex-shrink-0 group/btn"
+                            >
+                              Register
+                              <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                            </motion.button>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="full"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <h4 className="text-lg font-bold text-white mb-1">Ready to start?</h4>
+                            <p className="text-red-100 text-sm mb-4">Take the first step toward your career goals</p>
+                            <motion.button
+                              onClick={onRegister}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="w-full px-6 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center justify-center gap-2 group/btn"
+                            >
+                              Register Now
+                              <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                            </motion.button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* MAIN TEXT CONTENT — below the image, left column, order-3 */}
+              <div className="lg:col-span-2 order-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <FileText size={20} className="text-red-600" />
+                    Course Overview
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {course.description || course.fullDesc}
+                  </p>
+                </motion.div>
+
+                {course.objectives && course.objectives.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Target size={20} className="text-red-600" />
+                      Learning Objectives
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {course.objectives.map((obj, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md hover:bg-white transition-all group border border-transparent hover:border-red-100"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-red-600 transition-colors">
+                            <CheckCircle size={14} className="text-red-600 group-hover:text-white transition-colors" />
+                          </div>
+                          <span className="text-sm text-gray-700 leading-relaxed">{obj}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {course.outcomes && course.outcomes.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Award size={20} className="text-red-600" />
+                      What You'll Learn
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {course.outcomes.map((outcome, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition-all"
+                        >
+                          <CheckCircle size={16} color={course.color} className="flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-gray-700 leading-relaxed">{outcome}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {course.tools && course.tools.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Cpu size={20} className="text-red-600" />
+                      Tools & Technologies Covered
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {course.tools.map((tool, idx) => (
+                        <motion.span
+                          key={idx}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: idx * 0.03 }}
+                          whileHover={{ scale: 1.08, y: -2 }}
+                          className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all cursor-default shadow-sm"
+                        >
+                          {tool}
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {course.suitableFor && (
+                  <div className="mb-2 bg-gradient-to-r from-purple-50 to-white rounded-xl p-5 border border-purple-100">
+                    <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                      <Users size={18} className="text-purple-600" />
+                      Target Audience
+                    </h3>
+                    <p className="text-gray-700 text-sm leading-relaxed">{course.suitableFor}</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-          
-          {/* Content Section */}
-          <div className="p-8">
-            {/* Description */}
-            <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <FileText size={20} className="text-red-600" />
-                Course Overview
-              </h3>
-              <p className="text-gray-600 leading-relaxed">{course.description || course.fullDesc}</p>
-            </div>
-            
-            {/* Key Information Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {course.duration && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Clock size={20} className="text-red-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500 mb-1">Duration</p>
-                  <p className="font-semibold text-gray-900 text-sm">{course.duration}</p>
-                </div>
-              )}
-              {course.credits && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Award size={20} className="text-red-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500 mb-1">Credits</p>
-                  <p className="font-semibold text-gray-900 text-sm">{course.credits}</p>
-                </div>
-              )}
-              {course.students && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <Users size={20} className="text-red-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500 mb-1">Students</p>
-                  <p className="font-semibold text-gray-900 text-sm">{course.students}</p>
-                </div>
-              )}
-              {course.level && (
-                <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-                  <TrendingUp size={20} className="text-red-600 mx-auto mb-2" />
-                  <p className="text-xs text-gray-500 mb-1">Level</p>
-                  <p className="font-semibold text-gray-900 text-sm">{course.level}</p>
-                </div>
-              )}
-            </div>
-            
-            {/* Prerequisites (if exists) */}
-            {course.prerequisites && (
-              <div className="mb-8 bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <Shield size={18} className="text-blue-600" />
-                  Prerequisites
-                </h3>
-                <p className="text-gray-700 text-sm">{course.prerequisites}</p>
-              </div>
-            )}
-            
-            {/* Learning Objectives (if exists) */}
-            {course.objectives && course.objectives.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Target size={20} className="text-red-600" />
-                  Learning Objectives
-                </h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {course.objectives.map((obj, idx) => (
-                    <motion.div 
-                      key={idx} 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md transition-all group"
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+function GovernmentCourseModal({ program, onClose, onRegister }) {
+  const scrollRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // --- Sticky "Ready to start?" CTA (mobile/tablet only) ---------------
+  const ctaRef = useRef(null);
+  const ctaSentinelRef = useRef(null);
+  const [isCtaStuck, setIsCtaStuck] = useState(false);
+  const [ctaFlowHeight, setCtaFlowHeight] = useState(0);
+  const STICKY_TOP_OFFSET = 12;
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const maxScroll = scrollHeight - clientHeight;
+    setScrollProgress(maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0);
+
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    if (isDesktop) {
+      setIsCtaStuck(false);
+      return;
+    }
+
+    const sentinel = ctaSentinelRef.current;
+    const container = scrollRef.current;
+    if (!sentinel || !container) return;
+
+    const sentinelTop = sentinel.getBoundingClientRect().top;
+    const containerTop = container.getBoundingClientRect().top;
+    setIsCtaStuck(sentinelTop - containerTop <= STICKY_TOP_OFFSET);
+  }, []);
+
+  useEffect(() => {
+    if (!program) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    el.scrollTop = 0;
+    handleScroll();
+
+    const nudgeTimer = setTimeout(() => {
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      const prefersReduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (maxScroll > 40 && !prefersReduced) {
+        el.scrollTo({ top: 60, behavior: "smooth" });
+        setTimeout(() => el.scrollTo({ top: 0, behavior: "smooth" }), 600);
+      }
+    }, 550);
+
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      clearTimeout(nudgeTimer);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [program, handleScroll]);
+
+  useEffect(() => {
+    const node = ctaRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      if (!isCtaStuck) {
+        const h = entries[0]?.contentRect?.height;
+        if (h) setCtaFlowHeight(h);
+      }
+    });
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [isCtaStuck]);
+
+  if (!program) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, y: 30, rotateX: 20 }}
+          animate={{ scale: 1, y: 0, rotateX: 0 }}
+          exit={{ scale: 0.9, y: 30, rotateX: 20 }}
+          transition={{ type: "spring", damping: 22, stiffness: 260 }}
+          onClick={e => e.stopPropagation()}
+          className="w-full max-w-6xl max-h-[92vh] bg-white rounded-2xl sm:rounded-3xl relative shadow-2xl ring-1 ring-black/5 overflow-hidden flex flex-col"
+        >
+          <style>{`
+            .course-modal-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: rgba(220,38,38,0.35) transparent;
+            }
+            .course-modal-scroll::-webkit-scrollbar {
+              width: 8px;
+            }
+            .course-modal-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .course-modal-scroll::-webkit-scrollbar-thumb {
+              background-color: rgba(220,38,38,0.25);
+              border-radius: 999px;
+              border: 2px solid transparent;
+              background-clip: padding-box;
+            }
+            .course-modal-scroll::-webkit-scrollbar-thumb:hover {
+              background-color: rgba(220,38,38,0.45);
+              background-clip: padding-box;
+            }
+          `}</style>
+
+          {/* Scroll progress bar */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gray-100/60 z-30 overflow-hidden">
+            <motion.div
+              className="h-full"
+              style={{ background: program.color || "#dc2626" }}
+              animate={{ width: `${scrollProgress}%` }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+            />
+          </div>
+
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="course-modal-scroll overflow-y-auto flex-1"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 p-5 sm:p-8">
+              {/* IMAGE — left column, top of the layout */}
+              <div className="lg:col-span-2 order-1">
+                <div
+                  className="relative w-full rounded-2xl overflow-hidden shadow-lg"
+                  style={{ aspectRatio: '3 / 2' }}
+                >
+                  <motion.img
+                    src={program.img}
+                    alt={program.title}
+                    className="w-full h-full object-cover"
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+
+                  <motion.button
+                    onClick={onClose}
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg hover:bg-white/25 transition-colors z-10"
+                  >
+                    <X size={16} className="text-white" />
+                  </motion.button>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex flex-wrap gap-2 items-center"
+                  >
+                    <span
+                      className="px-3 py-1 sm:py-1.5 rounded-full text-white text-xs font-bold shadow-lg"
+                      style={{ background: program.color || "#dc2626" }}
                     >
-                      <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-red-600 transition-colors">
-                        <CheckCircle size={14} className="text-red-600 group-hover:text-white transition-colors" />
-                      </div>
-                      <span className="text-sm text-gray-700 leading-relaxed">{obj}</span>
-                    </motion.div>
-                  ))}
+                      {program.duration}
+                    </span>
+                    {program.credits && (
+                      <span className="px-3 py-1 sm:py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-xs font-semibold">
+                        {program.credits}
+                      </span>
+                    )}
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 z-10"
+                  >
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1.5 sm:mb-2 drop-shadow-lg leading-tight">
+                      {program.title}
+                    </h2>
+                    <div className="flex flex-wrap gap-2 text-white/90 text-xs">
+                      <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <Clock size={12} /> {program.duration}
+                      </span>
+                      <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                        <Users size={12} /> {program.participants || '100+'} participants
+                      </span>
+                      {program.rating && (
+                        <span className="flex items-center gap-1 bg-black/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                          <Star size={12} fill="#fbbf24" stroke="none" /> {program.rating}
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
                 </div>
               </div>
-            )}
-            
-            {/* Learning Outcomes */}
-            {course.outcomes && course.outcomes.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Award size={20} className="text-red-600" />
-                  What You'll Learn
-                </h3>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {course.outcomes.map((outcome, idx) => (
-                    <motion.div 
-                      key={idx}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition-all"
-                    >
-                      <CheckCircle size={16} color={course.color} className="flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700 leading-relaxed">{outcome}</span>
-                    </motion.div>
-                  ))}
+
+              {/* SIDEBAR — right column */}
+              <div className="lg:col-span-1 lg:row-span-2 order-2">
+                <div className="lg:sticky lg:top-4 flex flex-col gap-5">
+                  {/* Key info stat grid */}
+                  <div className="order-2 lg:order-1 grid grid-cols-2 gap-3">
+                    {program.duration && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-1 lg:order-1 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Clock size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Duration</p>
+                        <p className="font-semibold text-gray-900 text-sm">{program.duration}</p>
+                      </motion.div>
+                    )}
+                    {program.participants && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-2 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Users size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Participants</p>
+                        <p className="font-semibold text-gray-900 text-sm">{program.participants}</p>
+                      </motion.div>
+                    )}
+                    {program.credits && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-3 lg:order-2 bg-gray-50 rounded-xl p-4 text-center border border-gray-100 hover:border-red-200 hover:shadow-md transition-all"
+                      >
+                        <Award size={20} className="text-red-600 mx-auto mb-2" />
+                        <p className="text-xs text-gray-500 mb-1">Credits</p>
+                        <p className="font-semibold text-gray-900 text-sm">{program.credits}</p>
+                      </motion.div>
+                    )}
+                    {program.level && (
+                      <motion.div
+                        whileHover={{ y: -3 }}
+                        className="order-4 lg:order-4 col-span-2 bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-4 text-center text-white shadow-lg"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <TrendingUp size={18} className="text-white/90" />
+                          <p className="text-xs text-white/85 mb-0.5 uppercase tracking-wide font-semibold">Level</p>
+                        </div>
+                        <p className="font-extrabold text-base drop-shadow-sm">{program.level}</p>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {program.prerequisites && (
+                    <div className="order-3 bg-blue-50 rounded-xl p-4 border border-blue-200">
+                      <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                        <Shield size={16} className="text-blue-600" />
+                        Prerequisites
+                      </h3>
+                      <p className="text-gray-700 text-sm">{program.prerequisites}</p>
+                    </div>
+                  )}
+
+                  {/* Program includes */}
+                  <div className="order-4 bg-gray-50 rounded-xl p-5 border border-gray-100">
+                    <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-sm">
+                      <CheckSquare size={16} className="text-red-600" />
+                      This Program Includes:
+                    </h3>
+                    <div className="space-y-2.5">
+                      {[
+                        "Certificate of Completion",
+                        "Hands-on Projects",
+                        "Industry Expert Instructors",
+                        "Lifetime Access to Materials",
+                        "Career Support & Guidance",
+                        "Community Access",
+                      ].map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                          <CheckCircle size={14} className="text-red-500 flex-shrink-0" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA Sentinel */}
+                  <div ref={ctaSentinelRef} className="order-1 lg:order-4 h-0 lg:hidden" aria-hidden="true" />
+
+                  {/* Spacer */}
+                  <motion.div
+                    aria-hidden="true"
+                    className="order-1 lg:order-4 lg:hidden"
+                    animate={{ height: isCtaStuck ? ctaFlowHeight : 0 }}
+                    transition={{ type: "spring", stiffness: 320, damping: 34 }}
+                    style={{ pointerEvents: "none" }}
+                  />
+
+                  {/* CTA card */}
+                  <motion.div
+                    ref={ctaRef}
+                    layout
+                    transition={{ layout: { type: "spring", stiffness: 320, damping: 34 } }}
+                    whileHover={!isCtaStuck ? { scale: 1.01 } : {}}
+                    className={`order-1 lg:order-4 overflow-hidden bg-gradient-to-br from-red-600 to-red-700 shadow-xl group z-20 ${
+                      isCtaStuck
+                        ? "absolute top-3 left-5 right-5 sm:left-8 sm:right-8 rounded-2xl py-4 px-5 lg:static lg:top-auto lg:left-auto lg:right-auto lg:rounded-2xl lg:p-6"
+                        : "relative rounded-2xl p-6"
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-white/10 -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    <div className="relative z-10">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {isCtaStuck ? (
+                          <motion.div
+                            key="compact"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center justify-between gap-4"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-[11px] text-red-100 font-semibold uppercase tracking-wide leading-none mb-1">
+                                Ready to start?
+                              </p>
+                              <h4 className="text-base font-bold text-white truncate leading-tight">
+                                {program.title}
+                              </h4>
+                            </div>
+                            <motion.button
+                              onClick={() => onRegister(program)}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="px-5 py-2.5 rounded-xl bg-white text-red-600 font-bold text-sm cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center justify-center gap-1.5 flex-shrink-0 group/btn"
+                            >
+                              Register
+                              <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                            </motion.button>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="full"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <h4 className="text-lg font-bold text-white mb-1">Ready to start?</h4>
+                            <p className="text-red-100 text-sm mb-4">Take the first step toward your career goals</p>
+                            <motion.button
+                              onClick={() => onRegister(program)}
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="w-full px-6 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center justify-center gap-2 group/btn"
+                            >
+                              Register Now
+                              <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                            </motion.button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
-            )}
-            
-            {/* Tools & Technologies */}
-            {course.tools && course.tools.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Cpu size={20} className="text-red-600" />
-                  Tools & Technologies Covered
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {course.tools.map((tool, idx) => (
-                    <motion.span
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: idx * 0.03 }}
-                      className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-100 hover:text-red-700 transition-all cursor-default"
-                    >
-                      {tool}
-                    </motion.span>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Suitable For / Target Audience */}
-            {course.suitableFor && (
-              <div className="mb-8 bg-gradient-to-r from-purple-50 to-white rounded-xl p-5 border border-purple-100">
-                <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                  <Users size={18} className="text-purple-600" />
-                  Target Audience
-                </h3>
-                <p className="text-gray-700 text-sm leading-relaxed">{course.suitableFor}</p>
-              </div>
-            )}
-            
-            {/* Course Includes Section */}
-            <div className="mb-8 bg-gray-50 rounded-xl p-5">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <CheckSquare size={18} className="text-red-600" />
-                This Course Includes:
-              </h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Certificate of Completion</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Hands-on Projects</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Industry Expert Instructors</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Lifetime Access to Materials</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Career Support & Guidance</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle size={14} className="text-red-500" />
-                  <span>Community Access</span>
-                </div>
+
+              {/* MAIN TEXT CONTENT */}
+              <div className="lg:col-span-2 order-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-8"
+                >
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <FileText size={20} className="text-red-600" />
+                    Program Overview
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {program.fullDesc || program.description}
+                  </p>
+                </motion.div>
+
+                {program.objectives && program.objectives.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Target size={20} className="text-red-600" />
+                      Learning Objectives
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {program.objectives.map((obj, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:shadow-md hover:bg-white transition-all group border border-transparent hover:border-red-100"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-red-600 transition-colors">
+                            <CheckCircle size={14} className="text-red-600 group-hover:text-white transition-colors" />
+                          </div>
+                          <span className="text-sm text-gray-700 leading-relaxed">{obj}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {program.outcomes && program.outcomes.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Award size={20} className="text-red-600" />
+                      What You'll Learn
+                    </h3>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {program.outcomes.map((outcome, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition-all"
+                        >
+                          <CheckCircle size={16} color={program.color || "#dc2626"} className="flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-gray-700 leading-relaxed">{outcome}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {program.tools && program.tools.length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <Cpu size={20} className="text-red-600" />
+                      Tools & Technologies Covered
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {program.tools.map((tool, idx) => (
+                        <motion.span
+                          key={idx}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: idx * 0.03 }}
+                          whileHover={{ scale: 1.08, y: -2 }}
+                          className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all cursor-default shadow-sm"
+                        >
+                          {tool}
+                        </motion.span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {program.suitableFor && (
+                  <div className="mb-2 bg-gradient-to-r from-purple-50 to-white rounded-xl p-5 border border-purple-100">
+                    <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                      <Users size={18} className="text-purple-600" />
+                      Target Audience
+                    </h3>
+                    <p className="text-gray-700 text-sm leading-relaxed">{program.suitableFor}</p>
+                  </div>
+                )}
               </div>
             </div>
-            
-            {/* CTA Section with 3D Hover Effect */}
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-700 p-8 shadow-xl"
-            >
-              <div className="absolute inset-0 bg-white/10 transform -skew-x-12 translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-2xl font-bold text-white mb-2">Ready to Start Your Journey?</h4>
-                  <p className="text-red-100">Enroll now and take the first step toward your career goals</p>
-                </div>
-                <motion.button 
-                  onClick={onRegister} 
-                  whileHover={{ scale: 1.05 }} 
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 group">
-                  Register Now 
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </motion.button>
-              </div>
-            </motion.div>
           </div>
         </motion.div>
       </motion.div>
@@ -2831,219 +3534,11 @@ function IndustryProgramsSection() {
 
       {/* PROGRAM DETAIL MODAL - Shows ALL course details first */}
       {/* PROGRAM DETAIL MODAL - WITH IMAGE */}
-<AnimatePresence>
-  {selectedProgram && (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[200] flex items-center justify-center p-5 bg-black/80 backdrop-blur-md"
-      onClick={() => setSelectedProgram(null)}>
-      <motion.div 
-        initial={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }} 
-        animate={{ scale: 1, y: 0, rotateX: 0, opacity: 1 }} 
-        exit={{ scale: 0.8, y: 50, rotateX: 25, opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        onClick={e => e.stopPropagation()} 
-        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl relative shadow-2xl"
-      >
-        {/* Hero Section WITH IMAGE */}
-        <div className="relative h-80 overflow-hidden rounded-t-3xl">
-          {/* Background Image */}
-          <motion.img
-            src={selectedProgram.img}
-            alt={selectedProgram.title}
-            className="w-full h-full object-cover"
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.6 }}
-          />
-          
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-          
-          {/* Floating badges */}
-          <div className="absolute top-6 left-6 flex gap-3 z-10">
-            <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
-              {selectedProgram.duration}
-            </span>
-            <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-sm font-semibold">
-              Hands-on Workshop
-            </span>
-          </div>
-          
-          {/* Close button */}
-          <button 
-            onClick={() => setSelectedProgram(null)} 
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/30 transition-all z-10"
-          >
-            <X size={18} className="text-white" />
-          </button>
-          
-          {/* Title overlay at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                <selectedProgram.icon size={24} className="text-white" />
-              </div>
-              <h2 className="text-3xl font-bold text-white">{selectedProgram.title}</h2>
-            </div>
-            <div className="flex items-center gap-4 text-white/90 text-sm">
-              <span className="flex items-center gap-1"><Clock size={14} /> {selectedProgram.duration}</span>
-              <span className="flex items-center gap-1"><Users size={14} /> {selectedProgram.participants || '100+'} participants trained</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="p-8">
-          {/* Description */}
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <div className="w-1 h-6 bg-red-600 rounded-full" />
-              Program Overview
-            </h3>
-            <p className="text-gray-600 leading-relaxed bg-gray-50 p-5 rounded-2xl">
-              {selectedProgram.fullDesc || selectedProgram.description}
-            </p>
-          </div>
-          
-          {/* What You'll Learn - Features */}
-          {selectedProgram.features && selectedProgram.features.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                <Target size={20} className="text-red-600" />
-                What You'll Learn
-              </h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {selectedProgram.features.map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <CheckCircle size={16} className="text-red-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Learning Objectives */}
-          {selectedProgram.objectives && selectedProgram.objectives.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                <Target size={20} className="text-red-600" />
-                Learning Objectives
-              </h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {selectedProgram.objectives.map((obj, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                    <CheckCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{obj}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Key Outcomes */}
-          {selectedProgram.outcomes && selectedProgram.outcomes.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                <Award size={20} className="text-red-600" />
-                Key Outcomes
-              </h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {selectedProgram.outcomes.map((out, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100">
-                    <Sparkles size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{out}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Tools & Technologies */}
-          {selectedProgram.tools && selectedProgram.tools.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                <Cpu size={20} className="text-red-600" />
-                Tools & Technologies Covered
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedProgram.tools.map((tool, idx) => (
-                  <span key={idx} className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-200">
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Target Audience */}
-          {selectedProgram.suitableFor && (
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2 text-lg">
-                <Users size={20} className="text-red-600" />
-                Target Audience
-              </h3>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
-                <p className="text-gray-700 leading-relaxed">{selectedProgram.suitableFor}</p>
-              </div>
-            </div>
-          )}
-          
-          {/* Info Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <Clock size={20} className="text-red-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500 mb-1">Duration</p>
-              <p className="font-semibold text-gray-900">{selectedProgram.duration}</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <Users size={20} className="text-red-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500 mb-1">Participants</p>
-              <p className="font-semibold text-gray-900">{selectedProgram.participants || '100+'}</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <Award size={20} className="text-red-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500 mb-1">Certification</p>
-              <p className="font-semibold text-gray-900">Certificate</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <Calendar size={20} className="text-red-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-500 mb-1">Format</p>
-              <p className="font-semibold text-gray-900">In-Person</p>
-            </div>
-          </div>
-          
-          {/* Registration CTA */}
-          <motion.div 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.3, type: 'spring' }}
-            className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-700 p-8 shadow-xl"
-          >
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div>
-                <h4 className="text-2xl font-bold text-white mb-2">Ready to Enroll?</h4>
-                <p className="text-red-100">Register now to secure your spot in this workshop</p>
-              </div>
-              <motion.button 
-                whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleRegisterClick(selectedProgram)}
-                className="px-8 py-3 rounded-xl bg-white text-red-600 font-bold cursor-pointer shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 group"
-              >
-                Register Now 
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+<GovernmentCourseModal 
+  program={selectedProgram} 
+  onClose={() => setSelectedProgram(null)} 
+  onRegister={(program) => handleRegisterClick(program)}
+/>
 
       {/* Registration Modal */}
       <AnimatePresence>
